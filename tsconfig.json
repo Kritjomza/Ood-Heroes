@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "references": [{ "path": "packages/game-core" }, { "path": "apps/client" }],
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  }
+}

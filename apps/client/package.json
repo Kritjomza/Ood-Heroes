@@ -1,0 +1,9 @@
+{
+  "name": "@odd-tower/client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@odd-tower/game-core": "*"
+  }
+}
