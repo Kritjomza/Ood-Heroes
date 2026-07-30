@@ -1,4 +1,4 @@
-import type { AutoHuntState, Direction, HeroRole, MonsterMode, Vector2 } from './types';
+import type { AutoHuntState, Direction, HeroRole, MonsterMode, Vector2 } from './types.js';
 export const distance = (a: Vector2, b: Vector2) => Math.hypot(a.x - b.x, a.y - b.y);
 export function calculateDamage(attack: number, defense: number, rng: () => number) {
   const base = Math.max(1, attack - defense * 0.5);

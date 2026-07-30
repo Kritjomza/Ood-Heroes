@@ -1,4 +1,4 @@
-import type { HeroRole } from './types';
+import type { HeroRole } from './types.js';
 export const WORLD = {
   tiles: 64,
   tileSize: 32,

@@ -1,6 +1,11 @@
 {
   "files": [],
-  "references": [{ "path": "packages/game-core" }, { "path": "apps/client" }],
+  "references": [
+    { "path": "packages/game-core" },
+    { "path": "packages/network-protocol" },
+    { "path": "apps/game-server" },
+    { "path": "apps/client" }
+  ],
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,

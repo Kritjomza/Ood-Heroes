@@ -5,6 +5,7 @@ test('loads one playable canvas and supports keyboard and Auto Hunt override', a
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
+  await page.getByRole('button', { name: 'Local Prototype' }).click();
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.getByTestId('hud')).toBeVisible();
   await page.getByRole('button', { name: /auto hunt/i }).click();
@@ -29,7 +30,9 @@ test('reload keeps one canvas and mobile controls avoid the primary actions', as
   page,
 }, testInfo) => {
   await page.goto('/');
+  await page.getByRole('button', { name: 'Local Prototype' }).click();
   await page.reload();
+  await page.getByRole('button', { name: 'Local Prototype' }).click();
   await expect(page.locator('canvas')).toHaveCount(1);
   if (testInfo.project.name === 'mobile-landscape') {
     const joystick = page.getByLabel('Movement joystick'),

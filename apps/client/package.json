@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@odd-tower/game-core": "*"
+    "@colyseus/sdk": "0.17.43",
+    "@odd-tower/game-core": "*",
+    "@odd-tower/network-protocol": "0.2.0"
   }
 }

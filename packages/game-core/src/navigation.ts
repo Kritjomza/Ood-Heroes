@@ -1,4 +1,4 @@
-import type { Grid, GridPoint } from './types';
+import type { Grid, GridPoint } from './types.js';
 const key = (p: GridPoint) => `${p.x},${p.y}`;
 export function findPath(grid: Grid, start: GridPoint, goal: GridPoint): GridPoint[] | null {
   if (!grid.isWalkable(start.x, start.y) || !grid.isWalkable(goal.x, goal.y)) return null;

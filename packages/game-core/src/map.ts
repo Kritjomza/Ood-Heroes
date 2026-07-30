@@ -1,5 +1,5 @@
-import { WORLD } from './config';
-import type { GridPoint, Vector2 } from './types';
+import { WORLD } from './config.js';
+import type { GridPoint, Vector2 } from './types.js';
 const blocked = new Set<string>();
 for (let i = 0; i < 64; i++) {
   blocked.add(`${i},0`);

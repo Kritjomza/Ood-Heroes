@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../../packages/game-core" },
+    { "path": "../../packages/network-protocol" }
+  ],
+  "include": ["src"]
+}

@@ -4,12 +4,20 @@ export default defineConfig({
   workers: 1,
   timeout: 30000,
   use: { baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure' },
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
+  webServer: [
+    {
+      command: 'npm run dev:server',
+      url: 'http://127.0.0.1:2567/health',
+      reuseExistingServer: true,
+      timeout: 120000,
+    },
+    {
+      command: 'npm run dev:client',
+      url: 'http://127.0.0.1:4173',
+      reuseExistingServer: true,
+      timeout: 120000,
+    },
+  ],
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     {
