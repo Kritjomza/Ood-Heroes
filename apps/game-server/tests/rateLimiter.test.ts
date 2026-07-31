@@ -29,4 +29,13 @@ describe('per-client rate limiting', () => {
     limiter.remove('a');
     expect(limiter.trackedClients).toBe(1);
   });
+
+  it('supports separate bounded focus and Auto Hunt command budgets', () => {
+    const focus = new ClientRateLimiter({ ratePerSecond: 8, burst: 8, disconnectThreshold: 5 });
+    const auto = new ClientRateLimiter({ ratePerSecond: 4, burst: 4, disconnectThreshold: 5 });
+    for (let index = 0; index < 8; index++) expect(focus.consume('a', 0)).toBe('accepted');
+    expect(focus.consume('a', 0)).toBe('dropped');
+    for (let index = 0; index < 4; index++) expect(auto.consume('a', 0)).toBe('accepted');
+    expect(auto.consume('a', 0)).toBe('dropped');
+  });
 });

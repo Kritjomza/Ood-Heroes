@@ -1,0 +1,13 @@
+id,kind,replacement_path,status
+hero.grilled_chicken,hero,/assets/final/hero/grilled_chicken.webp,programmatic-mock
+hero.pink_chocolate_lizard,hero,/assets/final/hero/pink_chocolate_lizard.webp,programmatic-mock
+hero.robot_jelly,hero,/assets/final/hero/robot_jelly.webp,programmatic-mock
+hero.tofu_rabbit,hero,/assets/final/hero/tofu_rabbit.webp,programmatic-mock
+hero.accountant_octopus,hero,/assets/final/hero/accountant_octopus.webp,programmatic-mock
+hero.samurai_bread,hero,/assets/final/hero/samurai_bread.webp,programmatic-mock
+currency.gold,currency,/assets/final/currency/gold.webp,programmatic-mock
+currency.gem,currency,/assets/final/currency/gem.webp,programmatic-mock
+currency.upgrade_jelly,currency,/assets/final/currency/upgrade_jelly.webp,programmatic-mock
+ui.home.tower,ui,/assets/final/ui/home/tower.webp,programmatic-mock
+summon.standard,summon,/assets/final/summon/standard.webp,programmatic-mock
+afk.chest,afk,/assets/final/afk/chest.webp,programmatic-mock

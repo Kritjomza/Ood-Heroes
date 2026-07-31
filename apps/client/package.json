@@ -6,6 +6,7 @@
   "dependencies": {
     "@colyseus/sdk": "0.17.43",
     "@odd-tower/game-core": "*",
-    "@odd-tower/network-protocol": "0.2.0"
+    "@odd-tower/network-protocol": "0.2.0",
+    "@supabase/supabase-js": "2.111.0"
   }
 }

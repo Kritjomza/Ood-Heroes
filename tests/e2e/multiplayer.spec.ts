@@ -2,8 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function openLobby(page: Page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Online Movement Sandbox' }).click();
-  await expect(page.getByRole('heading', { name: 'Online Movement Sandbox' })).toBeVisible();
+  await page.getByRole('button', { name: 'Online Shared Combat Sandbox' }).click();
+  await expect(page.getByRole('heading', { name: 'Online Shared Combat Sandbox' })).toBeVisible();
 }
 
 async function createRoom(page: Page, name: string) {
@@ -77,7 +77,7 @@ test('unknown code is rejected without creating a room', async ({ page }) => {
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 
-test('temporary network loss reconnects the same player without duplication', async ({
+test('temporary network loss during combat reconnects the same player in manual mode without duplication', async ({
   browser,
 }) => {
   test.setTimeout(90_000);
@@ -88,11 +88,23 @@ test('temporary network loss reconnects the same player without duplication', as
   const code = await createRoom(pageA, 'Anchor');
   await joinRoom(pageB, 'Returner', code);
   await expect(pageA.getByTestId('player-count')).toHaveText('2 / 10');
+  await pageB.getByRole('button', { name: 'Auto Hunt' }).click();
+  await expect(pageB.getByRole('button', { name: 'Auto Hunt' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 
   await contextB.setOffline(true);
   await expect(pageB.getByRole('status')).toContainText('Reconnecting');
   await contextB.setOffline(false);
-  await expect(pageB.getByText('connected', { exact: true })).toBeVisible({ timeout: 12_000 });
+  await expect(pageB.getByRole('region', { name: 'Online room status' })).toContainText(
+    'connected',
+    { timeout: 12_000 },
+  );
+  await expect(pageB.getByRole('button', { name: 'Auto Hunt' })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
   await expect(pageA.getByTestId('player-count')).toHaveText('2 / 10');
   await expect.poll(() => pageA.locator('#game-root').getAttribute('data-remote-teams')).toBe('1');
   await Promise.all([contextA.close(), contextB.close()]);
@@ -137,13 +149,13 @@ test('reload is lifecycle-safe and mobile controls do not overlap Leave Room', a
     await page.mouse.up();
   }
   await page.getByRole('button', { name: 'Leave Room' }).click();
-  await expect(page.getByRole('heading', { name: 'Online Movement Sandbox' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Online Shared Combat Sandbox' })).toBeVisible();
   await page.getByRole('button', { name: 'Create Room' }).click();
   await expect(page.locator('canvas')).toHaveCount(1);
   await page.reload();
   await expect(page.locator('canvas')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Online Movement Sandbox' })).toBeVisible();
-  await page.getByRole('button', { name: 'Online Movement Sandbox' }).click();
+  await expect(page.getByRole('button', { name: 'Online Shared Combat Sandbox' })).toBeVisible();
+  await page.getByRole('button', { name: 'Online Shared Combat Sandbox' }).click();
   await page.getByRole('button', { name: 'Create Room' }).click();
   await expect(page.locator('canvas')).toHaveCount(1);
   expect(errors).toEqual([]);

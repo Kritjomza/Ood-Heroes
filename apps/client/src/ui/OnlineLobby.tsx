@@ -18,10 +18,11 @@ export function OnlineLobby({
   const errorId = useId();
   return (
     <section className="menu-card online-lobby" aria-labelledby="online-title">
-      <p className="eyebrow">Phase 2</p>
-      <h1 id="online-title">Online Movement Sandbox</h1>
+      <p className="eyebrow">Phase 3</p>
+      <h1 id="online-title">Online Shared Combat Sandbox</h1>
       <p>
-        Movement and player presence are server-authoritative. Combat is available in Local mode.
+        Movement, monsters, combat, Auto Hunt, and temporary session rewards are
+        server-authoritative.
       </p>
       <div className="lobby-fields">
         <label>

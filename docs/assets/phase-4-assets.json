@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "policy": "Programmatic mocks only. Replace files behind stable Asset IDs without changing gameplay code.",
+  "assets": [
+    {
+      "id": "hero.grilled_chicken",
+      "kind": "hero",
+      "replacementPath": "/assets/final/hero/grilled_chicken.webp"
+    },
+    {
+      "id": "hero.pink_chocolate_lizard",
+      "kind": "hero",
+      "replacementPath": "/assets/final/hero/pink_chocolate_lizard.webp"
+    },
+    {
+      "id": "hero.robot_jelly",
+      "kind": "hero",
+      "replacementPath": "/assets/final/hero/robot_jelly.webp"
+    },
+    {
+      "id": "hero.tofu_rabbit",
+      "kind": "hero",
+      "replacementPath": "/assets/final/hero/tofu_rabbit.webp"
+    },
+    {
+      "id": "hero.accountant_octopus",
+      "kind": "hero",
+      "replacementPath": "/assets/final/hero/accountant_octopus.webp"
+    },
+    {
+      "id": "hero.samurai_bread",
+      "kind": "hero",
+      "replacementPath": "/assets/final/hero/samurai_bread.webp"
+    },
+    {
+      "id": "currency.gold",
+      "kind": "currency",
+      "replacementPath": "/assets/final/currency/gold.webp"
+    },
+    {
+      "id": "currency.gem",
+      "kind": "currency",
+      "replacementPath": "/assets/final/currency/gem.webp"
+    },
+    {
+      "id": "currency.upgrade_jelly",
+      "kind": "currency",
+      "replacementPath": "/assets/final/currency/upgrade_jelly.webp"
+    },
+    { "id": "ui.home.tower", "kind": "ui", "replacementPath": "/assets/final/ui/home/tower.webp" },
+    {
+      "id": "summon.standard",
+      "kind": "summon",
+      "replacementPath": "/assets/final/summon/standard.webp"
+    },
+    { "id": "afk.chest", "kind": "afk", "replacementPath": "/assets/final/afk/chest.webp" }
+  ]
+}

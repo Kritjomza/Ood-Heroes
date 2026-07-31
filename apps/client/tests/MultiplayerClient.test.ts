@@ -83,7 +83,7 @@ describe('MultiplayerClient lifecycle', () => {
     await client.createRoom(' Player ');
     expect(sdk.joinById).toHaveBeenCalledWith('room-1', {
       displayName: 'Player',
-      protocolVersion: 2,
+      protocolVersion: 4,
     });
     expect(bridge.state).toMatchObject({ connection: 'connected', roomCode: 'ABC234' });
 

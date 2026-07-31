@@ -7,6 +7,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run dev:server',
+      env: { ODD_TOWER_TEST_MODE: '1' },
       url: 'http://127.0.0.1:2567/health',
       reuseExistingServer: true,
       timeout: 120000,

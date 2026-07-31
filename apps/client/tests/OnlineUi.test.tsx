@@ -6,12 +6,12 @@ import { OnlineLobby } from '../src/ui/OnlineLobby';
 import { initialMultiplayerState } from '../src/game/multiplayer/MultiplayerBridge';
 
 describe('online mode UI', () => {
-  it('offers explicit Local Prototype and Online Movement Sandbox modes', () => {
+  it('offers explicit Local Prototype and Online Shared Combat Sandbox modes', () => {
     const local = vi.fn();
     const online = vi.fn();
     render(<ModeSelection onLocal={local} onOnline={online} />);
     fireEvent.click(screen.getByRole('button', { name: 'Local Prototype' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Online Movement Sandbox' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Online Shared Combat Sandbox' }));
     expect(local).toHaveBeenCalledOnce();
     expect(online).toHaveBeenCalledOnce();
   });
@@ -51,6 +51,7 @@ describe('online mode UI', () => {
           latencyMs: 42,
         }}
         onLeave={leave}
+        onToggleAutoHunt={() => {}}
       />,
     );
     expect(screen.getByText('3 / 10')).toBeInTheDocument();
@@ -64,8 +65,112 @@ describe('online mode UI', () => {
       <OnlineHud
         state={{ ...initialMultiplayerState, connection: 'reconnecting' }}
         onLeave={() => {}}
+        onToggleAutoHunt={() => {}}
       />,
     );
     expect(screen.getByRole('status')).toHaveTextContent('Reconnecting');
+  });
+
+  it('labels temporary progression and sends one accessible Auto Hunt toggle', () => {
+    const toggle = vi.fn();
+    render(
+      <OnlineHud
+        state={{
+          ...initialMultiplayerState,
+          connection: 'connected',
+          sessionGold: 9,
+          autoHuntState: 'engaging',
+          heroes: [
+            {
+              id: 'p:fighter',
+              role: 'fighter',
+              level: 3,
+              experience: 20,
+              nextExperience: 220,
+              currentHp: 90,
+              maxHp: 130,
+              status: 'alive',
+            },
+          ],
+        }}
+        onLeave={() => {}}
+        onToggleAutoHunt={toggle}
+      />,
+    );
+    expect(screen.getByText(/online combat progress is temporary/i)).toBeInTheDocument();
+    expect(screen.getByText(/Session Gold: 9/i)).toBeInTheDocument();
+    expect(screen.getByText(/Session Level 3/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /auto hunt/i }));
+    expect(toggle).toHaveBeenCalledOnce();
+  });
+
+  it('shows playful but explicit combat status and a server-authoritative wipe countdown', () => {
+    const view = render(
+      <OnlineHud
+        state={{
+          ...initialMultiplayerState,
+          connection: 'connected',
+          autoHuntEnabled: true,
+          autoHuntState: 'retreating',
+          respawnSeconds: 0,
+        }}
+        onLeave={() => {}}
+        onToggleAutoHunt={() => {}}
+      />,
+    );
+    expect(screen.getByRole('status', { name: 'Combat status' })).toHaveTextContent(
+      'Strategic running away',
+    );
+    expect(screen.getByRole('button', { name: 'Auto Hunt' })).toHaveTextContent('RETREATING');
+    view.rerender(
+      <OnlineHud
+        state={{ ...initialMultiplayerState, connection: 'connected', respawnSeconds: 5 }}
+        onLeave={() => {}}
+        onToggleAutoHunt={() => {}}
+      />,
+    );
+    expect(screen.getByRole('dialog', { name: 'Team respawn' })).toHaveTextContent(
+      'The squad became floor decorations',
+    );
+    expect(screen.getByRole('dialog', { name: 'Team respawn' })).toHaveTextContent(
+      'Respawning in 5',
+    );
+  });
+
+  it('uses text as well as color for defeated and slowed hero states', () => {
+    render(
+      <OnlineHud
+        state={{
+          ...initialMultiplayerState,
+          heroes: [
+            {
+              id: 'p:tank',
+              role: 'tank',
+              level: 1,
+              experience: 0,
+              nextExperience: 50,
+              currentHp: 30,
+              maxHp: 100,
+              status: 'alive',
+              slowed: true,
+            },
+            {
+              id: 'p:support',
+              role: 'support',
+              level: 1,
+              experience: 0,
+              nextExperience: 50,
+              currentHp: 0,
+              maxHp: 80,
+              status: 'defeated',
+            },
+          ],
+        }}
+        onLeave={() => {}}
+        onToggleAutoHunt={() => {}}
+      />,
+    );
+    expect(screen.getByText('Slowed')).toBeInTheDocument();
+    expect(screen.getByText('Defeated')).toBeInTheDocument();
   });
 });

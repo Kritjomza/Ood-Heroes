@@ -1,0 +1,14 @@
+:root {
+  --p-cream: #fff8e8;
+  --p-paper: #fffdf7;
+  --p-ink: #3b3434;
+  --p-chocolate: #684338;
+  --p-pink: #ffb6c8;
+  --p-peach: #ffbd91;
+  --p-yellow: #ffe58a;
+  --p-mint: #b8ead5;
+  --p-sky: #b8def3;
+  --p-purple: #d9c5ef;
+  --p-danger: #a33c48;
+  --p-shadow: 0 7px 0 #684338, 0 16px 32px rgb(68 42 33 / 18%);
+}

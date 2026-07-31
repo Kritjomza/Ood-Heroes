@@ -2,7 +2,8 @@ import { moveCardinal, prototypeMap, type Vector2 } from '@odd-tower/game-core';
 import {
   NETWORK_CONFIG,
   type CardinalDirection,
-  type ClientCommand,
+  type ClientHeartbeatCommand,
+  type ClientMoveCommand,
   type NetworkPlayerState,
 } from '@odd-tower/network-protocol';
 
@@ -37,7 +38,7 @@ export function createSimulationPlayer(
 
 export function acceptPlayerCommand(
   player: SimulationPlayer,
-  command: ClientCommand,
+  command: ClientMoveCommand | ClientHeartbeatCommand,
   receivedAtMs: number,
 ): 'accepted' | 'stale' | 'jump' {
   if (command.sequence <= player.latestAcceptedSequence) return 'stale';

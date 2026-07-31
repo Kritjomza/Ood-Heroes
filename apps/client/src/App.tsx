@@ -11,11 +11,13 @@ import { Joystick } from './ui/Joystick';
 import { ModeSelection } from './ui/ModeSelection';
 import { OnlineHud } from './ui/OnlineHud';
 import { OnlineLobby } from './ui/OnlineLobby';
+import { PersistentShell } from './ui/persistent/PersistentShell';
+import { authConfigured } from './persistence/auth-client';
 
-type Mode = 'selection' | 'local' | 'online-lobby' | 'online-room';
+type Mode = 'persistent' | 'selection' | 'local' | 'online-lobby' | 'online-room';
 
 export function App() {
-  const [mode, setMode] = useState<Mode>('selection');
+  const [mode, setMode] = useState<Mode>(() => (authConfigured() ? 'persistent' : 'selection'));
   const bridge = useRef(new MultiplayerBridge()).current;
   const client = useRef(new MultiplayerClient(bridge)).current;
   const [networkState, setNetworkState] = useState(initialMultiplayerState);
@@ -37,13 +39,21 @@ export function App() {
     setMode('online-lobby');
   };
 
+  if (mode === 'persistent')
+    return (
+      <PersistentShell
+        onPlayLocal={() => setMode('local')}
+        onPlayOnline={() => setMode('online-lobby')}
+      />
+    );
   if (mode === 'selection')
     return (
       <main className="menu-shell">
         <ModeSelection onLocal={() => setMode('local')} onOnline={() => setMode('online-lobby')} />
       </main>
     );
-  if (mode === 'local') return <LocalMode onBack={() => setMode('selection')} />;
+  if (mode === 'local')
+    return <LocalMode onBack={() => setMode(authConfigured() ? 'persistent' : 'selection')} />;
   if (mode === 'online-lobby')
     return (
       <main className="menu-shell">
@@ -54,7 +64,7 @@ export function App() {
           onJoin={(name, code) => void connect(() => client.joinRoom(name, code))}
           onBack={() => {
             bridge.reset();
-            setMode('selection');
+            setMode(authConfigured() ? 'persistent' : 'selection');
           }}
         />
       </main>
@@ -142,7 +152,11 @@ function OnlineMode({
   return (
     <main>
       <div id="game-root" ref={mount} />
-      <OnlineHud state={state} onLeave={onLeave} />
+      <OnlineHud
+        state={state}
+        onLeave={onLeave}
+        onToggleAutoHunt={() => client.setAutoHunt(!state.autoHuntEnabled)}
+      />
       <Joystick onDirection={mobile} />
     </main>
   );

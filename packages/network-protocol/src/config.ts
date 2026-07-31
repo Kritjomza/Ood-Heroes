@@ -1,4 +1,4 @@
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 4;
 export const NETWORK_CONFIG = {
   simulationHz: 20,
   tickMs: 50,
@@ -21,6 +21,11 @@ export const NETWORK_CONFIG = {
   pingIntervalMs: 1000,
   maxLatencySamples: 10,
   roomCapacity: 10,
+  maxEntityIdLength: 64,
+  maxCombatEvents: 128,
+  maxClientEventIds: 256,
+  focusRatePerSecond: 8,
+  autoHuntRatePerSecond: 4,
 } as const;
 
 export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';

@@ -4,3 +4,8 @@ export * from './rules.js';
 export * from './navigation.js';
 export * from './map.js';
 export * from './movement.js';
+export * from './combat-config.js';
+export * from './combat.js';
+export * from './hero-definitions.js';
+export * from './progression.js';
+export * from './persistent-rules.js';

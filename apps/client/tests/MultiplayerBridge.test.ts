@@ -27,4 +27,59 @@ describe('MultiplayerBridge', () => {
     bridge.reset();
     expect(bridge.state).toEqual(initialMultiplayerState);
   });
+
+  it('publishes server-owned session combat state without per-frame mutation', () => {
+    const bridge = new MultiplayerBridge();
+    bridge.update({
+      sessionGold: 12,
+      autoHuntEnabled: true,
+      autoHuntState: 'navigating',
+      focusedMonsterName: 'Grumpy Radish',
+      livingHeroes: 2,
+      respawnSeconds: 4,
+      heroes: [
+        {
+          id: 'p:fighter',
+          role: 'fighter',
+          level: 2,
+          experience: 3,
+          nextExperience: 127,
+          currentHp: 80,
+          maxHp: 121,
+          status: 'alive',
+        },
+      ],
+    });
+    expect(bridge.state).toMatchObject({
+      sessionGold: 12,
+      autoHuntEnabled: true,
+      autoHuntState: 'navigating',
+      focusedMonsterName: 'Grumpy Radish',
+      livingHeroes: 2,
+      respawnSeconds: 4,
+    });
+  });
+
+  it('does not notify React when a server patch has no visible state change', () => {
+    const bridge = new MultiplayerBridge();
+    const listener = vi.fn();
+    bridge.subscribe(listener);
+    const heroes = [
+      {
+        id: 'p:fighter',
+        role: 'fighter' as const,
+        level: 1,
+        experience: 0,
+        nextExperience: 50,
+        currentHp: 100,
+        maxHp: 100,
+        status: 'alive' as const,
+      },
+    ];
+    bridge.update({ connection: 'connected', heroes });
+    bridge.update({ connection: 'connected', heroes: heroes.map((hero) => ({ ...hero })) });
+    expect(listener).toHaveBeenCalledTimes(2);
+    bridge.update({ heroes: [{ ...heroes[0]!, currentHp: 90 }] });
+    expect(listener).toHaveBeenCalledTimes(3);
+  });
 });

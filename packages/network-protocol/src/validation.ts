@@ -1,5 +1,12 @@
 import { PROTOCOL_VERSION, ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH } from './config.js';
-import type { CardinalDirection, ClientCommand, JoinOptions, ValidationResult } from './types.js';
+import type {
+  CardinalDirection,
+  ClientCommand,
+  CombatEvent,
+  CombatEventType,
+  JoinOptions,
+  ValidationResult,
+} from './types.js';
 
 const directions = new Set<CardinalDirection>(['up', 'down', 'left', 'right', 'none']);
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -8,12 +15,56 @@ const isSequence = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value);
+const isBoundedId = (value: unknown): value is string =>
+  typeof value === 'string' &&
+  value.length >= 1 &&
+  value.length <= 64 &&
+  ![...value].some((character) => {
+    const point = character.codePointAt(0)!;
+    return point <= 31 || point === 127;
+  });
+const combatEventTypes = new Set<CombatEventType>([
+  'hero-attack',
+  'monster-attack',
+  'damage',
+  'monster-heal',
+  'slow-applied',
+  'charge-warning',
+  'charge-impact',
+  'monster-defeated',
+  'reward-granted',
+  'hero-defeated',
+  'hero-revived',
+  'team-wipe',
+  'team-respawn',
+  'hero-level-up',
+]);
 
 export function validateClientCommand(
   value: unknown,
 ): ValidationResult<ClientCommand, 'INVALID_COMMAND'> {
-  if (!isObject(value) || !isSequence(value.sequence) || !isFiniteNumber(value.clientSentAtMs))
+  if (!isObject(value) || !isFiniteNumber(value.clientSentAtMs))
     return { ok: false, code: 'INVALID_COMMAND' };
+  if (value.type === 'focus-target') {
+    if (value.targetMonsterId !== null && !isBoundedId(value.targetMonsterId))
+      return { ok: false, code: 'INVALID_COMMAND' };
+    return {
+      ok: true,
+      value: {
+        type: 'focus-target',
+        targetMonsterId: value.targetMonsterId,
+        clientSentAtMs: value.clientSentAtMs,
+      },
+    };
+  }
+  if (value.type === 'auto-hunt') {
+    if (typeof value.enabled !== 'boolean') return { ok: false, code: 'INVALID_COMMAND' };
+    return {
+      ok: true,
+      value: { type: 'auto-hunt', enabled: value.enabled, clientSentAtMs: value.clientSentAtMs },
+    };
+  }
+  if (!isSequence(value.sequence)) return { ok: false, code: 'INVALID_COMMAND' };
   if (value.type === 'heartbeat')
     return {
       ok: true,
@@ -30,6 +81,24 @@ export function validateClientCommand(
       clientSentAtMs: value.clientSentAtMs,
     },
   };
+}
+
+export function validateCombatEvent(
+  value: unknown,
+): ValidationResult<CombatEvent, 'INVALID_COMMAND'> {
+  if (
+    !isObject(value) ||
+    !isBoundedId(value.id) ||
+    !isSequence(value.tick) ||
+    !combatEventTypes.has(value.type as CombatEventType)
+  )
+    return { ok: false, code: 'INVALID_COMMAND' };
+  for (const field of ['sourceId', 'targetId', 'playerId'] as const)
+    if (value[field] !== undefined && !isBoundedId(value[field]))
+      return { ok: false, code: 'INVALID_COMMAND' };
+  if (value.amount !== undefined && !isFiniteNumber(value.amount))
+    return { ok: false, code: 'INVALID_COMMAND' };
+  return { ok: true, value: value as CombatEvent };
 }
 
 export function normalizeRoomCode(value: unknown): ValidationResult<string, 'INVALID_ROOM_CODE'> {

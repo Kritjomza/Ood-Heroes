@@ -1,0 +1,20 @@
+:root {
+  --color-cream: #fff8e8;
+  --color-peach: #ffb58a;
+  --color-pink: #ff8eb8;
+  --color-yellow: #ffd75e;
+  --color-mint: #8ee0ba;
+  --color-sky: #8fd3ff;
+  --color-lavender: #b9a4ff;
+  --color-chocolate: #62463b;
+  --color-ink: #3b3434;
+  --color-danger: #d83f4e;
+  --color-success: #397d52;
+  --color-panel: rgb(255 248 232 / 94%);
+  --cartoon-outline: 3px solid var(--color-chocolate);
+  --radius-squishy: 20px;
+  --shadow-sticker: 0 5px 0 rgb(98 70 59 / 38%);
+  --motion-pop: 180ms;
+  --layer-hud: 7;
+  --layer-overlay: 20;
+}

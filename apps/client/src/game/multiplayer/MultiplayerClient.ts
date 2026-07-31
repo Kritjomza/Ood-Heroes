@@ -2,21 +2,34 @@ import { ColyseusSDK, type Room } from '@colyseus/sdk';
 import {
   NETWORK_CONFIG,
   PROTOCOL_VERSION,
+  validateCombatEvent,
   normalizeDisplayName,
   normalizeRoomCode,
   type CardinalDirection,
   type NetworkPlayerState,
+  type NetworkMonsterState,
+  type NetworkPlayerCombatState,
   type RoomSummary,
+  type CombatEvent,
 } from '@odd-tower/network-protocol';
 import type { Vector2 } from '@odd-tower/game-core';
 import { MultiplayerBridge } from './MultiplayerBridge';
 import { RemoteInterpolator } from './interpolation';
 import { PredictionController } from './prediction';
+import { CombatEventDeduplicator } from './combatEvents';
+import { authConfigured, getAuthClient } from '../../persistence/auth-client';
 
 type NetworkRoomState = RoomSummary & {
   players?: Map<string, NetworkPlayerState> & {
     forEach(callback: (value: NetworkPlayerState, key: string) => void): void;
   };
+  monsters?: Map<string, NetworkMonsterState> & {
+    forEach(callback: (value: NetworkMonsterState, key: string) => void): void;
+  };
+  combatPlayers?: Map<string, NetworkPlayerCombatState> & {
+    forEach(callback: (value: NetworkPlayerCombatState, key: string) => void): void;
+  };
+  serverTick?: number;
 };
 
 type Dependencies = {
@@ -24,6 +37,7 @@ type Dependencies = {
   createSdk: (url: string) => ColyseusSDK;
   wsUrl: string;
   httpUrl: string;
+  tokenProvider: () => Promise<string | null>;
 };
 
 const defaults: Dependencies = {
@@ -31,6 +45,11 @@ const defaults: Dependencies = {
   createSdk: (url) => new ColyseusSDK(url),
   wsUrl: import.meta.env.VITE_GAME_SERVER_URL ?? 'ws://127.0.0.1:2567',
   httpUrl: import.meta.env.VITE_GAME_SERVER_HTTP_URL ?? 'http://127.0.0.1:2567',
+  tokenProvider: async () => {
+    if (!authConfigured()) return null;
+    const { data } = await getAuthClient().auth.getSession();
+    return data.session?.access_token ?? null;
+  },
 };
 
 export class MultiplayerClient {
@@ -46,6 +65,8 @@ export class MultiplayerClient {
   private leaving = false;
   private connecting = false;
   private hardCorrection = false;
+  private readonly combatEventDedupe = new CombatEventDeduplicator();
+  private readonly combatEventListeners = new Set<(event: CombatEvent) => void>();
 
   constructor(
     private readonly bridge: MultiplayerBridge,
@@ -80,6 +101,20 @@ export class MultiplayerClient {
     this.sendMove();
   }
 
+  setFocusTarget(targetMonsterId: string | null) {
+    if (!this.room) return;
+    this.room.send('command', {
+      type: 'focus-target',
+      targetMonsterId,
+      clientSentAtMs: Date.now(),
+    });
+  }
+
+  setAutoHunt(enabled: boolean) {
+    if (!this.room) return;
+    this.room.send('command', { type: 'auto-hunt', enabled, clientSentAtMs: Date.now() });
+  }
+
   getLocalPosition(): Vector2 | null {
     return this.prediction?.position ?? null;
   }
@@ -102,6 +137,28 @@ export class MultiplayerClient {
     return this.currentPlayers().get(playerId);
   }
 
+  monsterIds() {
+    return [...(this.room?.state.monsters?.keys() ?? [])];
+  }
+  currentMonster(monsterId: string) {
+    return this.room?.state.monsters?.get(monsterId);
+  }
+  currentCombatPlayer(playerId: string) {
+    return this.room?.state.combatPlayers?.get(playerId);
+  }
+  autoHuntTargetId() {
+    const value = this.room?.state.combatPlayers?.get(this.localPlayerId)?.autoHuntTargetMonsterId;
+    return value || null;
+  }
+  focusedMonsterId() {
+    const value = this.room?.state.combatPlayers?.get(this.localPlayerId)?.focusedMonsterId;
+    return value || null;
+  }
+  onCombatEvent(listener: (event: CombatEvent) => void) {
+    this.combatEventListeners.add(listener);
+    return () => this.combatEventListeners.delete(listener);
+  }
+
   async leave() {
     this.leaving = true;
     this.stopTimers();
@@ -110,6 +167,8 @@ export class MultiplayerClient {
     this.prediction?.disconnect();
     this.prediction = null;
     this.interpolation.clear();
+    this.combatEventDedupe.clear();
+    this.combatEventListeners.clear();
     try {
       if (room) await room.leave(true);
     } finally {
@@ -127,12 +186,15 @@ export class MultiplayerClient {
     this.connecting = true;
     this.bridge.update({ connection: 'connecting', displayName, error: '' });
     try {
-      const summary = await this.requestRoom(method, path);
+      const accessToken = await this.dependencies.tokenProvider();
+      const summary = await this.requestRoom(method, path, accessToken);
       this.sdk = this.dependencies.createSdk(this.dependencies.wsUrl);
-      const room = await this.sdk.joinById<NetworkRoomState>(summary.roomId, {
-        displayName,
-        protocolVersion: PROTOCOL_VERSION,
-      });
+      const room = await this.sdk.joinById<NetworkRoomState>(
+        summary.roomId,
+        accessToken
+          ? { accessToken, protocolVersion: PROTOCOL_VERSION }
+          : { displayName, protocolVersion: PROTOCOL_VERSION },
+      );
       this.attachRoom(room);
       await this.waitForInitialState(room);
       this.consumeState(room.state);
@@ -216,6 +278,11 @@ export class MultiplayerClient {
       if (message?.code === 'RATE_LIMITED')
         this.bridge.update({ error: 'Movement input is being sent too quickly.' });
     });
+    room.onMessage<unknown>('combat-event', (message) => {
+      const result = validateCombatEvent(message);
+      if (!result.ok || !this.combatEventDedupe.accept(result.value.id)) return;
+      for (const listener of this.combatEventListeners) listener(result.value);
+    });
   }
 
   private consumeState(state: NetworkRoomState, reconnect = false) {
@@ -250,6 +317,34 @@ export class MultiplayerClient {
     });
     for (const id of this.interpolation.playerIds())
       if (!seen.has(id)) this.interpolation.remove(id);
+    const combat = state.combatPlayers?.get(this.localPlayerId);
+    if (combat) {
+      const focused = combat.focusedMonsterId || null;
+      const focusedName = focused ? (state.monsters?.get(focused)?.name ?? focused) : 'None';
+      const respawnSeconds =
+        combat.teamRespawnAtTick !== null && combat.teamRespawnAtTick >= 0
+          ? Math.max(0, Math.ceil((combat.teamRespawnAtTick - (state.serverTick ?? 0)) / 20))
+          : 0;
+      this.bridge.update({
+        sessionGold: combat.sessionGold,
+        heroes: [...combat.heroes].map((hero) => ({
+          id: hero.id,
+          role: hero.role,
+          level: hero.level,
+          experience: hero.experience,
+          nextExperience: hero.nextExperience,
+          currentHp: hero.currentHp,
+          maxHp: hero.maxHp,
+          status: hero.status,
+          slowed: [...hero.statusEffects].some((effect) => effect.type === 'movement-slow'),
+        })),
+        autoHuntEnabled: combat.autoHuntEnabled,
+        autoHuntState: combat.autoHuntState,
+        focusedMonsterName: focusedName,
+        livingHeroes: [...combat.heroes].filter((hero) => hero.status === 'alive').length,
+        respawnSeconds,
+      });
+    }
     if (
       this.bridge.state.roomCode !== state.roomCode ||
       this.bridge.state.playerCount !== state.playerCount ||
@@ -330,13 +425,19 @@ export class MultiplayerClient {
     return name.value;
   }
 
-  private async requestRoom(method: 'GET' | 'POST', path: string): Promise<RoomSummary> {
+  private async requestRoom(
+    method: 'GET' | 'POST',
+    path: string,
+    accessToken: string | null,
+  ): Promise<RoomSummary> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8_000);
     try {
-      const response = await this.dependencies.fetcher(`${this.dependencies.httpUrl}${path}`, {
+      const route = accessToken ? `/api${path}` : path;
+      const response = await this.dependencies.fetcher(`${this.dependencies.httpUrl}${route}`, {
         method,
         signal: controller.signal,
+        headers: accessToken ? { authorization: `Bearer ${accessToken}` } : {},
       });
       const body = (await response.json()) as Partial<RoomSummary> & { message?: string };
       if (!response.ok) throw new Error(body.message ?? 'The lobby request failed.');
