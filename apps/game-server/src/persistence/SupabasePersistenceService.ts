@@ -22,8 +22,12 @@ export class SupabasePersistenceService implements PlayerPersistenceService {
     });
   }
 
-  bootstrap(userId: string) {
-    return this.#bootstrapRpc('get_player_bootstrap', { p_user_id: userId });
+  async bootstrap(userId: string) {
+    const data = await this.#rpc('get_player_bootstrap', { p_user_id: userId });
+    if (data === null) throw new DomainError('PROFILE_NOT_FOUND');
+    const validated = validatePlayerBootstrap(data);
+    if (!validated.ok) throw new DomainError(validated.code, 503);
+    return validated.value;
   }
 
   updateProfile(userId: string, displayName: string, accountKind: 'guest' | 'permanent') {

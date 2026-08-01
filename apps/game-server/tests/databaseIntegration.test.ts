@@ -1,5 +1,6 @@
 // @vitest-environment node
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@odd-tower/network-protocol';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { SupabasePersistenceService } from '../src/persistence/SupabasePersistenceService';
 
@@ -11,6 +12,7 @@ const configured = Boolean(
 const suite = configured ? describe : describe.skip;
 const userId = crypto.randomUUID();
 let service: SupabasePersistenceService;
+let admin: SupabaseClient<Database>;
 
 suite('local Supabase persistence integration', () => {
   beforeAll(async () => {
@@ -20,7 +22,7 @@ suite('local Supabase persistence integration', () => {
       secretKey: process.env.SUPABASE_SECRET_KEY!,
       issuer: `${process.env.SUPABASE_URL!}/auth/v1`,
     };
-    const admin = createClient(config.url, config.secretKey, {
+    admin = createClient<Database>(config.url, config.secretKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { error } = await admin.auth.admin.createUser({
@@ -70,5 +72,29 @@ suite('local Supabase persistence integration', () => {
       p_idempotency_key: crypto.randomUUID(),
     });
     expect(error).not.toBeNull();
+  });
+
+  it('repairs incomplete player aggregate state idempotently', async () => {
+    await service.initialize(userId, 'Database Oddity', 'permanent');
+    const team = await admin
+      .from('player_teams')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .single();
+    if (team.error) throw team.error;
+    const deletions = await Promise.all([
+      admin.from('player_currencies').delete().eq('user_id', userId).eq('currency_code', 'gold'),
+      admin.from('team_members').delete().eq('team_id', team.data.id),
+      admin.from('player_summon_state').delete().eq('user_id', userId),
+      admin.from('afk_state').delete().eq('user_id', userId),
+    ]);
+    for (const deletion of deletions) if (deletion.error) throw deletion.error;
+
+    const repaired = await service.initialize(userId, 'Ignored Name', 'permanent');
+
+    expect(repaired.currencies).toEqual({ gold: 500, gem: 200, upgradeJelly: 0 });
+    expect(repaired.activeTeam.slots).toHaveLength(1);
+    expect(repaired.banner.id).toBe('standard_odd_heroes');
   });
 });

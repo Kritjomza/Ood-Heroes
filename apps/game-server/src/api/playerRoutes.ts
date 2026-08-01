@@ -13,28 +13,45 @@ type Dependencies = {
   persistence: PlayerPersistenceService;
   activeUsers: ActiveUserRegistry;
   health: PersistenceHealth;
+  logBootstrapFailure?: (failure: BootstrapFailure) => void;
+};
+
+type BootstrapFailure = {
+  requestId: string;
+  stage: 'initialize' | 'load';
+  code: string;
 };
 
 export function createPlayerRouter(dependencies: Dependencies) {
   const router = express.Router();
   const limiter = new ApiRateLimiter();
+  const logBootstrapFailure =
+    dependencies.logBootstrapFailure ??
+    ((failure: BootstrapFailure) =>
+      console.error(JSON.stringify({ event: 'player_bootstrap_failed', ...failure })));
   router.use(authMiddleware(dependencies.authVerifier), limiter.middleware);
 
   router.post(
     '/bootstrap',
-    route(async (request) => {
-      const displayName = request.body?.displayName;
-      if (typeof displayName !== 'string') throw new DomainError('DISPLAY_NAME_INVALID', 400);
-      return dependencies.persistence.initialize(
-        identity(request).userId,
-        displayName,
-        identity(request).accountKind,
-      );
-    }),
+    route(
+      async (request) => {
+        const displayName = request.body?.displayName;
+        if (typeof displayName !== 'string') throw new DomainError('DISPLAY_NAME_INVALID', 400);
+        return dependencies.persistence.initialize(
+          identity(request).userId,
+          displayName,
+          identity(request).accountKind,
+        );
+      },
+      { failureStage: 'initialize', logBootstrapFailure },
+    ),
   );
   router.get(
     '/bootstrap',
-    route((request) => dependencies.persistence.bootstrap(identity(request).userId)),
+    route((request) => dependencies.persistence.bootstrap(identity(request).userId), {
+      failureStage: 'load',
+      logBootstrapFailure,
+    }),
   );
   router.patch(
     '/profile',
@@ -124,13 +141,24 @@ function mutationRoute(
   });
 }
 
-function route(operation: (request: AuthenticatedRequest) => Promise<unknown>) {
+function route(
+  operation: (request: AuthenticatedRequest) => Promise<unknown>,
+  failureLogging?: {
+    failureStage: BootstrapFailure['stage'];
+    logBootstrapFailure: (failure: BootstrapFailure) => void;
+  },
+) {
   return async (request: AuthenticatedRequest, response: Response) => {
     try {
       const data = await operation(request);
       response.json({ data, requestId: response.locals.requestId });
     } catch (caught) {
       const error = mapPersistenceError(caught);
+      failureLogging?.logBootstrapFailure({
+        requestId: response.locals.requestId,
+        stage: failureLogging.failureStage,
+        code: error.code,
+      });
       response.status(error.status).json({
         error: {
           code: error.code,

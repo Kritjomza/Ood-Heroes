@@ -1,4 +1,11 @@
-import { createRemoteJWKSet, errors as joseErrors, jwtVerify, type JWTPayload } from 'jose';
+import {
+  createRemoteJWKSet,
+  customFetch,
+  decodeProtectedHeader,
+  errors as joseErrors,
+  jwtVerify,
+  type JWTPayload,
+} from 'jose';
 import type { AuthenticatedIdentity, AuthVerifier } from './AuthVerifier.js';
 import { AuthenticationError } from './AuthVerifier.js';
 
@@ -23,20 +30,23 @@ export class SupabaseAuthVerifier implements AuthVerifier {
     this.#fetch = fetcher;
     this.#jwks = createRemoteJWKSet(
       new URL(`${config.url.replace(/\/$/u, '')}/auth/v1/.well-known/jwks.json`),
-      { cooldownDuration: 30_000, cacheMaxAge: 600_000 },
+      { cooldownDuration: 30_000, cacheMaxAge: 600_000, [customFetch]: fetcher },
     );
   }
 
   async verifyAccessToken(token: string): Promise<AuthenticatedIdentity> {
     if (token.trim() === '') throw new AuthenticationError('AUTH_REQUIRED');
-    if (token.split('.').length === 3) {
+    if (usesAsymmetricSupabaseAlgorithm(token)) {
       try {
         const verified = await jwtVerify(token, this.#jwks, {
           issuer: this.#config.issuer,
+          audience: 'authenticated',
+          algorithms: ['ES256', 'RS256'],
         });
         return identityFromClaims(verified.payload);
       } catch (error) {
         if (error instanceof joseErrors.JWTExpired) throw new AuthenticationError('AUTH_EXPIRED');
+        throw new AuthenticationError('AUTH_INVALID');
       }
     }
     return this.#verifyThroughAuthUser(token);
@@ -71,6 +81,16 @@ export class SupabaseAuthVerifier implements AuthVerifier {
       accountKind: user.is_anonymous === true ? 'guest' : 'permanent',
       email: typeof user.email === 'string' ? user.email : null,
     };
+  }
+}
+
+function usesAsymmetricSupabaseAlgorithm(token: string) {
+  if (token.split('.').length !== 3) return false;
+  try {
+    const algorithm = decodeProtectedHeader(token).alg;
+    return algorithm === 'ES256' || algorithm === 'RS256';
+  } catch {
+    return false;
   }
 }
 
