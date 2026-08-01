@@ -61,8 +61,7 @@ npx playwright install chromium
 The checked-in defaults work locally. Optional environment overrides are:
 
 ```text
-GAME_SERVER_PORT=2567
-GAME_SERVER_HOST=127.0.0.1
+PORT=2567
 CLIENT_ORIGIN=http://127.0.0.1:4173
 VITE_GAME_SERVER_URL=ws://127.0.0.1:2567
 VITE_GAME_SERVER_HTTP_URL=http://127.0.0.1:2567
@@ -83,7 +82,7 @@ npm run dev:server
 npm run dev:client
 ```
 
-After `npm run build`, start the compiled server with `npm start -w @odd-tower/game-server`. Open `http://127.0.0.1:4173`; health is at `http://127.0.0.1:2567/health`.
+After `npm run build`, start the compiled server with `npm start -w @odd-tower/game-server`. The server binds to all network interfaces on `PORT` (default `2567`); locally, open `http://127.0.0.1:4173` and use `http://127.0.0.1:2567/health` for health checks.
 
 Choose **Online Shared Combat Sandbox**, enter a 1–20 character display name, then create a room or join an existing six-character code. Codes are temporary and case-insensitive.
 

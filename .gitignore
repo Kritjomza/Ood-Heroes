@@ -5,3 +5,7 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 phase1-*.png
+.env
+.env.*
+!.env.example
+

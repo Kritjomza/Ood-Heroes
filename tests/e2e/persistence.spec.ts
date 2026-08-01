@@ -9,6 +9,8 @@ test.describe('Phase 4 persistent player journey', () => {
   }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Odd Tower' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Play as Guest' })).toBeVisible();
     await capture(page, test.info().project.name, '01-auth');
     await page.getByLabel('Hero name').fill(`Odd E2E ${Date.now().toString().slice(-5)}`);
     await page.getByRole('button', { name: 'Play as Guest' }).click();
@@ -91,7 +93,7 @@ test.describe('Phase 4 persistent player journey', () => {
     await page.getByRole('button', { name: /Account/u }).click();
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password').fill(password);
-    await page.getByRole('button', { name: 'Protect Progress' }).click();
+    await page.getByRole('button', { name: 'Protect Progress', exact: true }).click();
     await expect(page.getByText(/Progress is protected|Your progress stays attached/u)).toBeVisible(
       {
         timeout: 15_000,

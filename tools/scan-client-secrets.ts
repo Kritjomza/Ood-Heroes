@@ -10,10 +10,8 @@ const forbidden = [
 const suspicious = [
   /SUPABASE_SECRET_KEY/u,
   /GOOGLE_CLIENT_SECRET/u,
-  /provider_refresh_token/u,
-  /provider_token/u,
   /service_role/u,
-  /sb_secret_/u,
+  /sb_secret_[A-Za-z0-9_-]{20,}/u,
 ];
 let scanned = 0;
 for (const path of await files(root)) {

@@ -100,15 +100,23 @@ export function AccountScreen({
                 onChange={(event) => setPassword(event.target.value)}
               />
             </label>
-            <button className="primary-action" disabled={busy} onClick={() => void protectEmail()}>
+            <button
+              className="primary-action"
+              disabled={busy}
+              aria-label="Protect Progress"
+              onClick={() => void protectEmail()}
+            >
               Protect Progress with Email
             </button>
           </>
         ) : (
-          <p>
-            Provider: {identity?.google ? 'Google connected' : 'Email/password'}
-            {identity?.email ? ` · ${identity.email}` : ''}
-          </p>
+          <>
+            <p>Progress is protected by your Supabase account.</p>
+            <p>
+              Provider: {identity?.google ? 'Google connected' : 'Email/password'}
+              {identity?.email ? ` · ${identity.email}` : ''}
+            </p>
+          </>
         )}
         {message && <p role="status">{message}</p>}
         <button className="secondary-action" onClick={() => void getAuthClient().auth.signOut()}>

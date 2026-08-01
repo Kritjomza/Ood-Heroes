@@ -51,6 +51,14 @@ export function AuthScreen() {
         <div className="tower-mark" aria-hidden="true">
           🏰
         </div>
+        <label>
+          Hero name
+          <input
+            maxLength={20}
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+          />
+        </label>
         {error && (
           <p className="persistent-error" role="alert">
             {error}
@@ -77,16 +85,6 @@ export function AuthScreen() {
         <div className="auth-divider">
           <span>or use email</span>
         </div>
-        {mode === 'create' && (
-          <label>
-            Hero name
-            <input
-              maxLength={20}
-              value={displayName}
-              onChange={(event) => setDisplayName(event.target.value)}
-            />
-          </label>
-        )}
         <label>
           Email
           <input

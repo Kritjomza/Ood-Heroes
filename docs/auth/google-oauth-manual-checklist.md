@@ -14,7 +14,7 @@
 
 ## Local Supabase
 
-- [ ] Put `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET` in `.env.local`.
+- [ ] Put `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET` in repository-root `.env.local`.
 - [ ] Confirm `[auth.external.google]` is enabled in `supabase/config.toml`.
 - [ ] Confirm `auth.enable_manual_linking = true`.
 - [ ] Run `npm run supabase:stop` and `npm run supabase:start`.

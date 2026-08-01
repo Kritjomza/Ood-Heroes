@@ -5,7 +5,7 @@ Odd Tower requests only `openid`, `email`, and `profile`. Google provider tokens
 ## Local Supabase setup
 
 1. In Google Cloud, create a **Web application** OAuth client. Set Authorized JavaScript Origin to `http://127.0.0.1:4173` and Authorized Redirect URI to `http://127.0.0.1:54321/auth/v1/callback`.
-2. Copy `.env.example` to `.env.local` and set `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`. These are consumed by the local Supabase CLI; neither may have a `VITE_` prefix.
+2. Copy `.env.example` to the repository-root `.env.local` and set `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`. Project scripts explicitly load this file for Vite, the game server, Supabase CLI, and database integration tests; neither secret may have a `VITE_` prefix.
 3. `supabase/config.toml` enables `[auth.external.google]`, environment-backed credentials, nonce checking, manual identity linking, and both app redirects.
 4. Run `npm run supabase:stop`, `npm run supabase:start`, then `npm run supabase:status`.
 
