@@ -16,16 +16,60 @@ describe('online mode UI', () => {
     expect(online).toHaveBeenCalledOnce();
   });
 
-  it('renders accessible lobby fields and dispatches create and exact-code join', () => {
+  it('presents the tower gate and dispatches create and exact-code join', () => {
     const create = vi.fn();
     const join = vi.fn();
-    render(<OnlineLobby busy={false} error="" onCreate={create} onJoin={join} onBack={() => {}} />);
+    const back = vi.fn();
+    render(<OnlineLobby busy={false} error="" onCreate={create} onJoin={join} onBack={back} />);
+    expect(screen.getByRole('heading', { name: 'Gather at the Tower Gate' })).toBeVisible();
+    expect(screen.queryByText(/phase 3|sandbox/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Start an expedition' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.queryByLabelText('Room code')).not.toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Display name'), { target: { value: 'Player' } });
     fireEvent.click(screen.getByRole('button', { name: 'Create Room' }));
     expect(create).toHaveBeenCalledWith('Player');
+    fireEvent.click(screen.getByRole('button', { name: 'Join your party' }));
     fireEvent.change(screen.getByLabelText('Room code'), { target: { value: 'abc234' } });
     fireEvent.click(screen.getByRole('button', { name: 'Join Room' }));
     expect(join).toHaveBeenCalledWith('Player', 'abc234');
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(back).toHaveBeenCalledOnce();
+  });
+
+  it('announces the gate opening and prevents duplicate room actions', () => {
+    const create = vi.fn();
+    const join = vi.fn();
+    render(<OnlineLobby busy error="" onCreate={create} onJoin={join} onBack={() => {}} />);
+    expect(screen.getByRole('status')).toHaveTextContent('Opening the gate…');
+    const submit = screen.getByRole('button', { name: 'Create Room' });
+    expect(submit).toBeDisabled();
+    fireEvent.submit(submit.closest('form')!);
+    expect(create).not.toHaveBeenCalled();
+    expect(join).not.toHaveBeenCalled();
+  });
+
+  it('requires a complete room code and gives path-aware recovery guidance', () => {
+    const view = render(
+      <OnlineLobby
+        busy={false}
+        error="The request failed."
+        onCreate={() => {}}
+        onJoin={() => {}}
+        onBack={() => {}}
+      />,
+    );
+    expect(screen.getByRole('alert')).not.toHaveTextContent('room code');
+    fireEvent.click(screen.getByRole('button', { name: 'Join your party' }));
+    expect(screen.getByRole('button', { name: 'Join Room' })).toBeDisabled();
+    fireEvent.change(screen.getByLabelText('Room code'), { target: { value: 'ABC12' } });
+    expect(screen.getByRole('button', { name: 'Join Room' })).toBeDisabled();
+    fireEvent.change(screen.getByLabelText('Room code'), { target: { value: 'ABC123' } });
+    expect(screen.getByRole('button', { name: 'Join Room' })).toBeEnabled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Check the room code and try again.');
+    view.unmount();
   });
 
   it('announces lobby errors and exposes in-room connection, player, latency, and leave controls', () => {

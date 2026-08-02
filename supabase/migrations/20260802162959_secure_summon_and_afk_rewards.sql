@@ -5,7 +5,15 @@ where status = 'pending';
 
 update public.afk_state set last_settled_at = clock_timestamp();
 
-alter function private.player_bootstrap(uuid) rename to player_bootstrap_legacy;
+do $$
+begin
+  if to_regprocedure('private.player_bootstrap_legacy(uuid)') is null then
+    alter function private.player_bootstrap(uuid) rename to player_bootstrap_legacy;
+  else
+    drop function if exists private.player_bootstrap(uuid);
+  end if;
+end;
+$$;
 
 create function private.player_bootstrap(p_user_id uuid)
 returns jsonb
@@ -25,6 +33,10 @@ as $$
     )
   );
 $$;
+
+revoke execute on function private.player_bootstrap(uuid) from public, anon, authenticated;
+revoke execute on function private.player_bootstrap_legacy(uuid) from public, anon, authenticated;
+grant execute on function private.player_bootstrap(uuid) to service_role;
 
 create or replace function private.summon_result(p_user_id uuid, p_history_id uuid)
 returns jsonb
