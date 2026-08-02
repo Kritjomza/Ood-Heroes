@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { PlayerBootstrap } from '@odd-tower/network-protocol';
 import { getAuthClient } from '../../persistence/auth-client';
 import { createOAuthCoordinator, hasGoogleIdentity } from '../../persistence/oauth';
+import { AdventureIcon } from './AdventureIcons';
 import { ScreenHeading } from './CollectionScreen';
 
 export function AccountScreen({
@@ -39,7 +40,7 @@ export function AccountScreen({
     }
     await getAuthClient().auth.refreshSession();
     await onProtected();
-    setMessage('Check your email if confirmation is enabled. Your progress stays attached.');
+    setMessage('Check your email if confirmation is enabled. Your heroes are safe.');
     setBusy(false);
   };
   const protectGoogle = async () => {
@@ -54,74 +55,123 @@ export function AccountScreen({
         data.user,
       );
     } catch {
-      setMessage('Google protection could not start. Your Guest progress is unchanged.');
+      setMessage('Google protection could not start. Your guest progress is unchanged.');
       setBusy(false);
     }
   };
+  const guest = player.profile.accountKind === 'guest';
   return (
-    <section className="persistent-content">
+    <section className="persistent-content account-screen">
       <ScreenHeading
-        title="Account"
-        subtitle={player.profile.accountKind === 'guest' ? 'Guest progress' : 'Protected account'}
+        title="Player passport"
+        subtitle={guest ? 'Guest adventurer' : 'Protected adventurer'}
         back={back}
       />
-      <div className="sticker-card account-card">
-        <h2>{player.profile.displayName}</h2>
-        <p>
-          <strong>Account type:</strong>{' '}
-          {player.profile.accountKind === 'guest' ? 'Guest' : 'Permanent'}
-        </p>
-        {player.profile.accountKind === 'guest' ? (
-          <>
+      <div className="passport">
+        <div className="passport-cover">
+          <span className="passport-emblem">
+            <AdventureIcon name="shield" />
+          </span>
+          <small>ODD TOWER ADVENTURER</small>
+          <h2>{player.profile.displayName}</h2>
+          <span className={`account-stamp ${guest ? 'guest' : 'protected'}`}>
+            {guest ? 'Guest' : 'Protected'}
+          </span>
+        </div>
+        <div className="passport-details">
+          <div className="account-status">
+            <AdventureIcon name={guest ? 'lock' : 'shield'} />
+            <span>
+              <strong>
+                {guest ? 'This adventure lives on this browser' : 'Your adventure is protected'}
+              </strong>
+              <small>
+                {identity?.google
+                  ? 'Google connected'
+                  : (identity?.email ?? 'No connected provider yet')}
+              </small>
+            </span>
+          </div>
+          {guest ? (
+            <>
+              <p>
+                Connect Google to keep your heroes, rewards, and team available on another device.
+              </p>
+              <button
+                className="google-action"
+                disabled={busy}
+                onClick={() => void protectGoogle()}
+              >
+                {busy ? 'Opening Google…' : 'Protect with Google'}
+              </button>
+              <details className="email-backup">
+                <summary>Use email instead</summary>
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                  />
+                </label>
+                <label>
+                  Password
+                  <input
+                    type="password"
+                    minLength={6}
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                  />
+                </label>
+                <button
+                  className="primary-action"
+                  disabled={busy || !email || password.length < 6}
+                  onClick={() => void protectEmail()}
+                >
+                  Protect with email
+                </button>
+              </details>
+            </>
+          ) : (
             <p>
-              Tie this suspicious tower adventure to your Google account. Your Heroes and rewards
-              will stay exactly where they are, and you can play on another device.
+              Your saved progress is attached to your account and can be restored after sign-in.
             </p>
-            <button className="google-action" disabled={busy} onClick={() => void protectGoogle()}>
-              {busy ? 'Redirecting…' : 'Protect Progress with Google'}
-            </button>
-            <div className="auth-divider">
-              <span>or use email</span>
-            </div>
-            <label>
-              Email
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </label>
-            <label>
-              Password
-              <input
-                type="password"
-                minLength={6}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </label>
-            <button
-              className="primary-action"
-              disabled={busy}
-              aria-label="Protect Progress"
-              onClick={() => void protectEmail()}
-            >
-              Protect Progress with Email
-            </button>
-          </>
-        ) : (
-          <>
-            <p>Progress is protected by your Supabase account.</p>
-            <p>
-              Provider: {identity?.google ? 'Google connected' : 'Email/password'}
-              {identity?.email ? ` · ${identity.email}` : ''}
+          )}
+          {message && (
+            <p className="account-message" role="status">
+              {message}
             </p>
-          </>
-        )}
-        {message && <p role="status">{message}</p>}
-        <button className="secondary-action" onClick={() => void getAuthClient().auth.signOut()}>
-          Sign Out
-        </button>
+          )}
+          <details className="technical-details">
+            <summary>Adventure record</summary>
+            <dl>
+              <div>
+                <dt>User ID</dt>
+                <dd>{player.profile.userId}</dd>
+              </div>
+              <div>
+                <dt>Contract</dt>
+                <dd>v{player.contractVersion}</dd>
+              </div>
+              <div>
+                <dt>Save status</dt>
+                <dd>{player.persistence.status}</dd>
+              </div>
+              <div>
+                <dt>Queue</dt>
+                <dd>{player.persistence.queueDepth}</dd>
+              </div>
+            </dl>
+          </details>
+          <button
+            className="plastic-button sign-out"
+            onClick={() => void getAuthClient().auth.signOut()}
+          >
+            Sign out
+          </button>
+        </div>
       </div>
     </section>
   );

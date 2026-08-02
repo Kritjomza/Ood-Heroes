@@ -7,6 +7,7 @@ import {
   readLinkIntent,
   type OAuthFlowState,
 } from '../../persistence/oauth';
+import { TowerLoader } from './TowerLoader';
 
 export function OAuthCallbackScreen({
   linking,
@@ -60,38 +61,16 @@ export function OAuthCallbackScreen({
       }
     })();
   }, [linking, onComplete, onLinked]);
+  if (flow !== 'failed') return <TowerLoader phase="oauth" />;
   return (
-    <main className="persistent-shell auth-page" aria-busy={flow !== 'failed'}>
-      <section className="sticker-card auth-card" aria-live="polite">
-        <div className="tower-mark" aria-hidden="true">
-          🏰
-        </div>
-        <h1>
-          {flow === 'failed'
-            ? 'The drawbridge got stuck'
-            : linking
-              ? 'Protecting your progress…'
-              : 'Google found your tower…'}
-        </h1>
-        <p>
-          {error ??
-            (flow === 'bootstrapping-player'
-              ? 'Checking every Hero is still where you left them.'
-              : 'Safely restoring your Odd Tower account.')}
-        </p>
-        {flow === 'failed' && (
-          <button
-            className="primary-action"
-            onClick={() => {
-              clearLinkIntent();
-              window.history.replaceState({}, '', '/');
-              onComplete();
-            }}
-          >
-            Back to Login
-          </button>
-        )}
-      </section>
-    </main>
+    <TowerLoader
+      phase="oauth"
+      error={error}
+      onRetry={() => {
+        clearLinkIntent();
+        window.history.replaceState({}, '', '/');
+        onComplete();
+      }}
+    />
   );
 }

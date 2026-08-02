@@ -10,7 +10,13 @@ export function HeroMock({
   const asset = resolveAsset(assetId);
   return (
     <span className={`hero-mock hero-mock-${size}`} role="img" aria-label={asset.label}>
-      <span aria-hidden="true">{asset.fallback}</span>
+      {asset.replacementPath ? (
+        <img src={asset.replacementPath} alt="" aria-hidden="true" />
+      ) : (
+        <span className="missing-hero-art" aria-hidden="true">
+          ?
+        </span>
+      )}
     </span>
   );
 }

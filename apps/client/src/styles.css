@@ -887,6 +887,340 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+.team-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.team-summary span {
+  display: grid;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--system-team);
+  font-size: 12px;
+  font-weight: 800;
+}
+.team-summary strong {
+  font-size: 25px;
+}
+.role-warning {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--p-yellow);
+  font-weight: 800;
+}
+.formation-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: 24px;
+  background: var(--system-team);
+  box-shadow:
+    inset 0 4px 0 var(--plastic-shine),
+    0 14px 26px var(--plastic-shadow);
+}
+.formation-slot {
+  position: relative;
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-panel);
+  background: var(--plastic-light);
+  text-align: center;
+}
+.formation-slot.locked {
+  background: var(--board-surface);
+  color: var(--board-ink-muted);
+}
+.formation-slot > .adventure-icon {
+  width: 44px;
+  height: 44px;
+}
+.formation-slot small {
+  text-transform: capitalize;
+}
+.slot-number {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--p-yellow);
+  font-weight: 950;
+}
+.roster-title {
+  margin: var(--space-6) 0 var(--space-3);
+}
+.formation-roster button > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+.formation-roster strong,
+.formation-roster small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.team-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+.unlock-slot {
+  background: var(--p-yellow);
+}
+.save-formation {
+  background: var(--system-team);
+}
+.plastic-button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.parcel-scrim {
+  background: rgb(59 52 52 / 62%);
+}
+.afk-parcel {
+  position: relative;
+  width: min(460px, 100%);
+  padding: clamp(28px, 6vw, 48px);
+  border-radius: var(--radius-panel);
+  background: var(--p-yellow);
+  color: var(--p-ink);
+  box-shadow: 0 20px 50px var(--plastic-shadow);
+  text-align: center;
+  animation: parcel-open 420ms var(--p-ease-out) both;
+}
+.parcel-tab {
+  position: absolute;
+  top: -13px;
+  right: 30px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  background: var(--p-coral);
+  font-size: 11px;
+  font-weight: 950;
+}
+.parcel-mark {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  border: 3px solid var(--p-chocolate);
+  border-radius: 20px;
+  background: var(--plastic-light);
+  transform: rotate(-4deg);
+}
+.parcel-mark .adventure-icon {
+  width: 36px;
+  height: 36px;
+}
+.afk-parcel h2 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 32px;
+}
+.reward-list {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  margin: var(--space-5) 0;
+  list-style: none;
+  text-align: left;
+}
+.reward-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--plastic-light);
+}
+.reward-list li > span {
+  display: grid;
+}
+.reward-list small {
+  color: var(--board-ink-muted);
+}
+.collect-rewards {
+  width: 100%;
+  background: var(--system-home);
+}
+@keyframes parcel-open {
+  from {
+    opacity: 0.5;
+    transform: translateY(20px);
+    clip-path: inset(30% 0 0);
+  }
+}
+@media (max-width: 680px) {
+  .formation-board {
+    grid-template-columns: 1fr;
+  }
+  .formation-slot {
+    min-height: 150px;
+  }
+  .team-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+  .team-actions {
+    flex-direction: column;
+  }
+  .team-actions button {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .afk-parcel {
+    animation: none;
+  }
+}
+.passport {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(300px, 1.2fr);
+  max-width: 880px;
+  margin: auto;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--plastic-light);
+  box-shadow: 0 18px 38px var(--plastic-shadow);
+}
+.passport-cover {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  min-height: 480px;
+  padding: var(--space-6);
+  background: var(--system-account);
+  text-align: center;
+}
+.passport-emblem {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  border: 4px solid var(--p-chocolate);
+  border-radius: 28px;
+  background: var(--p-yellow);
+  transform: rotate(-3deg);
+}
+.passport-emblem .adventure-icon {
+  width: 52px;
+  height: 52px;
+}
+.passport-cover h2 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 52px);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.passport-cover > small {
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+.account-stamp {
+  padding: 8px 14px;
+  border: 3px solid var(--p-chocolate);
+  border-radius: 10px;
+  background: var(--plastic-light);
+  font-weight: 950;
+  text-transform: uppercase;
+  transform: rotate(3deg);
+}
+.account-stamp.protected {
+  background: var(--system-team);
+}
+.passport-details {
+  display: grid;
+  align-content: center;
+  gap: var(--space-4);
+  padding: clamp(24px, 5vw, 52px);
+}
+.account-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--board-surface);
+}
+.account-status > .adventure-icon {
+  width: 34px;
+  height: 34px;
+}
+.account-status > span {
+  display: grid;
+}
+.account-status small {
+  color: var(--board-ink-muted);
+}
+.email-backup,
+.technical-details {
+  border-radius: var(--radius-control);
+  background: var(--board-surface);
+  padding: var(--space-3);
+}
+.email-backup summary,
+.technical-details summary {
+  cursor: pointer;
+  font-weight: 900;
+}
+.email-backup label {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+  font-weight: 800;
+}
+.email-backup input {
+  min-height: 48px;
+  border: 2px solid var(--p-chocolate);
+  border-radius: 12px;
+  padding: 0 var(--space-3);
+  font: inherit;
+}
+.email-backup .primary-action {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+.technical-details dl {
+  display: grid;
+  gap: var(--space-2);
+}
+.technical-details dl div {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+}
+.technical-details dd {
+  overflow-wrap: anywhere;
+}
+.sign-out {
+  justify-self: start;
+  background: var(--p-peach);
+}
+@media (max-width: 680px) {
+  .passport {
+    grid-template-columns: 1fr;
+  }
+  .passport-cover {
+    min-height: 260px;
+  }
+  .passport-details {
+    padding: var(--space-5);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .persistent-shell * {
     scroll-behavior: auto !important;
@@ -1585,6 +1919,765 @@ body:has(.auth-page) {
 }
 @media (prefers-reduced-motion: reduce) {
   .tower-mark {
+    animation: none;
+  }
+}
+
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V5
+ * genre: playful · macrostructure: pocket adventure board · designed-as-app
+ * palette: solid system fields · material: molded plastic + die-cut stickers
+ */
+.adventure-icon {
+  width: 1.35em;
+  height: 1.35em;
+  flex: 0 0 auto;
+}
+.tower-loading-screen {
+  min-height: 100dvh;
+  overflow: clip;
+  background: var(--board-surface);
+  color: var(--p-ink);
+  touch-action: manipulation;
+}
+.tower-loader {
+  width: min(390px, 100%);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+.tower-loader h1 {
+  margin: var(--space-3) 0 0;
+  font-size: clamp(28px, 8vw, 42px);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.tower-loader p {
+  margin: 0;
+  color: var(--board-ink-muted);
+  font-weight: 700;
+}
+.loader-scene {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  filter: drop-shadow(0 14px 12px var(--plastic-shadow));
+}
+.loader-tower {
+  position: absolute;
+  left: 50%;
+  border: 4px solid var(--p-chocolate);
+  background: var(--p-pink);
+  transform: translateX(-50%);
+}
+.loader-tower-base {
+  bottom: 20px;
+  width: 92px;
+  height: 92px;
+  border-radius: 15px 15px 10px 10px;
+  animation: loader-build var(--motion-screen) var(--p-ease-out) both;
+}
+.loader-tower-top {
+  bottom: 108px;
+  width: 72px;
+  height: 54px;
+  border-radius: 12px 12px 4px 4px;
+  background: var(--p-yellow);
+  clip-path: polygon(50% 0, 100% 55%, 100% 100%, 0 100%, 0 55%);
+  animation: loader-build var(--motion-screen) 90ms var(--p-ease-out) both;
+}
+.loader-flag {
+  position: absolute;
+  left: calc(50% + 2px);
+  bottom: 160px;
+  width: 42px;
+  height: 24px;
+  border: 4px solid var(--p-chocolate);
+  border-left: 0;
+  background: var(--p-coral);
+  transform-origin: left center;
+  animation: loader-flag 900ms ease-in-out infinite alternate;
+}
+.loader-window {
+  position: absolute;
+  left: 50%;
+  bottom: 58px;
+  width: 22px;
+  height: 28px;
+  border: 3px solid var(--p-chocolate);
+  border-radius: 10px 10px 4px 4px;
+  background: var(--p-sky);
+  transform: translateX(-50%);
+  animation: loader-light 1.15s ease-in-out infinite alternate;
+}
+.loader-cloud {
+  position: absolute;
+  top: 34px;
+  left: 8px;
+  width: 70px;
+  height: 25px;
+  border-radius: 999px;
+  background: var(--plastic-light);
+  opacity: 0.85;
+}
+.tower-loader.is-stuck .loader-flag {
+  transform: rotate(18deg);
+  animation: none;
+}
+.plastic-button {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  padding: 0 var(--space-5);
+  color: var(--p-ink);
+  font: inherit;
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow:
+    inset 0 3px 0 var(--plastic-shine),
+    0 7px 14px var(--plastic-shadow);
+  transition:
+    transform var(--motion-fast) var(--p-ease-out),
+    box-shadow var(--motion-fast) var(--p-ease-out);
+}
+.plastic-button-primary {
+  background: var(--system-home);
+}
+.plastic-button:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 2px 0 var(--plastic-shine),
+    0 3px 7px var(--plastic-shadow);
+}
+.plastic-button:focus-visible {
+  outline: 4px solid var(--p-focus);
+  outline-offset: 3px;
+}
+.adventure-shell {
+  min-height: 100dvh;
+  overflow-x: clip;
+  overflow-y: auto;
+  touch-action: manipulation;
+  padding: calc(78px + env(safe-area-inset-top)) var(--space-4)
+    calc(92px + env(safe-area-inset-bottom));
+  background: var(--board-surface);
+  color: var(--p-ink);
+}
+.adventure-screen {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  animation: screen-settle var(--motion-screen) var(--p-ease-out) both;
+}
+.player-strip {
+  position: fixed;
+  z-index: var(--layer-nav);
+  top: 0;
+  right: 0;
+  left: 0;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: max(var(--space-2), env(safe-area-inset-top))
+    max(var(--space-3), env(safe-area-inset-right)) var(--space-2)
+    max(var(--space-3), env(safe-area-inset-left));
+  background: var(--plastic-light);
+  box-shadow: 0 7px 18px var(--plastic-shadow);
+}
+.player-badge {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.player-avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 2px solid var(--p-chocolate);
+  border-radius: 13px;
+  background: var(--system-home);
+  font-weight: 950;
+}
+.player-badge span:last-child {
+  min-width: 0;
+  display: grid;
+}
+.player-badge small {
+  color: var(--board-ink-muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+.player-badge strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.player-currencies {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.player-currencies > span {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: 12px;
+  background: var(--board-surface);
+  font-size: 12px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.player-currencies .adventure-icon {
+  width: 16px;
+  height: 16px;
+}
+.player-strip .save-status {
+  position: static;
+  flex: 0 0 auto;
+  font-size: 10px;
+}
+.adventure-nav {
+  position: fixed;
+  z-index: var(--layer-nav);
+  right: max(var(--space-3), env(safe-area-inset-right));
+  bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  left: max(var(--space-3), env(safe-area-inset-left));
+  height: 68px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  padding: var(--space-1);
+  border-radius: 20px;
+  background: var(--plastic-light);
+  box-shadow:
+    inset 0 3px 0 var(--plastic-shine),
+    0 10px 24px var(--plastic-shadow);
+}
+.adventure-tab {
+  min-width: 0;
+  min-height: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--board-ink-muted);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform var(--motion-fast) var(--p-ease-out),
+    background-color var(--motion-fast) var(--p-ease-out),
+    color var(--motion-fast) var(--p-ease-out);
+}
+.adventure-tab .adventure-icon {
+  width: 22px;
+  height: 22px;
+}
+.adventure-tab[aria-current='page'] {
+  transform: translateY(-7px);
+  color: var(--p-ink);
+  box-shadow:
+    inset 0 3px 0 var(--plastic-shine),
+    0 6px 12px var(--plastic-shadow);
+}
+.tab-home[aria-current='page'] {
+  background: var(--system-home);
+}
+.tab-collection[aria-current='page'] {
+  background: var(--system-heroes);
+}
+.tab-summon[aria-current='page'] {
+  background: var(--system-summon);
+  color: var(--plastic-light);
+}
+.tab-team[aria-current='page'] {
+  background: var(--system-team);
+}
+.tab-account[aria-current='page'] {
+  background: var(--system-account);
+}
+.adventure-tab:focus-visible {
+  outline: 4px solid var(--p-focus);
+  outline-offset: 2px;
+}
+.adventure-tab:active {
+  transform: translateY(1px);
+}
+@keyframes loader-build {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 24px);
+    clip-path: inset(100% 0 0);
+  }
+}
+@keyframes loader-flag {
+  to {
+    transform: rotate(-8deg);
+  }
+}
+@keyframes loader-light {
+  to {
+    background: var(--p-yellow);
+    box-shadow: 0 0 12px var(--p-yellow);
+  }
+}
+@keyframes screen-settle {
+  from {
+    opacity: 0.45;
+    transform: translateY(10px);
+    clip-path: inset(0 0 12px);
+  }
+}
+@media (max-width: 620px) {
+  .player-strip .save-status {
+    display: none;
+  }
+  .player-currencies {
+    gap: var(--space-1);
+  }
+  .player-currencies > span {
+    padding-inline: 6px;
+  }
+  .player-badge small {
+    display: none;
+  }
+}
+@media (min-width: 769px) {
+  .adventure-shell {
+    padding: calc(88px + env(safe-area-inset-top)) var(--space-8) var(--space-8) 124px;
+  }
+  .adventure-nav {
+    top: 90px;
+    right: auto;
+    bottom: auto;
+    left: var(--space-5);
+    width: 82px;
+    height: auto;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+  .adventure-tab {
+    min-height: 64px;
+  }
+  .adventure-tab[aria-current='page'] {
+    transform: translateX(7px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-tower,
+  .loader-flag,
+  .adventure-screen {
+    animation: none;
+  }
+  .loader-window {
+    animation: loader-light 1.15s ease-in-out infinite alternate;
+  }
+  .adventure-tab,
+  .plastic-button {
+    transition: none;
+  }
+}
+.adventure-page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.adventure-page-heading h1 {
+  margin: var(--space-1) 0;
+  font-size: clamp(34px, 8vw, 62px);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.adventure-page-heading p {
+  margin: 0;
+  color: var(--board-ink-muted);
+  font-weight: 700;
+}
+.page-kicker {
+  color: var(--p-coral-dark);
+  font-size: 12px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+.floor-ticket {
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--system-home);
+  font-weight: 950;
+  transform: rotate(2deg);
+}
+.expedition-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+  gap: var(--space-4);
+}
+.active-party {
+  min-height: 250px;
+  display: grid;
+  align-content: space-between;
+  padding: var(--space-6);
+  border-radius: var(--radius-panel);
+  background: var(--p-sky);
+  box-shadow:
+    inset 0 4px 0 var(--plastic-shine),
+    0 12px 24px var(--plastic-shadow);
+}
+.party-copy h2 {
+  margin: 0;
+  font-size: 28px;
+}
+.party-copy p {
+  margin: var(--space-1) 0;
+  font-weight: 800;
+}
+.party-stickers {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+.party-hero {
+  width: min(150px, 45%);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+.play-actions {
+  display: grid;
+  gap: var(--space-3);
+}
+.play-actions button {
+  justify-content: flex-start;
+  text-align: left;
+  min-height: 96px;
+}
+.play-actions button > span {
+  display: grid;
+}
+.play-actions small {
+  font-weight: 700;
+}
+.online-play {
+  background: var(--system-home);
+}
+.local-play {
+  background: var(--p-mint);
+}
+.progress-ribbon {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.progress-ribbon button {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+  background: var(--plastic-light);
+  color: var(--p-ink);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 7px 16px var(--plastic-shadow);
+}
+.progress-ribbon button > span {
+  display: grid;
+}
+.progress-ribbon small {
+  color: var(--board-ink-muted);
+}
+.adventure-screen-heading {
+  margin-bottom: var(--space-5);
+}
+.adventure-screen-heading h1 {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.album-summary {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.album-summary strong {
+  min-width: 86px;
+  display: grid;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--system-heroes);
+  font-size: 24px;
+}
+.album-summary small {
+  font-size: 11px;
+}
+.album-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+.album-filters button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 var(--space-4);
+  background: var(--plastic-light);
+  color: var(--p-ink);
+  font: inherit;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+.album-filters button[aria-pressed='true'] {
+  background: var(--system-heroes);
+  box-shadow: inset 0 3px 0 var(--plastic-shine);
+}
+.sticker-album {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-4);
+}
+.album-sticker {
+  min-height: 290px;
+  display: grid;
+  grid-template-rows: 170px 1fr;
+  border: 0;
+  border-radius: var(--radius-panel);
+  padding: var(--space-3);
+  background: var(--plastic-light);
+  color: var(--p-ink);
+  text-align: left;
+  box-shadow: 0 10px 20px var(--plastic-shadow);
+  cursor: pointer;
+}
+.sticker-art {
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--p-purple);
+}
+.sticker-copy {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-1) 0;
+}
+.sticker-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.sticker-meta b {
+  padding: 3px 7px;
+  border-radius: 8px;
+  background: var(--board-surface);
+  font-size: 10px;
+  text-transform: capitalize;
+}
+.sticker-copy small {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.album-sticker:disabled {
+  opacity: 0.58;
+  cursor: default;
+}
+.hero-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+.hero-facts span {
+  display: grid;
+  padding: var(--space-3);
+  border-radius: 12px;
+  background: var(--board-surface);
+}
+.hero-facts small {
+  color: var(--board-ink-muted);
+}
+.capsule-stage {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) minmax(280px, 1.15fr);
+  align-items: center;
+  gap: var(--space-6);
+  padding: clamp(22px, 5vw, 54px);
+  border-radius: 24px;
+  background: var(--system-summon);
+  color: var(--plastic-light);
+  box-shadow:
+    inset 0 5px 0 var(--plastic-shine),
+    0 16px 30px var(--plastic-shadow);
+}
+.capsule-machine {
+  position: relative;
+  width: min(270px, 100%);
+  aspect-ratio: 0.78;
+  margin: auto;
+}
+.machine-dome {
+  position: absolute;
+  inset: 0 10% 36%;
+  border: 5px solid var(--p-chocolate);
+  border-radius: 50% 50% 24% 24%;
+  background: var(--p-purple);
+}
+.machine-dome i {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  left: 50%;
+  bottom: 20px;
+  border: 4px solid var(--p-chocolate);
+  border-radius: 50%;
+  background: var(--p-coral);
+  transform: translateX(-50%);
+}
+.machine-body {
+  position: absolute;
+  inset: 58% 4% 0;
+  border: 5px solid var(--p-chocolate);
+  border-radius: 20px;
+  background: var(--p-yellow);
+}
+.machine-body i {
+  position: absolute;
+  width: 70px;
+  height: 35px;
+  left: 50%;
+  bottom: 20px;
+  border: 4px solid var(--p-chocolate);
+  border-radius: 10px;
+  background: var(--p-coral);
+  transform: translateX(-50%);
+}
+.summon-copy h2 {
+  margin: var(--space-3) 0;
+  font-size: clamp(30px, 5vw, 52px);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.pull-count {
+  display: inline-block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 10px;
+  background: var(--p-coral);
+  color: var(--p-ink);
+  font-weight: 950;
+}
+.pity-track {
+  height: 18px;
+  overflow: hidden;
+  border: 3px solid var(--plastic-light);
+  border-radius: 999px;
+  background: var(--p-chocolate);
+}
+.pity-track span {
+  display: block;
+  height: 100%;
+  background: var(--p-yellow);
+}
+.summon-button {
+  width: 100%;
+  background: var(--p-coral);
+}
+@media (max-width: 680px) {
+  .expedition-board,
+  .capsule-stage {
+    grid-template-columns: 1fr;
+  }
+  .active-party {
+    min-height: 210px;
+  }
+  .progress-ribbon {
+    grid-template-columns: 1fr;
+  }
+  .capsule-machine {
+    width: 180px;
+  }
+  .hero-facts {
+    grid-template-columns: 1fr;
+  }
+  .album-summary {
+    overflow-x: auto;
+  }
+  .adventure-page-heading {
+    align-items: flex-start;
+  }
+  .floor-ticket {
+    font-size: 11px;
+  }
+}
+.hero-mock img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 5px var(--plastic-shadow));
+}
+.missing-hero-art {
+  font-weight: 950;
+}
+.phase-requesting .machine-dome i {
+  animation: capsule-charge 620ms ease-in-out infinite alternate;
+}
+.phase-requesting .machine-body i {
+  animation: machine-ready 420ms ease-in-out infinite alternate;
+}
+.phase-arrived .machine-dome i {
+  animation: capsule-arrive 520ms var(--p-ease-out) both;
+}
+@keyframes capsule-charge {
+  to {
+    transform: translateX(-50%) rotate(16deg) scale(1.08);
+    box-shadow: 0 8px 18px var(--plastic-shadow);
+  }
+}
+@keyframes machine-ready {
+  to {
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+@keyframes capsule-arrive {
+  from {
+    opacity: 0.2;
+    transform: translateX(-50%) translateY(-42px) rotate(-18deg) scale(0.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phase-requesting .machine-dome i,
+  .phase-requesting .machine-body i,
+  .phase-arrived .machine-dome i {
     animation: none;
   }
 }

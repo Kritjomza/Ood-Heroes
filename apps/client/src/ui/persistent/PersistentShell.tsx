@@ -12,10 +12,12 @@ import { SummonScreen } from './SummonScreen';
 import { TeamBuilderScreen } from './TeamBuilderScreen';
 import { AccountScreen } from './AccountScreen';
 import { AfkRewardModal } from './AfkRewardModal';
-import { PersistenceStatus } from './PersistenceStatus';
 import { OAuthCallbackScreen } from './OAuthCallbackScreen';
+import { TowerLoader } from './TowerLoader';
+import { AdventureNav, type PrimaryScreen } from './AdventureNav';
+import { PlayerStrip } from './PlayerStrip';
 
-type Screen = 'home' | 'collection' | 'hero' | 'summon' | 'team' | 'account';
+export type PersistentScreen = PrimaryScreen | 'hero';
 
 export function PersistentShell({
   onPlayLocal,
@@ -30,7 +32,7 @@ export function PersistentShell({
     loading: true,
     session: null,
   });
-  const [screen, setScreen] = useState<Screen>('home');
+  const [screen, setScreen] = useState<PersistentScreen>('home');
   const [heroId, setHeroId] = useState<string | null>(null);
   const [summonResult, setSummonResult] = useState<string | null>(null);
   const [, setCallbackVersion] = useState(0);
@@ -143,29 +145,16 @@ export function PersistentShell({
       />
     );
 
-  if (auth.loading)
-    return (
-      <main className="persistent-shell loading-screen" aria-busy="true">
-        Opening Odd Tower…
-      </main>
-    );
+  if (auth.loading) return <TowerLoader phase="auth" />;
   if (!auth.session) return <AuthScreen />;
   if (!state.bootstrap)
-    return (
-      <main className="persistent-shell loading-screen" aria-busy={state.loading}>
-        <div className="sticker-card">
-          <span aria-hidden="true">🏰</span>
-          <p>{state.error ?? 'Loading your saved oddities…'}</p>
-          <button className="primary-action" onClick={() => void refresh()}>
-            Try Again
-          </button>
-        </div>
-      </main>
-    );
+    return <TowerLoader phase="bootstrap" error={state.error} onRetry={() => void refresh()} />;
   const player = state.bootstrap;
   return (
-    <main className="persistent-shell">
-      <PersistenceStatus status={player.persistence.status} />
+    <main
+      className={`persistent-shell adventure-shell system-${screen === 'hero' ? 'collection' : screen}`}
+    >
+      <PlayerStrip player={player} />
       {state.error && (
         <div className="persistent-toast" role="alert">
           {state.error}
@@ -174,7 +163,7 @@ export function PersistentShell({
       {screen === 'home' && (
         <HomeScreen
           player={player}
-          navigate={(next) => setScreen(next as Screen)}
+          navigate={(next) => setScreen(next as PersistentScreen)}
           onPlayLocal={onPlayLocal}
           onPlayOnline={onPlayOnline}
         />
@@ -204,18 +193,17 @@ export function PersistentShell({
           back={() => setScreen('home')}
           busy={Boolean(state.pendingMutation)}
           result={summonResult}
-          summon={() =>
-            void mutation('summon', '/api/player/summon', { bannerId: player.banner.id }).then(
-              (result) => {
-                if (result && typeof result === 'object' && 'outcomeType' in result)
-                  setSummonResult(
-                    result.outcomeType === 'duplicate'
-                      ? 'Duplicate! Shards added.'
-                      : 'A new Hero joined!',
-                  );
-              },
-            )
-          }
+          summon={async () => {
+            const result = await mutation('summon', '/api/player/summon', {
+              bannerId: player.banner.id,
+            });
+            if (!result || typeof result !== 'object' || !('outcomeType' in result)) return null;
+            const outcomeType = result.outcomeType === 'duplicate' ? 'duplicate' : 'new';
+            const message =
+              outcomeType === 'duplicate' ? 'Duplicate! Shards added.' : 'A new Hero joined!';
+            setSummonResult(message);
+            return { outcomeType, message };
+          }}
         />
       )}
       {screen === 'team' && (
@@ -251,6 +239,10 @@ export function PersistentShell({
           }
         />
       )}
+      <AdventureNav
+        active={screen === 'hero' ? 'collection' : screen}
+        onSelect={(next) => setScreen(next)}
+      />
     </main>
   );
 }

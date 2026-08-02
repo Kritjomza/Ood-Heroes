@@ -25,6 +25,9 @@ export function HeroDetailScreen({
       </section>
     );
   const cost = starUpgradeCost(hero.stars);
+  const activeSlot = player.activeTeam.slots.find(
+    (slot) => slot.playerHeroId === hero.id,
+  )?.slotIndex;
   return (
     <section className="persistent-content">
       <ScreenHeading
@@ -39,8 +42,22 @@ export function HeroDetailScreen({
           {'☆'.repeat(5 - hero.stars)}
         </div>
         <h2>Level {hero.level}</h2>
-        <p>Total EXP: {hero.totalExperience.toLocaleString()} / 22,864</p>
-        <p>Shards: {hero.shards}</p>
+        <div className="hero-facts">
+          <span>
+            <small>Total experience</small>
+            <strong>{hero.totalExperience.toLocaleString()}</strong>
+          </span>
+          <span>
+            <small>Shard pouch</small>
+            <strong>{hero.shards} shards</strong>
+          </span>
+          {activeSlot && (
+            <span>
+              <small>Formation</small>
+              <strong>Active slot {activeSlot}</strong>
+            </span>
+          )}
+        </div>
         {cost === null ? (
           <strong>Maximum Stars reached</strong>
         ) : (
@@ -49,7 +66,7 @@ export function HeroDetailScreen({
             disabled={busy || hero.shards < cost}
             onClick={() => upgrade(hero.id)}
           >
-            Upgrade Star · {cost} Shards
+            {busy ? 'Upgrading…' : `Upgrade star · ${cost} shards`}
           </button>
         )}
       </div>

@@ -62,15 +62,15 @@ describe('persistent UI', () => {
         onPlayOnline={vi.fn()}
       />,
     );
-    expect(screen.getByRole('heading', { name: 'Odd Tester' })).toBeInTheDocument();
-    expect(screen.getByText('💎 300')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Collection/u })).toBeInTheDocument();
+    expect(screen.getByText('Welcome back, Odd Tester')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Your expedition' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enter Floor 1 online' })).toBeInTheDocument();
   });
 
   it('labels ownership without relying only on rarity color', () => {
     render(<CollectionScreen player={player} back={vi.fn()} selectHero={vi.fn()} />);
     expect(
-      screen.getByRole('button', { name: 'Grilled Chicken Executioner, owned' }),
+      screen.getByRole('button', { name: /Grilled Chicken Executioner, owned, level 1/ }),
     ).toBeInTheDocument();
   });
 });

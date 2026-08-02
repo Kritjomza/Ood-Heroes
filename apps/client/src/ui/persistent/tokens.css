@@ -18,4 +18,27 @@
   --p-focus: #315f9f;
   --p-shadow-soft: 0 18px 45px rgb(83 55 43 / 20%);
   --p-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --system-home: #f6b84a;
+  --system-heroes: #b67fe8;
+  --system-summon: #7654cf;
+  --system-team: #68c9ad;
+  --system-account: #f18478;
+  --plastic-light: #fffef9;
+  --plastic-shine: rgb(255 255 255 / 72%);
+  --plastic-shadow: rgb(84 52 43 / 22%);
+  --board-surface: #f7eed8;
+  --board-ink-muted: #75635c;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-control: 14px;
+  --radius-panel: 18px;
+  --motion-fast: 140ms;
+  --motion-screen: 220ms;
+  --layer-nav: 40;
+  --layer-toast: 50;
 }
