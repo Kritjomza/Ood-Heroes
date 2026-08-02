@@ -49,7 +49,26 @@ export class SupabasePersistenceService implements PlayerPersistenceService {
       p_idempotency_key: idempotencyKey,
     });
     const validated = validateSummonResult(data);
-    if (!validated.ok) throw new DomainError(validated.code, 503);
+    if (!validated.ok) {
+      if (!isLegacySummonResult(data)) throw new DomainError(validated.code, 503);
+      const bootstrap = await this.bootstrap(userId);
+      const definition = bootstrap.heroDefinitions.find(
+        (candidate) => candidate.id === data.heroDefinitionId,
+      );
+      if (!definition) throw new DomainError('SCHEMA_VERSION_MISMATCH', 503);
+      return {
+        outcomeType: data.outcomeType,
+        heroDefinitionId: data.heroDefinitionId,
+        heroDisplayName: definition.displayName,
+        heroRarity: definition.rarity,
+        shardsAwarded: data.shardsAwarded,
+        gemCost: data.gemCost,
+        gemBalance: data.gemBalance,
+        pityBefore: data.pityBefore,
+        pityAfter: data.pityAfter,
+        alreadyApplied: false,
+      };
+    }
     return validated.value;
   }
 
@@ -140,4 +159,24 @@ export class SupabasePersistenceService implements PlayerPersistenceService {
       throw mapPersistenceError(error);
     }
   }
+}
+
+function isLegacySummonResult(value: unknown): value is {
+  outcomeType: 'new_hero' | 'duplicate';
+  heroDefinitionId: string;
+  shardsAwarded: number;
+  gemCost: number;
+  gemBalance: number;
+  pityBefore: number;
+  pityAfter: number;
+} {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    (candidate.outcomeType === 'new_hero' || candidate.outcomeType === 'duplicate') &&
+    typeof candidate.heroDefinitionId === 'string' &&
+    ['shardsAwarded', 'gemCost', 'gemBalance', 'pityBefore', 'pityAfter'].every(
+      (key) => Number.isSafeInteger(candidate[key]) && (candidate[key] as number) >= 0,
+    )
+  );
 }
