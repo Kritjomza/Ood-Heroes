@@ -1,0 +1,131 @@
+import Phaser from 'phaser';
+import { FLOOR_ONE_MAP, WORLD, floorOneObject } from '@odd-tower/game-core';
+
+const ZONE_COLORS: Record<string, number> = {
+  portal: 0x49305f,
+  guardian_arena: 0x496375,
+  chocolate_swamp: 0x4b302d,
+  spicy_forest: 0x713a32,
+  beginner_fields: 0x496b3f,
+  central_camp: 0x315f60,
+};
+
+export class FloorOneRenderer {
+  private portal: Phaser.GameObjects.Arc | null = null;
+  private collisionDebug: Phaser.GameObjects.Container | null = null;
+  private guardian: Phaser.GameObjects.Container | null = null;
+  private guardianBody: Phaser.GameObjects.Rectangle | null = null;
+  private guardianHp: Phaser.GameObjects.Rectangle | null = null;
+  private adds: Phaser.GameObjects.Arc[] = [];
+
+  constructor(private readonly scene: Phaser.Scene) {}
+
+  create() {
+    this.scene.add.rectangle(WORLD.size / 2, WORLD.size / 2, WORLD.size, WORLD.size, 0x203a35).setDepth(-20);
+    for (const object of FLOOR_ONE_MAP.objects.filter((item) => item.type === 'zone')) {
+      this.scene.add
+        .rectangle(
+          (object.x + object.width / 2) * WORLD.tileSize,
+          (object.y + object.height / 2) * WORLD.tileSize,
+          object.width * WORLD.tileSize,
+          object.height * WORLD.tileSize,
+          ZONE_COLORS[object.zone] ?? 0x35454a,
+          object.zone === 'central_camp' ? 0.94 : 0.72,
+        )
+        .setDepth(-18);
+    }
+    const slow = FLOOR_ONE_MAP.layers.find((layer) => layer.name === 'Terrain_Slow')?.rects ?? [];
+    for (const rect of slow)
+      this.scene.add
+        .rectangle(
+          (rect.x + rect.width / 2) * 32,
+          (rect.y + rect.height / 2) * 32,
+          rect.width * 32,
+          rect.height * 32,
+          0x5d352f,
+          0.82,
+        )
+        .setStrokeStyle(3, 0xc18a62, 0.55)
+        .setDepth(-16);
+    for (const landmark of FLOOR_ONE_MAP.objects.filter((item) => item.type === 'landmark'))
+      this.scene.add
+        .text((landmark.x + 0.5) * 32, (landmark.y + 0.5) * 32, this.landmarkLabel(landmark.id), {
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: '14px',
+          color: '#fff7d7',
+          backgroundColor: '#17252bcc',
+          padding: { x: 7, y: 4 },
+        })
+        .setOrigin(0.5)
+        .setDepth(2);
+    const portal = floorOneObject('portal.floor_2')!;
+    this.portal = this.scene.add
+      .circle((portal.x + portal.width / 2) * 32, (portal.y + portal.height / 2) * 32, 58, 0x372147, 0.9)
+      .setStrokeStyle(8, 0x8863a7, 0.85)
+      .setDepth(1);
+    this.scene.add
+      .text(this.portal.x, this.portal.y + 78, 'SEALED PORTAL', { fontSize: '16px', color: '#dac8e8' })
+      .setOrigin(0.5)
+      .setDepth(2)
+      .setName('floor-one-portal-label');
+    const boss = floorOneObject('boss.angry_refrigerator')!;
+    this.guardian = this.scene.add.container((boss.x + 0.5) * 32, (boss.y + 0.5) * 32).setDepth(4);
+    const shadow = this.scene.add.ellipse(0, 30, 92, 30, 0x101820, 0.3);
+    this.guardianBody = this.scene.add.rectangle(0, 0, 78, 106, 0xf0dfbd).setStrokeStyle(6, 0x2b1a14);
+    const face = this.scene.add.text(0, -8, '▰  ▰\n  ▂', { fontSize: '18px', color: '#3c8f98', align: 'center' }).setOrigin(0.5);
+    const hpBack = this.scene.add.rectangle(0, -72, 122, 10, 0x321d24);
+    this.guardianHp = this.scene.add.rectangle(-60, -72, 120, 7, 0x78c8e3).setOrigin(0, 0.5);
+    this.guardian.add([shadow, this.guardianBody, face, hpBack, this.guardianHp]).setVisible(false);
+    this.scene.add
+      .text(WORLD.safeCenter.x, WORLD.safeCenter.y - 180, 'CENTRAL CAMP • SAFE ZONE', {
+        fontSize: '20px',
+        color: '#d6fff4',
+      })
+      .setOrigin(0.5)
+      .setDepth(2);
+  }
+
+  setPortalUnlocked(unlocked: boolean) {
+    this.portal?.setFillStyle(unlocked ? 0x6e52b5 : 0x372147, 0.92).setStrokeStyle(8, unlocked ? 0xc9b3ff : 0x8863a7, 0.9);
+    const label = this.scene.children.getByName('floor-one-portal-label') as Phaser.GameObjects.Text | null;
+    label?.setText(unlocked ? 'PORTAL READY • ENTER MANUALLY' : 'SEALED PORTAL');
+  }
+
+  setGuardian(state: { status: string; phase: string; currentHp: number; maxHp: number; activeAdds: number } | null) {
+    if (!state || !this.guardian || !this.guardianBody || !this.guardianHp) return;
+    this.guardian.setVisible(state.status === 'active' || state.status === 'defeated');
+    this.guardian.setAlpha(state.status === 'defeated' ? 0.25 : 1);
+    this.guardianBody.setFillStyle(state.phase === 'enraged' ? 0xe56c67 : 0xf0dfbd);
+    this.guardianHp.width = 120 * Math.max(0, Math.min(1, state.currentHp / Math.max(1, state.maxHp)));
+    while (this.adds.length < state.activeAdds) {
+      const index = this.adds.length;
+      this.adds.push(
+        this.scene.add
+          .circle(this.guardian.x + (index === 0 ? -120 : 120), this.guardian.y + 55, 20, index === 0 ? 0x78c8e3 : 0x3c8f98)
+          .setStrokeStyle(4, 0x2b1a14)
+          .setDepth(4),
+      );
+    }
+    this.adds.forEach((add, index) => add.setVisible(index < state.activeAdds && state.status === 'active'));
+  }
+
+  setCollisionDebug(visible: boolean) {
+    if (!this.collisionDebug) {
+      this.collisionDebug = this.scene.add.container(0, 0).setDepth(99);
+      const rects = FLOOR_ONE_MAP.layers.find((layer) => layer.name === 'Collision')?.rects ?? [];
+      for (const rect of rects)
+        this.collisionDebug.add(
+          this.scene.add
+            .rectangle((rect.x + rect.width / 2) * 32, (rect.y + rect.height / 2) * 32, rect.width * 32, rect.height * 32, 0xff315f, 0.18)
+            .setStrokeStyle(1, 0xff7b9c, 0.65),
+        );
+    }
+    this.collisionDebug.setVisible(visible);
+  }
+
+  private landmarkLabel(id: string) {
+    if (id.includes('summon')) return '✦ SUMMON SHRINE';
+    if (id.includes('team')) return '⚑ TEAM STATION';
+    return '▣ AFK REWARD';
+  }
+}

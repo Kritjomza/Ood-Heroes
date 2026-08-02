@@ -9,7 +9,11 @@ describe('AssetRegistry', () => {
       registry.entries().filter((entry) => entry.kind === 'hero' && entry.id.endsWith('.portrait')),
     ).toHaveLength(6);
     expect(
-      PHASE_4_ASSETS.every((entry) => entry.replacementPath.startsWith('/assets/final/')),
+      PHASE_4_ASSETS.every(
+        (entry) =>
+          entry.replacementPath.startsWith('/assets/final/') ||
+          entry.replacementPath.startsWith('/assets/game/'),
+      ),
     ).toBe(true);
     expect(registry.resolve('missing.asset')).toMatchObject({
       fallback: '?',
@@ -21,5 +25,14 @@ describe('AssetRegistry', () => {
     expect(() => new AssetRegistry([PHASE_4_ASSETS[0]!, PHASE_4_ASSETS[0]!])).toThrow(
       'Duplicate Asset ID',
     );
+  });
+
+  it('uses the approved 75-ID contract with six single-image hero world visuals', () => {
+    const ids = PHASE_4_ASSETS.map((asset) => asset.id);
+    expect(ids).toHaveLength(75);
+    expect(ids.filter((id) => id.endsWith('.world'))).toHaveLength(6);
+    expect(ids.some((id) => /\.sprite_(idle_|walk_|attack$)/u.test(id))).toBe(false);
+    expect(ids).toContain('hero.grilled_chicken.world');
+    expect(ids).toContain('hero.samurai_bread.world');
   });
 });

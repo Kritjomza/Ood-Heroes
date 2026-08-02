@@ -48,7 +48,10 @@ export function moveCardinal(
   if (!Number.isFinite(durationMs) || durationMs <= 0 || !Number.isFinite(speed) || speed < 0)
     return { ...position };
   const vector = directionVector[direction];
-  const distance = speed * (durationMs / 1000);
+  const tileX = Math.floor(position.x / WORLD.tileSize);
+  const tileY = Math.floor(position.y / WORLD.tileSize);
+  const terrainMultiplier = Math.max(0, Math.min(1, grid.terrainMultiplierAt?.(tileX, tileY) ?? 1));
+  const distance = speed * terrainMultiplier * (durationMs / 1000);
   const candidate = {
     x: position.x + vector.x * distance,
     y: position.y + vector.y * distance,

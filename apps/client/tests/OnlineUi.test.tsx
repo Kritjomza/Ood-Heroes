@@ -83,6 +83,7 @@ describe('online mode UI', () => {
           heroes: [
             {
               id: 'p:fighter',
+              definitionId: 'hero_001_grilled_chicken',
               role: 'fighter',
               level: 3,
               experience: 20,
@@ -145,6 +146,7 @@ describe('online mode UI', () => {
           heroes: [
             {
               id: 'p:tank',
+              definitionId: 'hero_003_robot_jelly',
               role: 'tank',
               level: 1,
               experience: 0,
@@ -156,6 +158,7 @@ describe('online mode UI', () => {
             },
             {
               id: 'p:support',
+              definitionId: 'hero_004_tofu_rabbit',
               role: 'support',
               level: 1,
               experience: 0,

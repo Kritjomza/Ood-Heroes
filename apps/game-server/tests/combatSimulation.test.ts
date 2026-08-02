@@ -13,6 +13,49 @@ function tickMany(
 }
 
 describe('authoritative shared combat simulation', () => {
+  it('preserves persistent definition identity independently from combat role through respawn', () => {
+    const combat = new CombatSimulation('room-definition-identity', 91);
+    combat.addPlayer('a', [
+      {
+        id: 'owned-hero-1',
+        definitionId: 'hero_001_grilled_chicken',
+        role: 'fighter',
+        level: 1,
+        totalExperience: 0,
+        maxHp: 100,
+        attack: 10,
+        defense: 2,
+        attackRange: 52,
+        attackCooldownMs: 800,
+      },
+      {
+        id: 'owned-hero-2',
+        definitionId: 'hero_002_pink_chocolate_lizard',
+        role: 'fighter',
+        level: 1,
+        totalExperience: 0,
+        maxHp: 90,
+        attack: 12,
+        defense: 1,
+        attackRange: 58,
+        attackCooldownMs: 700,
+      },
+    ]);
+    const player = createSimulationPlayer('a', 'Alpha', { x: 500, y: 500 });
+
+    expect(combat.playerSnapshot('a')!.heroes.map((hero) => hero.definitionId)).toEqual([
+      'hero_001_grilled_chicken',
+      'hero_002_pink_chocolate_lizard',
+    ]);
+
+    combat.forceTeamWipe('a');
+    tickMany(combat, [player], 101);
+    expect(combat.playerSnapshot('a')!.heroes.map((hero) => hero.definitionId)).toEqual([
+      'hero_001_grilled_chicken',
+      'hero_002_pink_chocolate_lizard',
+    ]);
+  });
+
   it('creates one shared validated 34-monster population and scales without exceeding 50', () => {
     const combat = new CombatSimulation('room-a', 123);
     expect(combat.monsterSnapshots()).toHaveLength(34);
@@ -80,7 +123,7 @@ describe('authoritative shared combat simulation', () => {
     expect(combat.playerSnapshot('a')!.heroes.every((hero) => hero.currentHp === hero.maxHp)).toBe(
       true,
     );
-    expect(player.state).toMatchObject({ x: 1024, y: 1024 });
+    expect(player.state).toMatchObject({ x: 1040, y: 1520 });
   });
 
   it('lets Lost Pudding heal an injured nearby living monster without creating contribution', () => {
@@ -163,14 +206,14 @@ describe('authoritative shared combat simulation', () => {
     });
   });
 
-  it('centers on a cached waypoint before turning through a one-tile wall gap', () => {
+  it('centers on a cached waypoint while navigating toward a one-tile wall gap', () => {
     const combat = new CombatSimulation('room-wall', 1);
     combat.addPlayer('a');
-    const player = createSimulationPlayer('a', 'Alpha', { x: 656, y: 528 });
+    const player = createSimulationPlayer('a', 'Alpha', { x: 656, y: 816 });
     const monsterId = combat.setupWallNavigation('a')!;
     tickMany(combat, [player], 100);
     const monster = combat.monsterSnapshots().find((candidate) => candidate.id === monsterId)!;
     expect(combat.diagnostics().pathCalculations).toBeGreaterThan(0);
-    expect(monster.x).toBeGreaterThan(608);
+    expect(monster.x).toBeGreaterThan(528);
   });
 });

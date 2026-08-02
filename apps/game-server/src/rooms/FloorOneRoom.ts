@@ -242,6 +242,16 @@ export class FloorOneRoom extends Room<{
       this.projectCombat();
       return;
     }
+    if (command.value.type === 'complete-floor-one') {
+      const result = this.combat.completeFloorOnePortal(
+        client.sessionId,
+        command.value.requestId,
+        command.value.manualEntry,
+      );
+      client.send('floor-one-completion', result);
+      this.projectCombat();
+      return;
+    }
     const result = acceptPlayerCommand(simulation, command.value, Date.now());
     if (result !== 'accepted') {
       client.send('error', { code: 'STALE_SEQUENCE' });
@@ -277,7 +287,7 @@ export class FloorOneRoom extends Room<{
     }
     if (action === 'team-wipe') return { ok: this.combat.forceTeamWipe(playerId), playerId };
     if (action === 'wall-navigation') {
-      Object.assign(simulation.state, { x: 656, y: 528, direction: 'none', moving: false });
+      Object.assign(simulation.state, { x: 656, y: 816, direction: 'none', moving: false });
       return { ok: true, playerId, monsterId: this.combat.setupWallNavigation(playerId) };
     }
     if (action === 'tap-target')
@@ -409,6 +419,11 @@ export class FloorOneRoom extends Room<{
         focusedMonsterId: snapshot.focusedMonsterId ?? '',
         autoHuntTargetMonsterId: snapshot.autoHuntTargetMonsterId ?? '',
         teamRespawnAtTick: snapshot.teamRespawnAtTick ?? -1,
+        floorProgress: snapshot.floorProgress ?? 0,
+        guardianEligible: snapshot.guardianEligible ?? false,
+        bossDefeated: snapshot.bossDefeated ?? false,
+        portalEligibility: snapshot.portalEligibility ?? 'progress-required',
+        floorCompleted: snapshot.floorCompleted ?? false,
       });
       while (schema.heroes.length > snapshot.heroes.length) schema.heroes.pop();
       snapshot.heroes.forEach((hero, index) => {
@@ -419,6 +434,7 @@ export class FloorOneRoom extends Room<{
         }
         this.assignChanged(heroSchema, {
           id: hero.id,
+          definitionId: hero.definitionId,
           role: hero.role,
           level: hero.level,
           experience: hero.experience,
@@ -443,6 +459,7 @@ export class FloorOneRoom extends Room<{
     }
     for (const id of this.state.combatPlayers.keys())
       if (!seenPlayers.has(id)) this.state.combatPlayers.delete(id);
+    this.assignChanged(this.state.guardian, this.combat.floorGuardianSnapshot());
   }
 
   private updateMetadata() {
@@ -457,7 +474,7 @@ export class FloorOneRoom extends Room<{
   }
 }
 
-function persistentCombatHeroes(bootstrap: PlayerBootstrap): CombatHeroInput[] {
+export function persistentCombatHeroes(bootstrap: PlayerBootstrap): CombatHeroInput[] {
   return bootstrap.activeTeam.slots.flatMap((slot) => {
     const hero = bootstrap.heroes.find((entry) => entry.id === slot.playerHeroId);
     const definition = HERO_DEFINITIONS.find((entry) => entry.id === hero?.definitionId);
@@ -472,6 +489,7 @@ function persistentCombatHeroes(bootstrap: PlayerBootstrap): CombatHeroInput[] {
     return [
       {
         id: hero.id,
+        definitionId: definition.id,
         role,
         level: hero.level,
         totalExperience: hero.totalExperience,

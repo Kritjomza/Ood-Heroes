@@ -7,6 +7,7 @@ import type {
 
 export type CombatHeroUiState = {
   id: string;
+  definitionId: string;
   role: HeroRole;
   level: number;
   experience: number;
@@ -103,6 +104,7 @@ function sameUiState(a: MultiplayerUiState, b: MultiplayerUiState) {
     return (
       other !== undefined &&
       hero.id === other.id &&
+      hero.definitionId === other.definitionId &&
       hero.role === other.role &&
       hero.level === other.level &&
       hero.experience === other.experience &&

@@ -1,26 +1,17 @@
 import { WORLD } from './config.js';
+import { FLOOR_ONE_MAP, createNavigationGrid, floorOneObject } from './floor-one-map.js';
 import type { GridPoint, Vector2 } from './types.js';
+const navigationGrid = createNavigationGrid(FLOOR_ONE_MAP);
 const blocked = new Set<string>();
-for (let i = 0; i < 64; i++) {
-  blocked.add(`${i},0`);
-  blocked.add(`${i},63`);
-  blocked.add(`0,${i}`);
-  blocked.add(`63,${i}`);
-}
-for (let y = 8; y < 25; y++) if (y !== 17) blocked.add(`18,${y}`);
-for (let x = 38; x < 55; x++) if (x !== 46) blocked.add(`${x},40`);
-for (let y = 42; y < 58; y++) if (y !== 52) blocked.add(`45,${y}`);
+for (let y = 0; y < FLOOR_ONE_MAP.height; y++)
+  for (let x = 0; x < FLOOR_ONE_MAP.width; x++)
+    if (!navigationGrid.isWalkable(x, y)) blocked.add(`${x},${y}`);
 export const prototypeMap = {
-  width: 64,
-  height: 64,
-  isWalkable: (x: number, y: number) =>
-    Number.isInteger(x) &&
-    Number.isInteger(y) &&
-    x >= 0 &&
-    y >= 0 &&
-    x < 64 &&
-    y < 64 &&
-    !blocked.has(`${x},${y}`),
+  width: FLOOR_ONE_MAP.width,
+  height: FLOOR_ONE_MAP.height,
+  isWalkable: navigationGrid.isWalkable,
+  costAt: navigationGrid.costAt,
+  terrainMultiplierAt: navigationGrid.terrainMultiplierAt,
   blocked,
 };
 export const worldToTile = (p: Vector2): GridPoint => ({
@@ -32,24 +23,17 @@ export const tileToWorld = (p: GridPoint): Vector2 => ({
   y: p.y * WORLD.tileSize + 16,
 });
 export const isInSafeZone = (p: Vector2) =>
-  Math.hypot(p.x - WORLD.safeCenter.x, p.y - WORLD.safeCenter.y) <= WORLD.safeRadius;
-export const MONSTER_SPAWNS: Vector2[] = [
-  { x: 700, y: 980 },
-  { x: 640, y: 1100 },
-  { x: 790, y: 1210 },
-  { x: 1240, y: 800 },
-  { x: 1380, y: 720 },
-  { x: 1510, y: 920 },
-  { x: 420, y: 420 },
-  { x: 560, y: 480 },
-  { x: 1640, y: 1420 },
-  { x: 1500, y: 1600 },
-  { x: 380, y: 1480 },
-  { x: 560, y: 1640 },
-  { x: 1280, y: 1240 },
-  { x: 1440, y: 1160 },
-  { x: 1720, y: 560 },
-  { x: 980, y: 480 },
-  { x: 960, y: 1540 },
-  { x: 1160, y: 1720 },
-];
+  (() => {
+    const safe = floorOneObject('zone.central_camp')!;
+    const tileX = p.x / WORLD.tileSize;
+    const tileY = p.y / WORLD.tileSize;
+    return tileX >= safe.x && tileY >= safe.y && tileX < safe.x + safe.width && tileY < safe.y + safe.height;
+  })();
+export const MONSTER_SPAWNS: Vector2[] = FLOOR_ONE_MAP.objects
+  .filter((object) => object.type === 'monster_spawn')
+  .flatMap((object) => [
+    tileToWorld(object),
+    tileToWorld({ x: object.x + 1, y: object.y }),
+    tileToWorld({ x: object.x, y: object.y + 1 }),
+    tileToWorld({ x: object.x - 1, y: object.y }),
+  ]);

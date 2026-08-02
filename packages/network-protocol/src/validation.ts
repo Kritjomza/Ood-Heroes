@@ -64,6 +64,19 @@ export function validateClientCommand(
       value: { type: 'auto-hunt', enabled: value.enabled, clientSentAtMs: value.clientSentAtMs },
     };
   }
+  if (value.type === 'complete-floor-one') {
+    if (!isBoundedId(value.requestId) || value.manualEntry !== true)
+      return { ok: false, code: 'INVALID_COMMAND' };
+    return {
+      ok: true,
+      value: {
+        type: 'complete-floor-one',
+        requestId: value.requestId,
+        manualEntry: true,
+        clientSentAtMs: value.clientSentAtMs,
+      },
+    };
+  }
   if (!isSequence(value.sequence)) return { ok: false, code: 'INVALID_COMMAND' };
   if (value.type === 'heartbeat')
     return {

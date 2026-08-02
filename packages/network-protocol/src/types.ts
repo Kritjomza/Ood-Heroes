@@ -26,12 +26,19 @@ export type ClientAutoHuntCommand = {
   enabled: boolean;
   clientSentAtMs: number;
 };
+export type ClientFloorOneCompletionCommand = {
+  type: 'complete-floor-one';
+  requestId: string;
+  manualEntry: true;
+  clientSentAtMs: number;
+};
 
 export type ClientCommand =
   | ClientMoveCommand
   | ClientHeartbeatCommand
   | ClientFocusTargetCommand
-  | ClientAutoHuntCommand;
+  | ClientAutoHuntCommand
+  | ClientFloorOneCompletionCommand;
 
 export type HeroRole = 'fighter' | 'tank' | 'support';
 export type HeroCombatStatus = 'alive' | 'defeated' | 'reviving';
@@ -61,6 +68,7 @@ export type NetworkTimedStatusEffect = {
 };
 export type NetworkHeroCombatState = {
   id: string;
+  definitionId: string;
   role: HeroRole;
   level: number;
   experience: number;
@@ -80,6 +88,20 @@ export type NetworkPlayerCombatState = {
   focusedMonsterId: string | null;
   autoHuntTargetMonsterId: string | null;
   teamRespawnAtTick: number | null;
+  floorProgress?: number;
+  guardianEligible?: boolean;
+  bossDefeated?: boolean;
+  portalEligibility?: 'eligible' | 'progress-required' | 'boss-required' | 'already-completed';
+  floorCompleted?: boolean;
+};
+export type NetworkFloorGuardianState = {
+  id: 'angry-refrigerator';
+  status: 'locked' | 'available' | 'active' | 'defeated';
+  phase: 'normal' | 'enraged';
+  currentHp: number;
+  maxHp: number;
+  activeAdds: number;
+  portalUnlocked: boolean;
 };
 export type NetworkMonsterState = {
   id: string;

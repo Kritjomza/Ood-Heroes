@@ -40,6 +40,7 @@ describe('MultiplayerBridge', () => {
       heroes: [
         {
           id: 'p:fighter',
+          definitionId: 'hero_001_grilled_chicken',
           role: 'fighter',
           level: 2,
           experience: 3,
@@ -67,6 +68,7 @@ describe('MultiplayerBridge', () => {
     const heroes = [
       {
         id: 'p:fighter',
+        definitionId: 'hero_001_grilled_chicken',
         role: 'fighter' as const,
         level: 1,
         experience: 0,
@@ -80,6 +82,28 @@ describe('MultiplayerBridge', () => {
     bridge.update({ connection: 'connected', heroes: heroes.map((hero) => ({ ...hero })) });
     expect(listener).toHaveBeenCalledTimes(2);
     bridge.update({ heroes: [{ ...heroes[0]!, currentHp: 90 }] });
+    expect(listener).toHaveBeenCalledTimes(3);
+  });
+
+  it('publishes a patch when persistent hero identity changes without a role change', () => {
+    const bridge = new MultiplayerBridge();
+    const listener = vi.fn();
+    bridge.subscribe(listener);
+    const hero = {
+      id: 'owned-hero',
+      definitionId: 'hero_001_grilled_chicken',
+      role: 'fighter' as const,
+      level: 1,
+      experience: 0,
+      nextExperience: 50,
+      currentHp: 100,
+      maxHp: 100,
+      status: 'alive' as const,
+    };
+    bridge.update({ heroes: [hero] });
+    bridge.update({
+      heroes: [{ ...hero, definitionId: 'hero_002_pink_chocolate_lizard' }],
+    });
     expect(listener).toHaveBeenCalledTimes(3);
   });
 });

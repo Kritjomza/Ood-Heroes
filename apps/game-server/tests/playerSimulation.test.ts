@@ -49,14 +49,14 @@ describe('authoritative player simulation', () => {
   });
 
   it('does not move through shared collision or world bounds', () => {
-    const wall = createSimulationPlayer('p1', 'One', { x: 559, y: 544 });
+    const wall = createSimulationPlayer('p1', 'One', { x: 527, y: 720 });
     acceptPlayerCommand(
       wall,
       { type: 'move', sequence: 1, direction: 'right', clientSentAtMs: 0 },
       0,
     );
     tickPlayer(wall, 50);
-    expect(wall.state.x).toBe(559);
+    expect(wall.state.x).toBe(527);
 
     const edge = createSimulationPlayer('p2', 'Two', { x: 15, y: 100 });
     acceptPlayerCommand(

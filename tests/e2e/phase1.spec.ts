@@ -1,11 +1,18 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
+
+async function openLocalPrototype(page: Page) {
+  const guest = page.getByRole('button', { name: 'Play as Guest' });
+  if (await guest.isVisible()) await guest.click();
+  await page.getByRole('button', { name: 'Play Local Prototype' }).click();
+}
+
 test('loads one playable canvas and supports keyboard and Auto Hunt override', async ({
   page,
 }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
-  await page.getByRole('button', { name: 'Local Prototype' }).click();
+  await openLocalPrototype(page);
   await expect(page.locator('canvas')).toHaveCount(1);
   await expect(page.getByTestId('hud')).toBeVisible();
   await page.getByRole('button', { name: /auto hunt/i }).click();
@@ -30,9 +37,9 @@ test('reload keeps one canvas and mobile controls avoid the primary actions', as
   page,
 }, testInfo) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Local Prototype' }).click();
+  await openLocalPrototype(page);
   await page.reload();
-  await page.getByRole('button', { name: 'Local Prototype' }).click();
+  await openLocalPrototype(page);
   await expect(page.locator('canvas')).toHaveCount(1);
   if (testInfo.project.name === 'mobile-landscape') {
     const joystick = page.getByLabel('Movement joystick'),

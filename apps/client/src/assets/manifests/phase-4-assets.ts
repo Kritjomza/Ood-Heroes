@@ -8,21 +8,13 @@ const heroes = [
   ['accountant_octopus', 'Accountant Octopus', '🐙'],
   ['samurai_bread', 'Samurai Bread', '🍞'],
 ] as const;
-const directions = ['down', 'up', 'left', 'right'] as const;
-
 const heroAssets = heroes.flatMap(([slug, label, fallback]) => {
   const base = `hero.${slug}`;
   return [
     entry(`${base}.portrait`, 'hero', `${label} portrait`, fallback),
     entry(`${base}.icon`, 'hero', `${label} icon`, fallback),
     entry(`${base}.collection_card`, 'hero', `${label} collection card`, fallback),
-    ...directions.map((direction) =>
-      entry(`${base}.sprite_idle_${direction}`, 'hero', `${label} idle ${direction}`, fallback),
-    ),
-    ...directions.map((direction) =>
-      entry(`${base}.sprite_walk_${direction}`, 'hero', `${label} walk ${direction}`, fallback),
-    ),
-    entry(`${base}.sprite_attack`, 'hero', `${label} attack`, fallback),
+    entry(`${base}.world`, 'hero', `${label} world image`, fallback),
     entry(`${base}.silhouette`, 'hero', `${label} silhouette`, '●'),
   ];
 });
@@ -81,12 +73,20 @@ export const PHASE_4_ASSETS: AssetEntry[] = [
 ];
 
 function entry(id: string, kind: AssetEntry['kind'], label: string, fallback: string): AssetEntry {
+  const worldSlug = id.startsWith('hero.') && id.endsWith('.world')
+    ? id.split('.')[1]
+    : null;
+  const monsterSlug = kind === 'monster' ? id.slice('monster.'.length) : null;
   return {
     id,
     kind,
     label,
     mock: kind === 'hero' ? 'css-hero' : 'glyph',
-    replacementPath: `/assets/final/${id.replaceAll('.', '/')}.webp`,
+    replacementPath: worldSlug
+      ? `/assets/game/heroes/${worldSlug}/world.webp`
+      : monsterSlug
+        ? `/assets/game/monsters/${monsterSlug}/world.webp`
+        : `/assets/final/${id.replaceAll('.', '/')}.webp`,
     fallback,
   };
 }

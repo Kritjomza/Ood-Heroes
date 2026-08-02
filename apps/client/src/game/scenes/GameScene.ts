@@ -20,9 +20,19 @@ import {
 } from '@odd-tower/game-core';
 import type { GameBridge } from '../bridge';
 import type { Controls } from '../createGame';
+import { FloorOneRenderer } from '../map/FloorOneRenderer';
+import {
+  createMotionState,
+  updateSingleSpriteMotion,
+  type SingleSpriteMotionState,
+} from '../animation/SingleSpriteMotionController';
 type HeroView = {
   role: HeroRole;
-  shape: Phaser.GameObjects.Arc;
+  shape: Phaser.GameObjects.Container;
+  visual: Phaser.GameObjects.Arc;
+  shadow: Phaser.GameObjects.Ellipse;
+  motion: SingleSpriteMotionState;
+  lastPosition: Vector2;
   hp: number;
   maxHp: number;
   attack: number;
@@ -36,6 +46,10 @@ type Mob = {
   id: string;
   shape: Phaser.GameObjects.Container;
   body: Phaser.Physics.Arcade.Body;
+  visual: Phaser.GameObjects.Container;
+  shadow: Phaser.GameObjects.Ellipse;
+  motion: SingleSpriteMotionState;
+  lastPosition: Vector2;
   hp: number;
   maxHp: number;
   level: number;
@@ -63,6 +77,7 @@ export class GameScene extends Phaser.Scene {
   private lastHud = 0;
   private lastPathAt = 0;
   private fxPool: Phaser.GameObjects.Arc[] = [];
+  private floorRenderer!: FloorOneRenderer;
   constructor(bridge: GameBridge, controls: Controls) {
     super({ key: 'game' });
     this.bridge = bridge;
@@ -107,14 +122,8 @@ export class GameScene extends Phaser.Scene {
     this.publish(0);
   }
   private drawMap() {
-    this.add.rectangle(WORLD.size / 2, WORLD.size / 2, WORLD.size, WORLD.size, 0x172d34);
-    this.add
-      .circle(WORLD.safeCenter.x, WORLD.safeCenter.y, WORLD.safeRadius, 0x315f60, 0.9)
-      .setStrokeStyle(6, 0x8de1cf);
-    this.add.text(940, 1000, 'SAFE ZONE', { fontSize: '22px', color: '#d6fff4' });
-    this.add.rectangle(520, 1050, 500, 700, 0x355c45, 0.35);
-    this.add.rectangle(1450, 850, 650, 650, 0x664d38, 0.35);
-    this.add.rectangle(1100, 1580, 900, 500, 0x4b426b, 0.35);
+    this.floorRenderer = new FloorOneRenderer(this);
+    this.floorRenderer.create();
     this.obstacles = this.physics.add.staticGroup();
     for (const cell of prototypeMap.blocked) {
       const [x, y] = cell.split(',').map(Number);
@@ -138,17 +147,18 @@ export class GameScene extends Phaser.Scene {
     make('anchor', 0xffffff, 30);
   }
   private createHeroes() {
-    const defs: [HeroRole, number][] = [
-      ['fighter', 0xffa64d],
-      ['tank', 0x68a7ff],
-      ['support', 0xffef6e],
+    const defs: HeroRole[] = [
+      'fighter',
+      'tank',
+      'support',
     ];
-    for (const [role, color] of defs) {
+    for (const role of defs) {
       const c = HERO_CONFIG[role],
         p = formationDestination(WORLD.safeCenter, 'down', role);
-      const shape = this.add
-        .circle(p.x, p.y, role === 'tank' ? 22 : 20, color)
-        .setStrokeStyle(4, 0xffffff, 0.8);
+      const shape = this.add.container(p.x, p.y).setDepth(3);
+      const shadow = this.add.ellipse(0, 18, 40, 14, 0x101820, 0.28);
+      const visual = this.add.circle(0, 0, 20, 0xffa64d).setStrokeStyle(4, 0x2b1a14, 0.9);
+      shape.add([shadow, visual]);
       this.add
         .text(p.x, p.y - 34, c.name.split(' ')[0], { fontSize: '14px', color: '#fff' })
         .setOrigin(0.5)
@@ -156,6 +166,10 @@ export class GameScene extends Phaser.Scene {
       this.heroes.push({
         role,
         shape,
+        visual,
+        shadow,
+        motion: createMotionState(role === 'tank' ? 'jelly' : role === 'support' ? 'floating' : 'normal'),
+        lastPosition: { ...p },
         hp: c.maxHp,
         maxHp: c.maxHp,
         attack: c.attack,
@@ -170,10 +184,12 @@ export class GameScene extends Phaser.Scene {
   private createMonsters() {
     MONSTER_SPAWNS.forEach((spawn, i) => {
       const radish = this.add.container(spawn.x, spawn.y);
+      const shadow = this.add.ellipse(0, 18, 36, 13, 0x101820, 0.28);
       const body = this.add.ellipse(0, 3, 30, 40, 0x79d14d).setStrokeStyle(3, 0x263a20);
       const leaf = this.add.triangle(0, -23, -10, 8, 0, -10, 10, 8, 0xb6ee77);
+      const visual = this.add.container(0, 0, [body, leaf]);
       const hp = this.add.rectangle(0, -32, 34, 4, 0x67e76e).setName('hp');
-      radish.add([body, leaf, hp]).setSize(32, 42).setInteractive();
+      radish.add([shadow, visual, hp]).setSize(32, 42).setInteractive();
       this.physics.add.existing(radish);
       const arcade = radish.body as Phaser.Physics.Arcade.Body;
       arcade.setCollideWorldBounds(true);
@@ -182,6 +198,10 @@ export class GameScene extends Phaser.Scene {
         id: `Radish ${i + 1}`,
         shape: radish,
         body: arcade,
+        visual,
+        shadow,
+        motion: createMotionState('normal', 'right', (i % 9) / 9),
+        lastPosition: { ...spawn },
         hp: MONSTER.maxHp,
         maxHp: MONSTER.maxHp,
         level: (i % 3) + 1,
@@ -201,7 +221,7 @@ export class GameScene extends Phaser.Scene {
       this.move(dir, HERO_CONFIG.fighter.moveSpeed);
     } else if (this.autoEnabled) this.updateAuto(time);
     else this.anchor.setVelocity(0);
-    this.updateFormation();
+    this.updateFormation(time);
     this.updateCombat(time);
     this.updateMonsters(time);
     this.updateRespawns(time);
@@ -228,7 +248,7 @@ export class GameScene extends Phaser.Scene {
       d === 'up' ? -speed : d === 'down' ? speed : 0,
     );
   }
-  private updateFormation() {
+  private updateFormation(time: number) {
     for (const h of this.heroes) {
       const dest = formationDestination(
         { x: this.anchor.x, y: this.anchor.y },
@@ -241,6 +261,17 @@ export class GameScene extends Phaser.Scene {
         h.shape.x = Phaser.Math.Linear(h.shape.x, dest.x, 0.12);
         h.shape.y = Phaser.Math.Linear(h.shape.y, dest.y, 0.12);
       }
+      h.motion = updateSingleSpriteMotion(h.motion, {
+        velocityX: (h.shape.x - h.lastPosition.x) * 60,
+        velocityY: (h.shape.y - h.lastPosition.y) * 60,
+        nowMs: time,
+      });
+      h.lastPosition = { x: h.shape.x, y: h.shape.y };
+      h.visual
+        .setPosition(h.motion.visualX, h.motion.visualY)
+        .setScale((h.motion.flipX ? -1 : 1) * h.motion.scaleX, h.motion.scaleY)
+        .setAngle(h.motion.angle);
+      h.shadow.setScale(h.motion.shadowScale).setAlpha(h.motion.shadowAlpha);
       const label = this.children.getByName(`${h.role}-label`) as Phaser.GameObjects.Text;
       label?.setPosition(h.shape.x, h.shape.y - 34);
       h.shape.setAlpha(h.status === 'alive' ? 1 : 0.25);
@@ -365,6 +396,17 @@ export class GameScene extends Phaser.Scene {
     const hero = this.heroes.find((h) => h.status === 'alive');
     for (const m of this.mobs) {
       if (m.status === 'defeated') continue;
+      m.motion = updateSingleSpriteMotion(m.motion, {
+        velocityX: (m.shape.x - m.lastPosition.x) * 60,
+        velocityY: (m.shape.y - m.lastPosition.y) * 60,
+        nowMs: time,
+      });
+      m.lastPosition = { x: m.shape.x, y: m.shape.y };
+      m.visual
+        .setPosition(m.motion.visualX, m.motion.visualY)
+        .setScale((m.motion.flipX ? -1 : 1) * m.motion.scaleX, m.motion.scaleY)
+        .setAngle(m.motion.angle);
+      m.shadow.setScale(m.motion.shadowScale).setAlpha(m.motion.shadowAlpha);
       const from = Phaser.Math.Distance.Between(m.shape.x, m.shape.y, m.spawn.x, m.spawn.y),
         to = hero
           ? Phaser.Math.Distance.Between(m.shape.x, m.shape.y, hero.shape.x, hero.shape.y)

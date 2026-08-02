@@ -12,6 +12,7 @@ import {
   effectiveHeroPosition,
   expireStatusEffects,
   findPath,
+  floorOneObject,
   isInSafeZone,
   moveCardinal,
   prototypeMap,
@@ -39,6 +40,7 @@ import type {
 import type { SimulationPlayer } from './playerSimulation.js';
 import { SpatialGrid } from './SpatialGrid.js';
 import { StuckTracker, chooseWanderDestination, findMonsterPath } from './MonsterNavigator.js';
+import { FloorOneProgressionSimulation } from './FloorOneProgressionSimulation.js';
 
 type Hero = NetworkHeroCombatState & {
   attack: number;
@@ -51,6 +53,7 @@ type Hero = NetworkHeroCombatState & {
 };
 export type CombatHeroInput = {
   id: string;
+  definitionId: string;
   role: HeroRole;
   level: number;
   totalExperience: number;
@@ -157,6 +160,7 @@ export class CombatSimulation {
   private readonly heroGrid = new SpatialGrid<HeroSpatial>(COMBAT_CONFIG.spatialCellSize);
   private readonly monsterGrid = new SpatialGrid<Monster>(COMBAT_CONFIG.spatialCellSize);
   private readonly heroIndex = new Map<string, HeroSpatial>();
+  private readonly floorOne = new FloorOneProgressionSimulation();
 
   constructor(
     private readonly roomId: string,
@@ -171,10 +175,12 @@ export class CombatSimulation {
   }
 
   addPlayer(playerId: string, persistentHeroes?: CombatHeroInput[]) {
+    this.floorOne.addPlayer(playerId);
     if (!this.players.has(playerId)) {
       const heroes: Hero[] = persistentHeroes?.length
-        ? persistentHeroes.map((hero) => ({
+          ? persistentHeroes.map((hero) => ({
             id: hero.id,
+            definitionId: hero.definitionId,
             role: hero.role,
             level: hero.level,
             experience: hero.totalExperience,
@@ -196,6 +202,7 @@ export class CombatSimulation {
             const definition = HERO_CONFIG[role];
             return {
               id: `${playerId}:${role}`,
+              definitionId: '',
               role,
               level: 1,
               experience: 0,
@@ -234,6 +241,7 @@ export class CombatSimulation {
 
   removePlayer(playerId: string) {
     this.players.delete(playerId);
+    this.floorOne.removePlayer(playerId);
     for (const monster of this.monsters.values()) monster.contributions.delete(playerId);
   }
 
@@ -303,8 +311,8 @@ export class CombatSimulation {
     if (!monster || !this.players.has(playerId)) return null;
     Object.assign(monster, {
       x: 528,
-      y: 528,
-      spawn: { x: 528, y: 528 },
+      y: 816,
+      spawn: { x: 528, y: 816 },
       targetPlayerId: playerId,
       targetHeroId: `${playerId}:fighter`,
       nextDecisionTick: this.tickNumber,
@@ -390,6 +398,19 @@ export class CombatSimulation {
 
   tick(simulations: Map<string, SimulationPlayer>) {
     this.tickNumber += 1;
+    this.floorOne.tick(this.tickNumber);
+    const arena = floorOneObject('arena.combat')!;
+    for (const [playerId, simulation] of simulations) {
+      const tileX = simulation.state.x / WORLD.tileSize;
+      const tileY = simulation.state.y / WORLD.tileSize;
+      const insideArena =
+        tileX >= arena.x &&
+        tileY >= arena.y &&
+        tileX < arena.x + arena.width &&
+        tileY < arena.y + arena.height;
+      if (insideArena && this.floorOne.playerSnapshot(playerId).guardianEligible)
+        this.floorOne.startGuardian(playerId);
+    }
     this.processWipes(simulations);
     for (const [playerId, player] of this.players) {
       const simulation = simulations.get(playerId);
@@ -401,8 +422,58 @@ export class CombatSimulation {
     this.rebuildSpatialIndexes(simulations);
     this.updateMonsters(simulations);
     this.resolveHeroAttacks(simulations);
+    this.resolveFloorGuardian(simulations);
     this.resolveSafeZoneAndRespawns(simulations);
     this.processMonsterRespawns();
+  }
+
+  private resolveFloorGuardian(simulations: Map<string, SimulationPlayer>) {
+    const guardian = this.floorOne.guardianSnapshot();
+    const bossObject = floorOneObject('boss.angry_refrigerator')!;
+    const bossPosition = tileToWorld(bossObject);
+    if (guardian.status === 'active') {
+      for (const [playerId, player] of this.players) {
+        const simulation = simulations.get(playerId);
+        if (!simulation || distance(simulation.state, bossPosition) > 300) continue;
+        for (const hero of player.heroes) {
+          if (hero.status !== 'alive' || this.tickNumber < hero.nextAttackTick) continue;
+          const position = effectiveHeroPosition(
+            simulation.state,
+            directionFor(simulation.state.direction),
+            hero.role,
+          );
+          if (distance(position, bossPosition) > hero.attackRange + 70) continue;
+          hero.nextAttackTick = this.tickNumber + hero.attackCooldownTicks;
+          const damage = Math.max(1, Math.floor(hero.attack - 4));
+          this.floorOne.damageGuardian(playerId, damage);
+          this.emit('hero-attack', { sourceId: hero.id, targetId: 'angry-refrigerator', amount: damage });
+          this.emit('damage', { sourceId: hero.id, targetId: 'angry-refrigerator', amount: damage });
+        }
+      }
+    }
+    for (const event of this.floorOne.drainEvents()) {
+      if (event.type !== 'frontal-attack' && event.type !== 'cold-wind') continue;
+      for (const [playerId, player] of this.players) {
+        const simulation = simulations.get(playerId);
+        if (!simulation || distance(simulation.state, bossPosition) > (event.type === 'frontal-attack' ? 190 : 260))
+          continue;
+        for (const hero of player.heroes) {
+          if (hero.status !== 'alive') continue;
+          if (event.type === 'frontal-attack')
+            this.applyHeroDamage(playerId, hero.id, guardian.phase === 'enraged' ? 28 : 20, 'angry-refrigerator');
+          else {
+            hero.effects = refreshMovementSlow(
+              hero.effects,
+              'angry-refrigerator',
+              this.tickNumber,
+              50,
+            );
+            hero.statusEffects = hero.effects;
+            this.emit('slow-applied', { sourceId: 'angry-refrigerator', targetId: hero.id, amount: 0.3 });
+          }
+        }
+      }
+    }
   }
 
   monsterSnapshots(): NetworkMonsterState[] {
@@ -416,6 +487,7 @@ export class CombatSimulation {
       playerId,
       heroes: player.heroes.map((hero) => ({
         id: hero.id,
+        definitionId: hero.definitionId,
         role: hero.role,
         level: hero.level,
         experience: hero.experience,
@@ -436,7 +508,28 @@ export class CombatSimulation {
       focusedMonsterId: player.focusedMonsterId,
       autoHuntTargetMonsterId: player.autoHuntTargetMonsterId,
       teamRespawnAtTick: player.teamRespawnAtTick,
+      ...this.floorOne.playerSnapshot(playerId),
     };
+  }
+
+  floorGuardianSnapshot() {
+    return this.floorOne.guardianSnapshot();
+  }
+
+  startFloorGuardian(playerId: string) {
+    return this.floorOne.startGuardian(playerId);
+  }
+
+  damageFloorGuardian(playerId: string, amount: number) {
+    return this.floorOne.damageGuardian(playerId, amount);
+  }
+
+  completeFloorOnePortal(playerId: string, requestId: string, manualEntry = true) {
+    return this.floorOne.completePortal(playerId, requestId, manualEntry);
+  }
+
+  forceFloorOneEligible(playerId: string) {
+    this.floorOne.forceEligible(playerId);
   }
 
   playerSnapshots() {
@@ -491,6 +584,7 @@ export class CombatSimulation {
     this.eventHistory.length = 0;
     this.pendingEvents.length = 0;
     this.processedRewards.clear();
+    this.floorOne.dispose();
     this.preparedSharedDeathMonsterId = null;
     this.heroGrid.clear();
     this.monsterGrid.clear();
@@ -879,6 +973,7 @@ export class CombatSimulation {
       )
         continue;
       this.processedRewards.add(key);
+      this.floorOne.recordMonsterReward(playerId);
       const definition = MONSTER_DEFINITIONS[monster.definitionId];
       player.sessionGold += definition.goldReward;
       this.rewardGrants += 1;

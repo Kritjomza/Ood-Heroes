@@ -55,6 +55,33 @@ describe('client command validation', () => {
     });
   });
 
+  it('accepts only bounded idempotent manual portal completion commands', () => {
+    expect(
+      validateClientCommand({
+        type: 'complete-floor-one',
+        requestId: 'portal-request-1',
+        manualEntry: true,
+        clientSentAtMs: 4,
+      }),
+    ).toEqual({
+      ok: true,
+      value: {
+        type: 'complete-floor-one',
+        requestId: 'portal-request-1',
+        manualEntry: true,
+        clientSentAtMs: 4,
+      },
+    });
+    expect(
+      validateClientCommand({
+        type: 'complete-floor-one',
+        requestId: '',
+        manualEntry: true,
+        clientSentAtMs: 4,
+      }),
+    ).toEqual({ ok: false, code: 'INVALID_COMMAND' });
+  });
+
   it.each([
     { type: 'focus-target', targetMonsterId: '', clientSentAtMs: 1 },
     { type: 'focus-target', targetMonsterId: 'x'.repeat(65), clientSentAtMs: 1 },

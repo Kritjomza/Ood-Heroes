@@ -41,7 +41,8 @@ export function findPath(grid: Grid, start: GridPoint, goal: GridPoint): GridPoi
         closed.has(nk)
       )
         continue;
-      const score = (g.get(key(cur)) ?? 0) + 1;
+      const stepCost = Math.max(1, grid.costAt?.(n.x, n.y) ?? 1);
+      const score = (g.get(key(cur)) ?? 0) + stepCost;
       if (score < (g.get(nk) ?? Infinity)) {
         came.set(nk, cur);
         g.set(nk, score);

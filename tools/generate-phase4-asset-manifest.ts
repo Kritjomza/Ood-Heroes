@@ -4,39 +4,28 @@ import { PHASE_4_ASSETS } from '../apps/client/src/assets/manifests/phase-4-asse
 type Priority = 'P0' | 'P1' | 'P2';
 
 const entries = PHASE_4_ASSETS.map((asset) => {
-  const sprite = asset.id.includes('.sprite_');
+  const sprite = asset.id.endsWith('.world');
   const portrait = asset.id.endsWith('.portrait');
   const icon = asset.id.endsWith('.icon');
   const collectionCard = asset.id.endsWith('.collection_card');
   const silhouette = asset.id.endsWith('.silhouette');
-  const attack = asset.id.endsWith('.sprite_attack');
   const monster = asset.kind === 'monster';
   const vfx = asset.kind === 'vfx';
   const entityName = asset.id.startsWith('hero.')
     ? asset.label.replace(
-        / (portrait|icon|collection card|idle .+|walk .+|attack|silhouette)$/u,
+        / (portrait|icon|collection card|world image|silhouette)$/u,
         '',
       )
     : monster
       ? asset.label
       : null;
-  const frameCount = attack
-    ? 32
-    : sprite && asset.id.includes('.sprite_walk_')
-      ? 6
-      : sprite
-        ? 4
-        : monster || vfx
-          ? 8
-          : 1;
-  const directions = attack
-    ? ['down', 'up', 'left', 'right']
-    : sprite
-      ? [asset.id.split('_').at(-1)!]
-      : monster
-        ? ['down', 'up', 'left', 'right']
-        : [];
-  const size = dimensions(asset.id, { portrait, icon, collectionCard, silhouette, sprite, vfx });
+  const frameCount = sprite || monster ? 1 : vfx ? 8 : 1;
+  const directions = sprite
+    ? ['right']
+    : monster
+      ? ['right']
+      : [];
+  const size = dimensions(asset.id, { portrait, icon, collectionCard, silhouette, sprite, monster, vfx });
   return {
     assetId: asset.id,
     category: asset.kind,
@@ -58,11 +47,7 @@ const entries = PHASE_4_ASSETS.map((asset) => {
     frameCount,
     anchorX: sprite || monster || vfx ? 0.5 : null,
     anchorY: sprite || monster ? 0.82 : vfx ? 0.5 : null,
-    atlasGroup: sprite
-      ? asset.id.split('.').slice(0, 2).join('.')
-      : monster
-        ? 'monsters.floor_1'
-        : vfx
+    atlasGroup: vfx
           ? 'vfx.floor_1'
           : null,
     mobileReadabilityNotes: 'Preserve a clear silhouette and readable contrast at 48 CSS pixels.',
@@ -105,13 +90,15 @@ function dimensions(
     collectionCard: boolean;
     silhouette: boolean;
     sprite: boolean;
+    monster: boolean;
     vfx: boolean;
   },
 ): [number, number] {
   if (flags.portrait || flags.silhouette) return [512, 512];
   if (flags.icon) return [128, 128];
   if (flags.collectionCard) return [640, 800];
-  if (flags.sprite) return id.includes('attack') ? [768, 384] : [576, 96];
+  if (flags.sprite) return [96, 96];
+  if (flags.monster) return [96, 96];
   if (flags.vfx) return [512, 512];
   if (id.includes('background')) return [1920, 1080];
   if (id.includes('.tiles')) return [1024, 1024];
@@ -145,7 +132,7 @@ function priority(id: string, kind: string): Priority {
     id.startsWith('ui.afk')
   )
     return 'P0';
-  if (id.includes('.sprite_') || kind === 'monster' || kind === 'map' || kind === 'vfx')
+  if (id.endsWith('.world') || kind === 'monster' || kind === 'map' || kind === 'vfx')
     return 'P1';
   return 'P2';
 }

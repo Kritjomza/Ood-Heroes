@@ -1,8 +1,14 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { assignChanged, statusEffectSignature } from '../src/rooms/schemaProjection';
+import { HeroCombatSchema } from '../src/schema/RoomState';
 
 describe('change-aware schema projection', () => {
+  it('initializes persistent hero visual identity for Colyseus snapshots', () => {
+    const hero = new HeroCombatSchema();
+    expect(hero.definitionId).toBe('');
+  });
+
   it('does not invoke setters for unchanged primitive values', () => {
     let writes = 0;
     let stored = 4;

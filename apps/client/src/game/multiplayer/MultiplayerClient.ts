@@ -11,6 +11,7 @@ import {
   type NetworkPlayerCombatState,
   type RoomSummary,
   type CombatEvent,
+  type NetworkFloorGuardianState,
 } from '@odd-tower/network-protocol';
 import type { Vector2 } from '@odd-tower/game-core';
 import { MultiplayerBridge } from './MultiplayerBridge';
@@ -30,6 +31,7 @@ type NetworkRoomState = RoomSummary & {
     forEach(callback: (value: NetworkPlayerCombatState, key: string) => void): void;
   };
   serverTick?: number;
+  guardian?: NetworkFloorGuardianState;
 };
 
 type Dependencies = {
@@ -67,6 +69,7 @@ export class MultiplayerClient {
   private hardCorrection = false;
   private readonly combatEventDedupe = new CombatEventDeduplicator();
   private readonly combatEventListeners = new Set<(event: CombatEvent) => void>();
+  private readonly floorCompletionListeners = new Set<(result: Record<string, unknown>) => void>();
 
   constructor(
     private readonly bridge: MultiplayerBridge,
@@ -113,6 +116,25 @@ export class MultiplayerClient {
   setAutoHunt(enabled: boolean) {
     if (!this.room) return;
     this.room.send('command', { type: 'auto-hunt', enabled, clientSentAtMs: Date.now() });
+  }
+
+  completeFloorOne() {
+    if (!this.room) return;
+    this.room.send('command', {
+      type: 'complete-floor-one',
+      requestId: `portal:${this.room.sessionId}:${Date.now()}`,
+      manualEntry: true,
+      clientSentAtMs: Date.now(),
+    });
+  }
+
+  onFloorCompletion(listener: (result: Record<string, unknown>) => void) {
+    this.floorCompletionListeners.add(listener);
+    return () => this.floorCompletionListeners.delete(listener);
+  }
+
+  currentGuardian() {
+    return this.room?.state.guardian ?? null;
   }
 
   getLocalPosition(): Vector2 | null {
@@ -169,6 +191,7 @@ export class MultiplayerClient {
     this.interpolation.clear();
     this.combatEventDedupe.clear();
     this.combatEventListeners.clear();
+    this.floorCompletionListeners.clear();
     try {
       if (room) await room.leave(true);
     } finally {
@@ -283,6 +306,10 @@ export class MultiplayerClient {
       if (!result.ok || !this.combatEventDedupe.accept(result.value.id)) return;
       for (const listener of this.combatEventListeners) listener(result.value);
     });
+    room.onMessage<Record<string, unknown>>('floor-one-completion', (message) => {
+      if (!message || typeof message.status !== 'string') return;
+      for (const listener of this.floorCompletionListeners) listener(message);
+    });
   }
 
   private consumeState(state: NetworkRoomState, reconnect = false) {
@@ -329,6 +356,7 @@ export class MultiplayerClient {
         sessionGold: combat.sessionGold,
         heroes: [...combat.heroes].map((hero) => ({
           id: hero.id,
+          definitionId: typeof hero.definitionId === 'string' ? hero.definitionId : '',
           role: hero.role,
           level: hero.level,
           experience: hero.experience,

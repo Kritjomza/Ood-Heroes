@@ -37,10 +37,21 @@ describe('shared cardinal movement', () => {
     });
   });
 
+  it('applies map-derived slow terrain without treating it as collision', () => {
+    const slowGrid = {
+      ...openGrid,
+      terrainMultiplierAt: (x: number, y: number) => (x === 3 && y === 3 ? 0.55 : 1),
+    };
+    expect(moveCardinal({ x: 112, y: 112 }, 'right', 100, 100, slowGrid, 0)).toEqual({
+      x: 117.5,
+      y: 112,
+    });
+  });
+
   it('returns deterministic safe-zone spawns that are walkable and in bounds', () => {
     const first = safePlayerSpawn(0);
     const wrapped = safePlayerSpawn(10);
-    expect(first).toEqual({ x: 1024, y: 1024 });
+    expect(first).toEqual({ x: 1040, y: 1520 });
     expect(wrapped).toEqual(first);
     expect(Number.isFinite(first.x) && Number.isFinite(first.y)).toBe(true);
   });

@@ -49,6 +49,7 @@ defineTypes(StatusEffectSchema, { type: 'string', magnitude: 'number', expiratio
 
 export class HeroCombatSchema extends Schema {
   declare id: string;
+  declare definitionId: string;
   declare role: string;
   declare level: number;
   declare experience: number;
@@ -61,6 +62,7 @@ export class HeroCombatSchema extends Schema {
   constructor() {
     super();
     this.id = '';
+    this.definitionId = '';
     this.role = 'fighter';
     this.level = 1;
     this.experience = 0;
@@ -74,6 +76,7 @@ export class HeroCombatSchema extends Schema {
 }
 defineTypes(HeroCombatSchema, {
   id: 'string',
+  definitionId: 'string',
   role: 'string',
   level: 'number',
   experience: 'number',
@@ -94,6 +97,11 @@ export class PlayerCombatSchema extends Schema {
   declare focusedMonsterId: string;
   declare autoHuntTargetMonsterId: string;
   declare teamRespawnAtTick: number;
+  declare floorProgress: number;
+  declare guardianEligible: boolean;
+  declare bossDefeated: boolean;
+  declare portalEligibility: string;
+  declare floorCompleted: boolean;
   constructor() {
     super();
     this.playerId = '';
@@ -104,6 +112,11 @@ export class PlayerCombatSchema extends Schema {
     this.focusedMonsterId = '';
     this.autoHuntTargetMonsterId = '';
     this.teamRespawnAtTick = -1;
+    this.floorProgress = 0;
+    this.guardianEligible = false;
+    this.bossDefeated = false;
+    this.portalEligibility = 'progress-required';
+    this.floorCompleted = false;
   }
 }
 defineTypes(PlayerCombatSchema, {
@@ -115,6 +128,40 @@ defineTypes(PlayerCombatSchema, {
   focusedMonsterId: 'string',
   autoHuntTargetMonsterId: 'string',
   teamRespawnAtTick: 'number',
+  floorProgress: 'number',
+  guardianEligible: 'boolean',
+  bossDefeated: 'boolean',
+  portalEligibility: 'string',
+  floorCompleted: 'boolean',
+});
+
+export class FloorGuardianSchema extends Schema {
+  declare id: string;
+  declare status: string;
+  declare phase: string;
+  declare currentHp: number;
+  declare maxHp: number;
+  declare activeAdds: number;
+  declare portalUnlocked: boolean;
+  constructor() {
+    super();
+    this.id = 'angry-refrigerator';
+    this.status = 'locked';
+    this.phase = 'normal';
+    this.currentHp = 5000;
+    this.maxHp = 5000;
+    this.activeAdds = 0;
+    this.portalUnlocked = false;
+  }
+}
+defineTypes(FloorGuardianSchema, {
+  id: 'string',
+  status: 'string',
+  phase: 'string',
+  currentHp: 'number',
+  maxHp: 'number',
+  activeAdds: 'number',
+  portalUnlocked: 'boolean',
 });
 
 export class MonsterSchema extends Schema {
@@ -177,6 +224,7 @@ export class FloorOneState extends Schema {
   declare monsters: MapSchema<MonsterSchema>;
   declare combatPlayers: MapSchema<PlayerCombatSchema>;
   declare serverTick: number;
+  declare guardian: FloorGuardianSchema;
 
   constructor() {
     super();
@@ -189,6 +237,7 @@ export class FloorOneState extends Schema {
     this.monsters = new MapSchema<MonsterSchema>();
     this.combatPlayers = new MapSchema<PlayerCombatSchema>();
     this.serverTick = 0;
+    this.guardian = new FloorGuardianSchema();
   }
 }
 defineTypes(FloorOneState, {
@@ -201,4 +250,5 @@ defineTypes(FloorOneState, {
   monsters: { map: MonsterSchema },
   combatPlayers: { map: PlayerCombatSchema },
   serverTick: 'number',
+  guardian: FloorGuardianSchema,
 });

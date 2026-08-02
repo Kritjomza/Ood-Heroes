@@ -42,6 +42,7 @@
     "test:restart": "node --env-file=.env --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs tools/local-supabase-runtime.ts node node_modules/vitest/vitest.mjs run apps/game-server/tests/databaseIntegration.test.ts",
     "assets:manifest": "tsx tools/generate-phase4-asset-manifest.ts",
     "assets:validate": "tsx tools/validate-phase4-assets.ts",
+    "prompts:validate": "tsx tools/validate-art-prompts.ts",
     "assets:screenshots": "node --env-file=.env --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs tools/local-supabase-runtime.ts node node_modules/@playwright/test/cli.js test tests/e2e/persistence.spec.ts",
     "secrets:scan": "node --env-file=.env --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs tools/local-supabase-runtime.ts node node_modules/tsx/dist/cli.mjs tools/scan-client-secrets.ts",
     "format": "prettier --write .",

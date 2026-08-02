@@ -58,4 +58,10 @@ export type AutoHuntState =
   | 'retreating'
   | 'recovering'
   | 'waiting';
-export type Grid = { width: number; height: number; isWalkable: (x: number, y: number) => boolean };
+export type Grid = {
+  width: number;
+  height: number;
+  isWalkable: (x: number, y: number) => boolean;
+  costAt?: (x: number, y: number) => number;
+  terrainMultiplierAt?: (x: number, y: number) => number;
+};
