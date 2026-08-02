@@ -2,6 +2,10 @@
 
 ## Automated checks completed
 
+- [x] Local and Online use one Sticker Adventure HUD shell.
+- [x] HUD exposes party, floor objective, session, action rail, action dock, objective feed, and minimap.
+- [x] HUD uses safe-area anchors, compact landscape/portrait rules, focus outlines, and reduced-motion rules.
+- [x] Floor dressing is deterministic and never places details on blocked tiles.
 - [x] Map is exactly 64×64 at 32 px per tile.
 - [x] All 12 required layer names validate.
 - [x] Spawn, camp exits, boss arena, and portal are reachable on the shared grid.

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { FLOOR_ONE_MAP, WORLD, floorOneObject } from '@odd-tower/game-core';
+import { createFloorOneVisualModel } from './floorOneVisualModel';
 
 const ZONE_COLORS: Record<string, number> = {
   portal: 0x49305f,
@@ -32,8 +33,10 @@ export class FloorOneRenderer {
           ZONE_COLORS[object.zone] ?? 0x35454a,
           object.zone === 'central_camp' ? 0.94 : 0.72,
         )
+        .setStrokeStyle(4, this.lighten(ZONE_COLORS[object.zone] ?? 0x35454a), 0.4)
         .setDepth(-18);
     }
+    this.createPixelGroundDetails();
     const slow = FLOOR_ONE_MAP.layers.find((layer) => layer.name === 'Terrain_Slow')?.rects ?? [];
     for (const rect of slow)
       this.scene.add
@@ -83,6 +86,48 @@ export class FloorOneRenderer {
       })
       .setOrigin(0.5)
       .setDepth(2);
+  }
+
+  private createPixelGroundDetails() {
+    const visual = createFloorOneVisualModel(FLOOR_ONE_MAP);
+    const grid = this.scene.add.graphics().setDepth(visual.depths.ground + 1).setAlpha(0.11);
+    grid.lineStyle(1, 0xf5ffd7);
+    for (let tile = 0; tile <= 64; tile += 2) {
+      grid.lineBetween(tile * 32, 0, tile * 32, WORLD.size);
+      grid.lineBetween(0, tile * 32, WORLD.size, tile * 32);
+    }
+    for (const detail of visual.details) {
+      const x = detail.tileX * 32 + 16;
+      const y = detail.tileY * 32 + 16;
+      if (detail.kind === 'grass') {
+        const grass = this.scene.add.graphics().setDepth(visual.depths.detail);
+        grass.lineStyle(3, detail.tint, 0.62);
+        grass.lineBetween(x - 5, y + 5, x - 2, y - 4);
+        grass.lineBetween(x, y + 5, x + 1, y - 6);
+        grass.lineBetween(x + 5, y + 5, x + 7, y - 3);
+        grass.setScale(detail.scale);
+      } else if (detail.kind === 'flower') {
+        this.scene.add.circle(x, y, 4 * detail.scale, detail.tint, 0.9).setStrokeStyle(2, 0xfff6d7, 0.8).setDepth(visual.depths.detail);
+      } else if (detail.kind === 'stone') {
+        this.scene.add.ellipse(x, y, 12 * detail.scale, 7 * detail.scale, detail.tint, 0.46).setDepth(visual.depths.detail);
+      } else {
+        this.scene.add.star(x, y, 4, 2, 5, detail.tint, 0.45).setDepth(visual.depths.detail);
+      }
+    }
+    const camp = floorOneObject('spawn.camp') ?? FLOOR_ONE_MAP.objects.find((item) => item.zone === 'central_camp');
+    if (camp) {
+      const cx = (camp.x + camp.width / 2) * 32;
+      const cy = (camp.y + camp.height / 2) * 32;
+      this.scene.add.ellipse(cx, cy + 32, 380, 180, 0xaeeac9, 0.08).setDepth(-14);
+      for (let i = 0; i < 8; i++) this.scene.add.circle(cx + Math.cos(i) * 120, cy + Math.sin(i) * 62, 4, 0xffdc72, 0.55).setDepth(-13);
+    }
+  }
+
+  private lighten(color: number) {
+    const r = Math.min(255, ((color >> 16) & 255) + 35);
+    const g = Math.min(255, ((color >> 8) & 255) + 35);
+    const b = Math.min(255, (color & 255) + 35);
+    return (r << 16) | (g << 8) | b;
   }
 
   setPortalUnlocked(unlocked: boolean) {

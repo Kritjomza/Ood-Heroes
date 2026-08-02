@@ -102,14 +102,11 @@ function LocalMode({ onBack }: { onBack: () => void }) {
   return (
     <main>
       <div id="game-root" ref={mount} />
-      <div className="mode-badge">Local Prototype</div>
-      <button className="back-mode" onClick={onBack}>
-        Back to mode selection
-      </button>
       <Hud
         bridge={bridge}
         onToggleAuto={() => scene()?.toggleAuto()}
         onPause={() => scene()?.togglePause()}
+        onLeave={onBack}
       />
       <Joystick onDirection={mobile} />
     </main>
