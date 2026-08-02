@@ -1,0 +1,4 @@
+
+> odd-tower@0.1.0 dev
+> node --env-file=.env --env-file-if-exists=.env.local node_modules/tsx/dist/cli.mjs tools/local-supabase-runtime.ts npm run dev:configured
+

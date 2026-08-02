@@ -1,0 +1,677 @@
+/* Approved Hero Gate system: responsive, character-first, tactile, and data-honest. */
+:root {
+  --game-outline: #4d332d;
+  --game-paper: #fff9e9;
+  --game-stone: #d8c3a4;
+  --game-gold: #ffc943;
+  --game-coral: #ef765f;
+  --game-mint: #83d8bc;
+  --game-sky: #91d8ee;
+  --game-purple: #9a75d8;
+  --game-depth: 0 9px 0 rgb(77 51 45 / 22%), 0 18px 36px rgb(77 51 45 / 18%);
+  --game-inset: inset 0 3px 0 rgb(255 255 255 / 65%);
+}
+
+.persistent-shell {
+  background:
+    radial-gradient(circle at 72% 6%, rgb(145 216 238 / 48%), transparent 28rem),
+    linear-gradient(#f8efd9, #ead8b8);
+}
+.persistent-content {
+  width: min(1480px, 100%);
+}
+.adventure-shell {
+  padding-top: calc(86px + env(safe-area-inset-top));
+}
+.player-strip {
+  min-height: 72px;
+  border-bottom: 3px solid var(--game-outline);
+  box-shadow: 0 8px 24px rgb(77 51 45 / 18%);
+}
+.player-avatar {
+  width: 46px;
+  height: 46px;
+  border: 3px solid var(--game-outline);
+  background: var(--game-gold);
+  box-shadow: var(--game-inset);
+}
+.player-badge strong {
+  max-width: min(30vw, 260px);
+  font-size: 15px;
+}
+.player-currencies > span {
+  min-width: 92px;
+  min-height: 40px;
+  justify-content: center;
+  border: 2px solid var(--game-outline);
+  background: var(--game-paper);
+  box-shadow: var(--game-inset);
+  font-size: 14px;
+}
+.player-strip .save-status {
+  border: 2px solid var(--game-outline);
+  box-shadow: var(--game-inset);
+}
+
+.adventure-nav {
+  border: 3px solid var(--game-outline);
+  box-shadow: var(--game-depth);
+}
+.adventure-tab {
+  min-height: 60px;
+  border: 2px solid transparent;
+}
+.adventure-tab:hover {
+  color: var(--p-ink);
+  background: rgb(255 201 67 / 28%);
+  transform: translateY(-2px);
+}
+.adventure-tab[aria-current='page'] {
+  border-color: var(--game-outline);
+}
+
+.lobby-heading {
+  margin-bottom: 16px;
+  align-items: center;
+}
+.lobby-heading h1 {
+  max-width: 20ch;
+  font-size: clamp(28px, 4vw, 52px);
+  letter-spacing: -0.025em;
+}
+.floor-ticket {
+  border: 3px solid var(--game-outline);
+  box-shadow:
+    var(--game-inset),
+    0 6px 14px rgb(77 51 45 / 16%);
+}
+.hero-gate-board {
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.72fr);
+  gap: 18px;
+}
+.hero-gate-stage {
+  position: relative;
+  min-height: clamp(390px, 58vh, 650px);
+  overflow: hidden;
+  border: 4px solid var(--game-outline);
+  border-radius: 20px;
+  background: linear-gradient(
+    180deg,
+    var(--game-sky) 0 37%,
+    #b8ddb0 37% 48%,
+    var(--game-stone) 48% 100%
+  );
+  box-shadow: var(--game-inset), var(--game-depth);
+  isolation: isolate;
+}
+.hero-gate-stage::before {
+  content: '';
+  position: absolute;
+  inset: 8% 18% 31%;
+  z-index: -1;
+  border: 12px solid var(--game-outline);
+  border-bottom-width: 20px;
+  border-radius: 46% 46% 12px 12px;
+  background: #292837;
+  box-shadow:
+    0 0 0 10px #866f5d,
+    0 20px 32px rgb(35 27 27 / 28%);
+}
+.hero-gate-stage::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 31%;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 50% 0, #f4d78d 0 18%, transparent 19%),
+    linear-gradient(#ab9478, #816b57);
+  border-top: 4px solid var(--game-outline);
+}
+.party-copy {
+  position: relative;
+  z-index: 2;
+  width: fit-content;
+  padding: 10px 16px;
+  border: 3px solid var(--game-outline);
+  border-radius: 12px;
+  background: var(--game-paper);
+  box-shadow:
+    var(--game-inset),
+    0 7px 16px rgb(77 51 45 / 18%);
+}
+.party-copy h2 {
+  font-size: clamp(22px, 3vw, 34px);
+}
+.party-stickers {
+  position: relative;
+  z-index: 2;
+  min-height: 285px;
+  align-items: end;
+  justify-content: center;
+}
+.party-hero {
+  width: min(310px, 48%);
+  font-size: 14px;
+}
+.party-hero .hero-mock {
+  width: 100%;
+  height: clamp(210px, 34vh, 390px);
+  transform: translateY(16px);
+}
+.party-hero strong {
+  max-width: 22ch;
+  padding: 7px 12px;
+  border: 3px solid var(--game-outline);
+  border-radius: 11px;
+  background: var(--game-paper);
+  box-shadow: var(--game-inset);
+}
+.party-hero small {
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: var(--game-outline);
+  color: var(--game-paper);
+  text-transform: capitalize;
+}
+.party-slot-label {
+  position: absolute;
+  top: 8px;
+  padding: 5px 10px;
+  border: 2px solid var(--game-outline);
+  border-radius: 9px;
+  background: var(--game-coral);
+  font-weight: 900;
+}
+.empty-party-slot {
+  width: min(150px, 24%);
+  min-height: 190px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  border: 3px dashed var(--game-paper);
+  border-radius: 46% 46% 18px 18px;
+  background: rgb(44 41 52 / 70%);
+  color: var(--game-paper);
+  font: inherit;
+  cursor: pointer;
+}
+.empty-party-slot > span {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  font-size: 28px;
+}
+.empty-party-slot:hover {
+  transform: translateY(-5px);
+  background: rgb(77 51 45 / 88%);
+}
+
+.mission-gate {
+  align-self: stretch;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 18px;
+  border: 4px solid var(--game-outline);
+  border-radius: 20px;
+  background: var(--game-paper);
+  box-shadow: var(--game-inset), var(--game-depth);
+}
+.mission-sign {
+  margin: -28px 10px 0;
+  padding: 12px;
+  border: 3px solid var(--game-outline);
+  border-radius: 13px;
+  background: var(--game-purple);
+  color: white;
+  text-align: center;
+  transform: rotate(1deg);
+  box-shadow:
+    var(--game-inset),
+    0 7px 16px rgb(77 51 45 / 22%);
+}
+.mission-sign span {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.mission-sign h2 {
+  margin: 2px 0;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 0.95;
+}
+.mission-sign p {
+  margin: 6px 0 0;
+  font-weight: 800;
+}
+.mission-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+.mission-stats span {
+  display: grid;
+  min-width: 0;
+  padding: 10px 7px;
+  border: 2px solid var(--game-outline);
+  border-radius: 11px;
+  background: #f2e3c7;
+  text-align: center;
+}
+.mission-stats small {
+  color: var(--p-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+.mission-stats strong {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.mission-details {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--p-focus);
+  font: inherit;
+  font-weight: 900;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.play-actions .primary-play-button {
+  min-height: 118px;
+  border-width: 4px;
+  background: var(--game-gold);
+  font-size: 17px;
+}
+.primary-play-button strong {
+  font-size: clamp(22px, 2.6vw, 34px);
+}
+.play-actions .local-play {
+  min-height: 62px;
+  background: var(--game-mint);
+}
+.progress-ribbon button {
+  border: 3px solid var(--game-outline);
+  background: var(--game-paper);
+  box-shadow:
+    var(--game-inset),
+    0 8px 18px rgb(77 51 45 / 16%);
+}
+.progress-ribbon button:hover {
+  transform: translateY(-3px);
+}
+
+.game-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+    max(18px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  background: rgb(34 25 27 / 72%);
+  overflow-y: auto;
+}
+.mission-briefing {
+  position: relative;
+  width: min(680px, 100%);
+  max-height: min(760px, calc(100dvh - 36px));
+  overflow-y: auto;
+  padding: clamp(22px, 5vw, 42px);
+  border: 5px solid var(--game-outline);
+  border-radius: 18px;
+  background: var(--game-paper);
+  box-shadow:
+    var(--game-inset),
+    0 28px 70px rgb(20 14 15 / 45%);
+}
+.briefing-ribbon {
+  display: inline-block;
+  padding: 7px 12px;
+  border: 2px solid var(--game-outline);
+  border-radius: 8px;
+  background: var(--game-coral);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.mission-briefing h2 {
+  margin: 22px 48px 8px 0;
+  font-size: clamp(28px, 6vw, 46px);
+  line-height: 1.05;
+}
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--game-outline);
+  border-radius: 12px;
+  background: var(--game-gold);
+  color: var(--game-outline);
+  font-size: 28px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.briefing-party {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0;
+}
+.briefing-party > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 2px solid var(--game-outline);
+  border-radius: 12px;
+  background: #f1e2c7;
+}
+.briefing-party span {
+  display: grid;
+  font-weight: 900;
+}
+.briefing-party small {
+  text-transform: capitalize;
+}
+.briefing-rewards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.briefing-rewards span {
+  display: grid;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--p-purple);
+}
+.briefing-actions {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.hero-mock {
+  position: relative;
+  overflow: hidden;
+}
+.hero-art-failed {
+  border: 3px solid var(--game-outline);
+  border-radius: 18px;
+  background: var(--p-purple);
+}
+.missing-hero-art {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  color: var(--game-outline);
+}
+.fallback-face {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 4px solid currentColor;
+  border-radius: 45% 55% 48% 52%;
+  background: var(--game-paper);
+  font-size: 28px;
+  transform: rotate(-4deg);
+}
+.missing-hero-art small {
+  font-size: 11px;
+}
+
+.album-summary {
+  padding: 12px;
+  border: 3px solid var(--game-outline);
+  border-radius: 16px;
+  background: var(--game-paper);
+  box-shadow: var(--game-inset);
+}
+.album-filters {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 3px 3px 10px;
+  scrollbar-width: thin;
+}
+.album-filters button {
+  flex: 0 0 auto;
+  border: 2px solid var(--game-outline);
+}
+.album-sticker {
+  border: 3px solid var(--game-outline);
+  box-shadow: var(--game-inset), var(--game-depth);
+}
+.album-sticker:not(:disabled):hover {
+  transform: translateY(-5px) rotate(-0.5deg);
+}
+.capsule-stage,
+.passport {
+  border: 4px solid var(--game-outline);
+  box-shadow: var(--game-inset), var(--game-depth);
+}
+.formation-board,
+.team-picker {
+  border-color: var(--game-outline);
+}
+
+@media (min-width: 1180px) {
+  .adventure-shell {
+    padding-left: 152px;
+    padding-right: 28px;
+  }
+  .adventure-nav {
+    left: 24px;
+    width: 104px;
+    padding: 10px;
+    border-radius: 20px;
+  }
+  .adventure-tab {
+    min-height: 74px;
+    font-size: 12px;
+  }
+  .adventure-tab .adventure-icon {
+    width: 27px;
+    height: 27px;
+  }
+  .persistent-content {
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-gate-board {
+    grid-template-columns: 1fr;
+  }
+  .hero-gate-stage {
+    min-height: 430px;
+  }
+  .mission-gate {
+    position: relative;
+    z-index: 3;
+    margin: -28px 10px 0;
+  }
+  .mission-sign {
+    margin-top: -30px;
+  }
+}
+
+@media (max-width: 620px) {
+  .adventure-shell {
+    padding: calc(74px + env(safe-area-inset-top)) 10px calc(92px + env(safe-area-inset-bottom));
+  }
+  .player-strip {
+    min-height: 64px;
+    padding-inline: 8px;
+  }
+  .player-avatar {
+    width: 38px;
+    height: 38px;
+  }
+  .player-badge strong {
+    max-width: 21vw;
+    font-size: 12px;
+  }
+  .player-currencies > span {
+    min-width: 0;
+    min-height: 36px;
+    padding-inline: 7px;
+    font-size: 11px;
+  }
+  .player-currencies > span:nth-child(3) {
+    display: none;
+  }
+  .lobby-heading {
+    align-items: start;
+  }
+  .lobby-heading h1 {
+    font-size: clamp(26px, 8vw, 36px);
+  }
+  .lobby-heading p {
+    font-size: 14px;
+  }
+  .floor-ticket {
+    padding: 9px;
+    white-space: nowrap;
+  }
+  .hero-gate-stage {
+    min-height: 330px;
+    padding: 16px 10px;
+  }
+  .hero-gate-stage::before {
+    inset: 17% 10% 32%;
+  }
+  .party-copy {
+    padding: 7px 10px;
+  }
+  .party-copy h2 {
+    font-size: 21px;
+  }
+  .party-stickers {
+    min-height: 218px;
+    gap: 6px;
+  }
+  .party-hero {
+    width: 58%;
+  }
+  .party-hero .hero-mock {
+    height: 205px;
+  }
+  .party-hero strong {
+    max-width: 18ch;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  .empty-party-slot {
+    width: 34%;
+    min-height: 150px;
+    font-size: 12px;
+  }
+  .mission-gate {
+    padding: 14px;
+  }
+  .mission-stats {
+    gap: 5px;
+  }
+  .mission-stats span {
+    padding-inline: 4px;
+  }
+  .progress-ribbon {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .progress-ribbon button {
+    min-height: 92px;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    padding: 8px 5px;
+    text-align: center;
+  }
+  .progress-ribbon strong {
+    font-size: 11px;
+  }
+  .progress-ribbon small {
+    font-size: 9px;
+  }
+  .briefing-rewards {
+    grid-template-columns: 1fr;
+  }
+  .adventure-nav {
+    right: max(6px, env(safe-area-inset-right));
+    bottom: max(6px, env(safe-area-inset-bottom));
+    left: max(6px, env(safe-area-inset-left));
+  }
+  .adventure-tab {
+    min-height: 58px;
+  }
+}
+
+@media (max-width: 350px) {
+  .player-badge span:last-child {
+    display: none;
+  }
+  .player-currencies {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .hero-gate-stage {
+    min-height: 310px;
+  }
+  .party-hero .hero-mock {
+    height: 185px;
+  }
+  .mission-stats {
+    grid-template-columns: 1fr;
+  }
+  .progress-ribbon {
+    grid-template-columns: 1fr;
+  }
+  .progress-ribbon button {
+    min-height: 64px;
+    display: flex;
+    justify-items: initial;
+    text-align: left;
+  }
+}
+
+@media (max-height: 720px) and (min-width: 769px) {
+  .adventure-shell {
+    padding-top: 80px;
+  }
+  .lobby-heading {
+    margin-bottom: 10px;
+  }
+  .hero-gate-stage {
+    min-height: 410px;
+  }
+  .party-hero .hero-mock {
+    height: 270px;
+  }
+  .progress-ribbon button {
+    min-height: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empty-party-slot,
+  .progress-ribbon button,
+  .album-sticker {
+    transition: none;
+  }
+  .empty-party-slot:hover,
+  .progress-ribbon button:hover,
+  .album-sticker:not(:disabled):hover {
+    transform: none;
+  }
+}

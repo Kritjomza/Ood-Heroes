@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-02T14:33:10.631Z",
+  "title": "Design System: Odd Tower: Odd Heroes",
+  "extensions": {
+    "colorMeta": {
+      "cream-canvas": { "role": "neutral", "displayName": "Cream Canvas", "canonical": "#fff8e8", "tonalRamp": ["oklch(15% 0.03 85)", "oklch(27% 0.03 85)", "oklch(39% 0.03 85)", "oklch(51% 0.03 85)", "oklch(63% 0.03 85)", "oklch(75% 0.03 85)", "oklch(87% 0.03 85)", "oklch(95% 0.03 85)"] },
+      "paper": { "role": "neutral", "displayName": "Clean Paper", "canonical": "#fffdf7", "tonalRamp": ["oklch(15% 0.015 90)", "oklch(27% 0.015 90)", "oklch(39% 0.015 90)", "oklch(51% 0.015 90)", "oklch(63% 0.015 90)", "oklch(75% 0.015 90)", "oklch(87% 0.015 90)", "oklch(95% 0.015 90)"] },
+      "gate-paper": { "role": "neutral", "displayName": "Gate Paper", "canonical": "#fff9e9", "tonalRamp": ["oklch(15% 0.025 88)", "oklch(27% 0.025 88)", "oklch(39% 0.025 88)", "oklch(51% 0.025 88)", "oklch(63% 0.025 88)", "oklch(75% 0.025 88)", "oklch(87% 0.025 88)", "oklch(95% 0.025 88)"] },
+      "plastic-light": { "role": "neutral", "displayName": "Plastic Highlight", "canonical": "#fffef9", "tonalRamp": ["oklch(15% 0.01 90)", "oklch(27% 0.01 90)", "oklch(39% 0.01 90)", "oklch(51% 0.01 90)", "oklch(63% 0.01 90)", "oklch(75% 0.01 90)", "oklch(87% 0.01 90)", "oklch(95% 0.01 90)"] },
+      "board-surface": { "role": "neutral", "displayName": "Warm Board", "canonical": "#f7eed8", "tonalRamp": ["oklch(15% 0.035 83)", "oklch(27% 0.035 83)", "oklch(39% 0.035 83)", "oklch(51% 0.035 83)", "oklch(63% 0.035 83)", "oklch(75% 0.035 83)", "oklch(87% 0.035 83)", "oklch(95% 0.035 83)"] },
+      "cocoa-outline": { "role": "neutral", "displayName": "Cocoa Outline", "canonical": "#4d332d", "tonalRamp": ["oklch(15% 0.045 35)", "oklch(27% 0.045 35)", "oklch(39% 0.045 35)", "oklch(51% 0.045 35)", "oklch(63% 0.045 35)", "oklch(75% 0.045 35)", "oklch(87% 0.045 35)", "oklch(95% 0.045 35)"] },
+      "warm-ink": { "role": "neutral", "displayName": "Warm Ink", "canonical": "#3b3434", "tonalRamp": ["oklch(15% 0.018 20)", "oklch(27% 0.018 20)", "oklch(39% 0.018 20)", "oklch(51% 0.018 20)", "oklch(63% 0.018 20)", "oklch(75% 0.018 20)", "oklch(87% 0.018 20)", "oklch(95% 0.018 20)"] },
+      "muted-ink": { "role": "neutral", "displayName": "Muted Cocoa", "canonical": "#75635c", "tonalRamp": ["oklch(15% 0.03 45)", "oklch(27% 0.03 45)", "oklch(39% 0.03 45)", "oklch(51% 0.03 45)", "oklch(63% 0.03 45)", "oklch(75% 0.03 45)", "oklch(87% 0.03 45)", "oklch(95% 0.03 45)"] },
+      "tower-stone": { "role": "neutral", "displayName": "Tower Stone", "canonical": "#d8c3a4", "tonalRamp": ["oklch(15% 0.055 75)", "oklch(27% 0.055 75)", "oklch(39% 0.055 75)", "oklch(51% 0.055 75)", "oklch(63% 0.055 75)", "oklch(75% 0.055 75)", "oklch(87% 0.055 75)", "oklch(95% 0.055 75)"] },
+      "adventure-gold": { "role": "primary", "displayName": "Adventure Gold", "canonical": "#ffc943", "tonalRamp": ["oklch(15% 0.16 85)", "oklch(27% 0.16 85)", "oklch(39% 0.16 85)", "oklch(51% 0.16 85)", "oklch(63% 0.16 85)", "oklch(75% 0.16 85)", "oklch(87% 0.16 85)", "oklch(95% 0.16 85)"] },
+      "coral-ribbon": { "role": "secondary", "displayName": "Coral Ribbon", "canonical": "#ef765f", "tonalRamp": ["oklch(15% 0.15 32)", "oklch(27% 0.15 32)", "oklch(39% 0.15 32)", "oklch(51% 0.15 32)", "oklch(63% 0.15 32)", "oklch(75% 0.15 32)", "oklch(87% 0.15 32)", "oklch(95% 0.15 32)"] },
+      "mint-action": { "role": "secondary", "displayName": "Party Mint", "canonical": "#83d8bc", "tonalRamp": ["oklch(15% 0.1 165)", "oklch(27% 0.1 165)", "oklch(39% 0.1 165)", "oklch(51% 0.1 165)", "oklch(63% 0.1 165)", "oklch(75% 0.1 165)", "oklch(87% 0.1 165)", "oklch(95% 0.1 165)"] },
+      "sky-stage": { "role": "secondary", "displayName": "Open Sky", "canonical": "#91d8ee", "tonalRamp": ["oklch(15% 0.095 220)", "oklch(27% 0.095 220)", "oklch(39% 0.095 220)", "oklch(51% 0.095 220)", "oklch(63% 0.095 220)", "oklch(75% 0.095 220)", "oklch(87% 0.095 220)", "oklch(95% 0.095 220)"] },
+      "rarity-purple": { "role": "tertiary", "displayName": "Rarity Purple", "canonical": "#9a75d8", "tonalRamp": ["oklch(15% 0.14 300)", "oklch(27% 0.14 300)", "oklch(39% 0.14 300)", "oklch(51% 0.14 300)", "oklch(63% 0.14 300)", "oklch(75% 0.14 300)", "oklch(87% 0.14 300)", "oklch(95% 0.14 300)"] },
+      "focus-blue": { "role": "primary", "displayName": "Focus Blue", "canonical": "#315f9f", "tonalRamp": ["oklch(15% 0.12 255)", "oklch(27% 0.12 255)", "oklch(39% 0.12 255)", "oklch(51% 0.12 255)", "oklch(63% 0.12 255)", "oklch(75% 0.12 255)", "oklch(87% 0.12 255)", "oklch(95% 0.12 255)"] },
+      "danger-red": { "role": "tertiary", "displayName": "Danger Red", "canonical": "#a33c48", "tonalRamp": ["oklch(15% 0.14 20)", "oklch(27% 0.14 20)", "oklch(39% 0.14 20)", "oklch(51% 0.14 20)", "oklch(63% 0.14 20)", "oklch(75% 0.14 20)", "oklch(87% 0.14 20)", "oklch(95% 0.14 20)"] },
+      "heroes-purple": { "role": "tertiary", "displayName": "Heroes Purple", "canonical": "#b67fe8", "tonalRamp": ["oklch(15% 0.14 305)", "oklch(27% 0.14 305)", "oklch(39% 0.14 305)", "oklch(51% 0.14 305)", "oklch(63% 0.14 305)", "oklch(75% 0.14 305)", "oklch(87% 0.14 305)", "oklch(95% 0.14 305)"] },
+      "summon-violet": { "role": "tertiary", "displayName": "Summon Violet", "canonical": "#7654cf", "tonalRamp": ["oklch(15% 0.16 295)", "oklch(27% 0.16 295)", "oklch(39% 0.16 295)", "oklch(51% 0.16 295)", "oklch(63% 0.16 295)", "oklch(75% 0.16 295)", "oklch(87% 0.16 295)", "oklch(95% 0.16 295)"] },
+      "team-mint": { "role": "secondary", "displayName": "Team Mint", "canonical": "#68c9ad", "tonalRamp": ["oklch(15% 0.1 165)", "oklch(27% 0.1 165)", "oklch(39% 0.1 165)", "oklch(51% 0.1 165)", "oklch(63% 0.1 165)", "oklch(75% 0.1 165)", "oklch(87% 0.1 165)", "oklch(95% 0.1 165)"] },
+      "account-coral": { "role": "secondary", "displayName": "Account Coral", "canonical": "#f18478", "tonalRamp": ["oklch(15% 0.13 30)", "oklch(27% 0.13 30)", "oklch(39% 0.13 30)", "oklch(51% 0.13 30)", "oklch(63% 0.13 30)", "oklch(75% 0.13 30)", "oklch(87% 0.13 30)", "oklch(95% 0.13 30)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Adventure Display", "purpose": "Page greetings and major adventure headings." },
+      "hero-display": { "displayName": "Hero Display", "purpose": "Auth identity and rare brand-scale moments." },
+      "title": { "displayName": "Painted Sign Title", "purpose": "Mission signs, card headings, and primary action copy." },
+      "body": { "displayName": "Friendly Body", "purpose": "Explanations and supportive copy." },
+      "label": { "displayName": "Game Label", "purpose": "Tabs, badges, stats, ribbons, and metadata." }
+    },
+    "shadows": [
+      { "name": "game-depth", "value": "0 9px 0 rgb(77 51 45 / 22%), 0 18px 36px rgb(77 51 45 / 18%)", "purpose": "Large gates, album stickers, and primary feature surfaces." },
+      { "name": "game-inset", "value": "inset 0 3px 0 rgb(255 255 255 / 65%)", "purpose": "Painted highlights on plaques, capsules, and controls." },
+      { "name": "soft-card-lift", "value": "0 18px 45px rgb(83 55 43 / 20%)", "purpose": "Auth card and isolated paper sheets." },
+      { "name": "modal-lift", "value": "0 28px 70px rgb(20 14 15 / 45%)", "purpose": "Mission briefing above the darkened world." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default playful settle and state-change easing." },
+      { "name": "fast", "value": "140ms", "purpose": "Button, tab, and hover response." },
+      { "name": "screen", "value": "220ms", "purpose": "Screen entry settle." },
+      { "name": "tower-arrive", "value": "720ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "One-time auth tower entrance; disabled for reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "micro", "value": "350px" },
+      { "name": "phone", "value": "620px" },
+      { "name": "nav-rail", "value": "769px" },
+      { "name": "auth-stack", "value": "860px" },
+      { "name": "hero-gate-stack", "value": "900px" },
+      { "name": "wide-rail", "value": "1180px" },
+      { "name": "short-desktop", "value": "720px height" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Enter Floor Button",
+      "kind": "button",
+      "refersTo": "button-enter-floor",
+      "description": "The dominant route into the next online adventure.",
+      "html": "<button class=\"ds-enter-floor\"><span aria-hidden=\"true\">⚔</span><span><strong>Enter Floor 1</strong><small>Online adventure</small></span></button>",
+      "css": ".ds-enter-floor{width:100%;min-height:118px;display:flex;align-items:center;justify-content:flex-start;gap:12px;border:4px solid var(--game-outline,#4d332d);border-radius:var(--radius-control,14px);padding:0 20px;background:var(--game-gold,#ffc943);color:var(--p-ink,#3b3434);font-family:ui-rounded,'Arial Rounded MT Bold','Noto Sans Thai',system-ui,sans-serif;font-weight:900;cursor:pointer;box-shadow:inset 0 3px 0 rgb(255 255 255 / 72%),0 7px 14px rgb(84 52 43 / 22%);transition:transform 140ms cubic-bezier(.16,1,.3,1),box-shadow 140ms cubic-bezier(.16,1,.3,1)}.ds-enter-floor>span:last-child{display:grid;text-align:left}.ds-enter-floor strong{font-size:clamp(22px,2.6vw,34px)}.ds-enter-floor small{font-weight:700}.ds-enter-floor:hover{transform:translateY(-2px)}.ds-enter-floor:active{transform:translateY(2px);box-shadow:inset 0 2px 0 rgb(255 255 255 / 72%),0 3px 7px rgb(84 52 43 / 22%)}.ds-enter-floor:focus-visible{outline:4px solid var(--p-focus,#315f9f);outline-offset:3px}"
+    },
+    {
+      "name": "Practice Button",
+      "kind": "button",
+      "refersTo": "button-practice",
+      "description": "A tactile secondary action for the local practice route.",
+      "html": "<button class=\"ds-practice\"><span aria-hidden=\"true\">⌂</span><span><strong>Practice run</strong><small>Local prototype</small></span></button>",
+      "css": ".ds-practice{width:100%;min-height:62px;display:flex;align-items:center;justify-content:flex-start;gap:8px;border:0;border-radius:var(--radius-control,14px);padding:0 20px;background:var(--game-mint,#83d8bc);color:var(--p-ink,#3b3434);font-family:ui-rounded,'Arial Rounded MT Bold','Noto Sans Thai',system-ui,sans-serif;font-weight:900;cursor:pointer;box-shadow:inset 0 3px 0 rgb(255 255 255 / 72%),0 7px 14px rgb(84 52 43 / 22%);transition:transform 140ms cubic-bezier(.16,1,.3,1),box-shadow 140ms cubic-bezier(.16,1,.3,1)}.ds-practice>span:last-child{display:grid;text-align:left}.ds-practice small{font-weight:700}.ds-practice:hover{transform:translateY(-2px)}.ds-practice:active{transform:translateY(2px);box-shadow:inset 0 2px 0 rgb(255 255 255 / 72%),0 3px 7px rgb(84 52 43 / 22%)}.ds-practice:focus-visible{outline:4px solid var(--p-focus,#315f9f);outline-offset:3px}"
+    },
+    {
+      "name": "Hero Name Field",
+      "kind": "input",
+      "refersTo": "input-hero-name",
+      "description": "The friendly, high-contrast identity field used before entering the tower.",
+      "html": "<label class=\"ds-hero-field\"><span>Hero name</span><input value=\"Odd Hero\" aria-describedby=\"ds-hero-help\"><small id=\"ds-hero-help\">This is the name your party will use inside the tower.</small></label>",
+      "css": ".ds-hero-field{display:grid;gap:9px;color:var(--p-ink,#3b3434);font-family:ui-rounded,'Arial Rounded MT Bold','Noto Sans Thai',system-ui,sans-serif;font-weight:900}.ds-hero-field input{width:100%;min-height:50px;border:2px solid color-mix(in srgb,var(--p-chocolate,#684338) 42%,transparent);border-radius:var(--radius-control,14px);padding:0 13px;background:var(--p-white,#fffdf7);color:var(--p-ink,#3b3434);font:inherit}.ds-hero-field small{color:var(--p-muted,#75635c);font-size:12px;font-weight:650;line-height:1.45}.ds-hero-field input:hover{border-color:var(--p-chocolate,#684338)}.ds-hero-field input:focus{border-color:var(--p-chocolate,#684338);outline:4px solid color-mix(in srgb,var(--p-focus,#315f9f) 28%,transparent);outline-offset:2px}.ds-hero-field input:focus-visible{border-color:var(--p-chocolate,#684338);outline:4px solid color-mix(in srgb,var(--p-focus,#315f9f) 28%,transparent);outline-offset:2px}"
+    },
+    {
+      "name": "Adventure Navigation",
+      "kind": "nav",
+      "refersTo": "nav-shell",
+      "description": "Five icon-and-label destinations in a tactile dock with an elevated active state.",
+      "html": "<nav class=\"ds-adventure-nav\" aria-label=\"Adventure\"><button class=\"ds-nav-tab ds-active\" aria-current=\"page\">⌂<span>Home</span></button><button class=\"ds-nav-tab\">♟<span>Heroes</span></button><button class=\"ds-nav-tab\">✦<span>Summon</span></button><button class=\"ds-nav-tab\">♜<span>Team</span></button><button class=\"ds-nav-tab\">●<span>Account</span></button></nav>",
+      "css": ".ds-adventure-nav{height:68px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;padding:4px;border:3px solid var(--game-outline,#4d332d);border-radius:20px;background:var(--plastic-light,#fffef9);box-shadow:inset 0 3px 0 rgb(255 255 255 / 72%),0 10px 24px rgb(84 52 43 / 22%)}.ds-nav-tab{min-width:0;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:2px solid transparent;border-radius:16px;background:transparent;color:var(--board-ink-muted,#75635c);font-family:ui-rounded,'Arial Rounded MT Bold','Noto Sans Thai',system-ui,sans-serif;font-size:18px;font-weight:900;cursor:pointer;transition:transform 140ms cubic-bezier(.16,1,.3,1),background-color 140ms cubic-bezier(.16,1,.3,1)}.ds-nav-tab span{font-size:10px}.ds-nav-tab:hover{background:rgb(255 201 67 / 28%);transform:translateY(-2px)}.ds-nav-tab.ds-active{border-color:var(--game-outline,#4d332d);background:var(--game-gold,#ffc943);color:var(--p-ink,#3b3434);transform:translateY(-7px);box-shadow:inset 0 3px 0 rgb(255 255 255 / 72%),0 6px 12px rgb(84 52 43 / 22%)}.ds-nav-tab:focus-visible{outline:4px solid var(--p-focus,#315f9f);outline-offset:2px}.ds-nav-tab:active{transform:translateY(1px)}"
+    },
+    {
+      "name": "Mission Gate Card",
+      "kind": "card",
+      "refersTo": "card-mission",
+      "description": "A paper mission card topped by a slightly rotated rarity-purple sign.",
+      "html": "<aside class=\"ds-mission-card\"><div class=\"ds-mission-sign\"><span>Next adventure</span><strong>Floor 01</strong><p>The Crooked Welcome Hall</p></div><div class=\"ds-mission-stats\"><span><small>Status</small><b>Online</b></span><span><small>Party</small><b>2/3 ready</b></span><span><small>Expected</small><b>Gold · XP</b></span></div></aside>",
+      "css": ".ds-mission-card{display:grid;gap:12px;padding:18px;border:4px solid var(--game-outline,#4d332d);border-radius:20px;background:var(--game-paper,#fff9e9);color:var(--p-ink,#3b3434);font-family:ui-rounded,'Arial Rounded MT Bold','Noto Sans Thai',system-ui,sans-serif;box-shadow:inset 0 3px 0 rgb(255 255 255 / 65%),0 9px 0 rgb(77 51 45 / 22%),0 18px 36px rgb(77 51 45 / 18%)}.ds-mission-sign{padding:12px;border:3px solid var(--game-outline,#4d332d);border-radius:13px;background:var(--game-purple,#9a75d8);color:#fff;text-align:center;transform:rotate(1deg);box-shadow:inset 0 3px 0 rgb(255 255 255 / 65%),0 7px 16px rgb(77 51 45 / 22%)}.ds-mission-sign span{display:block;font-size:11px;font-weight:900;text-transform:uppercase}.ds-mission-sign strong{display:block;font-size:48px;line-height:.95}.ds-mission-sign p{margin:6px 0 0;font-weight:800}.ds-mission-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.ds-mission-stats>span{display:grid;min-width:0;padding:10px 7px;border:2px solid var(--game-outline,#4d332d);border-radius:11px;background:#f2e3c7;text-align:center}.ds-mission-stats small{color:var(--p-muted,#75635c);font-size:10px;text-transform:uppercase}.ds-mission-stats b{overflow-wrap:anywhere;font-size:12px}"
+    },
+    {
+      "name": "Progress Shortcut",
+      "kind": "card",
+      "description": "A compact tactile shortcut for collection, summons, or upgrades.",
+      "html": "<button class=\"ds-progress\"><span class=\"ds-progress-icon\" aria-hidden=\"true\">★</span><span><strong>8 of 24 heroes</strong><small>33% collected</small></span></button>",
+      "css": ".ds-progress{min-height:76px;display:flex;align-items:center;gap:12px;border:3px solid var(--game-outline,#4d332d);border-radius:var(--radius-control,14px);padding:12px;background:var(--game-paper,#fff9e9);color:var(--p-ink,#3b3434);font-family:ui-rounded,'Arial Rounded MT Bold','Noto Sans Thai',system-ui,sans-serif;text-align:left;cursor:pointer;box-shadow:inset 0 3px 0 rgb(255 255 255 / 65%),0 8px 18px rgb(77 51 45 / 16%);transition:transform 140ms cubic-bezier(.16,1,.3,1)}.ds-progress>span:last-child{display:grid}.ds-progress strong{font-weight:900}.ds-progress small{color:var(--p-muted,#75635c)}.ds-progress-icon{font-size:26px;color:var(--game-gold,#ffc943)}.ds-progress:hover{transform:translateY(-3px)}.ds-progress:focus-visible{outline:4px solid var(--p-focus,#315f9f);outline-offset:3px}.ds-progress:active{transform:translateY(1px)}"
+    },
+    {
+      "name": "Empty Party Slot",
+      "kind": "custom",
+      "description": "An arched dashed silhouette that makes missing party members actionable.",
+      "html": "<button class=\"ds-empty-slot\"><span aria-hidden=\"true\">+</span><strong>Open slot</strong><small>Choose a hero</small></button>",
+      "css": ".ds-empty-slot{width:150px;min-height:190px;display:grid;place-content:center;justify-items:center;gap:8px;border:3px dashed var(--game-paper,#fff9e9);border-radius:46% 46% 18px 18px;background:rgb(44 41 52 / 70%);color:var(--game-paper,#fff9e9);font-family:ui-rounded,'Arial Rounded MT Bold','Noto Sans Thai',system-ui,sans-serif;cursor:pointer;transition:transform 140ms cubic-bezier(.16,1,.3,1),background-color 140ms cubic-bezier(.16,1,.3,1)}.ds-empty-slot>span{width:52px;height:52px;display:grid;place-items:center;border:3px solid currentColor;border-radius:50%;font-size:28px}.ds-empty-slot strong{font-weight:900}.ds-empty-slot:hover{transform:translateY(-5px);background:rgb(77 51 45 / 88%)}.ds-empty-slot:focus-visible{outline:4px solid var(--p-focus,#315f9f);outline-offset:3px}.ds-empty-slot:active{transform:translateY(1px)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Handmade Hero Gate",
+    "overview": "Odd Tower is a character-first adventure lobby, not a centered dashboard grid. The interface should feel like a cheerful game board assembled from cream paper, carved tower stone, painted ribbons, toy-like plastic controls, and thick cocoa ink. Characters occupy the visual stage; resources and progress form a compact supporting HUD; the next adventure is the unmistakable action.\n\nThe world is cute, strange, energetic, and slightly handmade. Small rotations, inset highlights, irregular silhouettes, illustrated fallbacks, and soft offset depth make controls feel physical without sacrificing legibility. Saturated rarity colors punctuate a warm neutral base, while every state remains data-honest, keyboard-visible, touch-friendly, localization-resilient, and useful at narrow or short viewports.",
+    "keyCharacteristics": [
+      "Character artwork and party formation dominate the first view.",
+      "Cream paper and tower stone are bounded by thick cocoa outlines.",
+      "Gold, coral, mint, sky, and purple communicate action and game roles.",
+      "Inset highlights and downward shadows make controls feel pressable.",
+      "Small rotations and ribbon silhouettes supply handmade personality.",
+      "Responsive navigation moves from a bottom dock to a left rail without changing hierarchy."
+    ],
+    "rules": [
+      { "name": "The Cocoa Line Rule", "body": "Major interactive or narrative objects use a dark cocoa boundary; do not replace that structure with faint gray hairlines.", "section": "colors" },
+      { "name": "The Gold Means Go Rule", "body": "Adventure Gold belongs to the primary route and active home state. Keep it rare enough that “Enter Floor” remains unmistakable.", "section": "colors" },
+      { "name": "The Color-Plus-Shape Rule", "body": "Never communicate active, locked, failed, or rare states by hue alone; pair color with labels, borders, icons, or position.", "section": "colors" },
+      { "name": "The Rounded Voice Rule", "body": "All persistent-shell text uses the rounded stack, including Thai fallback; do not introduce a generic geometric sans inside the game lobby.", "section": "typography" },
+      { "name": "The Sign, Not Spreadsheet Rule", "body": "Compact labels should read like painted plaques—short, bold, and contextual—not like dense dashboard column headers.", "section": "typography" },
+      { "name": "The Stacked Toy Rule", "body": "Large objects combine outline, inset shine, and downward depth; never use a generic floating gray shadow as the only separator.", "section": "elevation" },
+      { "name": "The Pressed State Rule", "body": "On activation, controls move down and their shadow shortens, preserving the physical model.", "section": "elevation" },
+      { "name": "The Silhouette Mix Rule", "body": "Pair grounded rounded panels with at least one relevant sign, ribbon, arch, sticker, or illustrated shape in focal game compositions.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do keep characters and party formation larger than resource and progress summaries.",
+      "Do preserve the cocoa outline, inset shine, and soft offset-depth combination on focal game objects.",
+      "Do reserve Adventure Gold for the clearest next action and the active home route.",
+      "Do use stable hero-art boxes with themed illustrated fallback states.",
+      "Do maintain safe-area padding, visible keyboard focus, reduced-motion behavior, and at least 44px touch targets.",
+      "Do let English, Thai, long names, and large values wrap, truncate, or reflow intentionally."
+    ],
+    "donts": [
+      "Don't turn the lobby into a centered analytics dashboard or a uniform card grid.",
+      "Don't flatten the world into borderless pastel rectangles or faint gray dividers.",
+      "Don't let secondary progress, shop-like actions, or resources compete with Enter Floor.",
+      "Don't use hue as the only signal for active, error, rarity, or lock state.",
+      "Don't expose broken-image chrome, clipped fixed-width labels, hidden focus, or motion that ignores reduced-motion preferences.",
+      "Don't copy protected characters, artwork, branding, or layouts from reference games."
+    ]
+  }
+}

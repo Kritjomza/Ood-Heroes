@@ -1,0 +1,15 @@
+.env.local not found. Continuing without it.
+C:\Users\Admin\Downloads\OodHeroes\tools\local-supabase-runtime.ts:45
+  if (result.status !== 0) throw new Error('Local Supabase is not running.');
+                                 ^
+
+
+Error: Local Supabase is not running.
+    at readLocalStatus (C:\Users\Admin\Downloads\OodHeroes\tools\local-supabase-runtime.ts:45:34)
+    at run (C:\Users\Admin\Downloads\OodHeroes\tools\local-supabase-runtime.ts:58:48)
+    at <anonymous> (C:\Users\Admin\Downloads\OodHeroes\tools\local-supabase-runtime.ts:66:90)
+    at ModuleJob.run (node:internal/modules/esm/module_job:370:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:99:5)
+
+Node.js v24.4.0

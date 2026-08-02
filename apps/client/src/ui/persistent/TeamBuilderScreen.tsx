@@ -34,11 +34,11 @@ export function TeamBuilderScreen({
       <ScreenHeading title="Formation board" subtitle="Battle order matters" back={back} />
       <div className="team-summary">
         <span>
-          <strong>{view.averageLevel}</strong>Average level {view.averageLevel}
+          <strong>{view.averageLevel}</strong>Average level
         </span>
         <span>
           <strong>{view.totalStars}</strong>
-          {view.totalStars} total stars
+          Total stars
         </span>
         <span>
           <strong>

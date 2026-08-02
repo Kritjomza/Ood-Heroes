@@ -70,10 +70,13 @@ describe('Pocket Adventure post-login screens', () => {
         onPlayOnline={vi.fn()}
       />,
     );
-    expect(screen.getByRole('heading', { name: 'Your expedition' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Welcome back, Mali' })).toBeInTheDocument();
     expect(screen.getByText('1 of 2 heroes')).toBeInTheDocument();
     expect(screen.getByText('3 summons ready')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Enter Floor 1 online' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'View mission briefing' }));
+    expect(screen.getByRole('dialog', { name: /Floor 01/u })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enter tower' })).toBeInTheDocument();
   });
 
   it('presents the collection as a filterable sticker album', () => {
@@ -132,8 +135,8 @@ describe('Pocket Adventure post-login screens', () => {
         busy={false}
       />,
     );
-    expect(screen.getByText('Average level 4')).toBeInTheDocument();
-    expect(screen.getByText('2 total stars')).toBeInTheDocument();
+    expect(screen.getByText('Average level')).toBeInTheDocument();
+    expect(screen.getByText('Total stars')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save formation' })).toBeDisabled();
   });
 

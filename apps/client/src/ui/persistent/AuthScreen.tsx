@@ -69,7 +69,6 @@ export function AuthScreen() {
 
       <section className="auth-card" aria-labelledby="auth-title">
         <span className="auth-card-tape" aria-hidden="true" />
-        <div className="auth-step">Your adventure pass</div>
         <h2>What should we call you?</h2>
         <label className="hero-name-field">
           <span>Hero name</span>
