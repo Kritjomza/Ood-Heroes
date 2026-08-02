@@ -11,4 +11,11 @@
   --p-purple: #d9c5ef;
   --p-danger: #a33c48;
   --p-shadow: 0 7px 0 #684338, 0 16px 32px rgb(68 42 33 / 18%);
+  --p-coral: #f47f73;
+  --p-coral-dark: #b94d49;
+  --p-muted: #75635c;
+  --p-white: #fffdf7;
+  --p-focus: #315f9f;
+  --p-shadow-soft: 0 18px 45px rgb(83 55 43 / 20%);
+  --p-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }

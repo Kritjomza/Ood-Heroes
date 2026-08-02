@@ -1196,3 +1196,395 @@ button:disabled {
     transition: none !important;
   }
 }
+
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V5
+ * genre: playful · macrostructure: split adventure pass · designed-as-app
+ * contrast: pass (40–41) · honest: pass (46) · chrome: pass (47) · icons: pass (30)
+ * responsive: pass (34, 49–57)
+ */
+html:has(.auth-page),
+body:has(.auth-page) {
+  overflow-x: clip;
+}
+.auth-page {
+  position: relative;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: clamp(26px, 6vw, 88px);
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--p-cream);
+  color: var(--p-ink);
+  touch-action: manipulation;
+}
+.auth-page::before,
+.auth-page::after {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  border-radius: 50%;
+  background: var(--p-mint);
+}
+.auth-page::before {
+  width: min(58vw, 780px);
+  height: min(58vw, 780px);
+  left: -14vw;
+  bottom: -34vw;
+}
+.auth-page::after {
+  width: min(38vw, 520px);
+  height: min(38vw, 520px);
+  left: 28vw;
+  bottom: -27vw;
+  background: var(--p-yellow);
+}
+.auth-adventure {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(220px, 1fr);
+  align-items: center;
+  align-self: stretch;
+  min-width: 0;
+}
+.auth-cloud {
+  position: absolute;
+  width: 90px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--p-white);
+  opacity: 0.78;
+}
+.auth-cloud::before,
+.auth-cloud::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  background: inherit;
+}
+.auth-cloud::before {
+  left: 14px;
+  width: 42px;
+  height: 42px;
+}
+.auth-cloud::after {
+  right: 10px;
+  width: 52px;
+  height: 52px;
+}
+.auth-cloud-one {
+  top: 12%;
+  left: 4%;
+  transform: rotate(-5deg);
+}
+.auth-cloud-two {
+  top: 22%;
+  right: -2%;
+  transform: scale(0.72) rotate(6deg);
+}
+.tower-mark {
+  width: min(100%, 330px);
+  margin: 9vh 0 0;
+  overflow: visible;
+  filter: drop-shadow(0 16px 10px rgb(91 61 44 / 18%));
+  transform: rotate(-3deg);
+  animation: tower-arrive 720ms var(--p-ease-out) both;
+}
+.tower-shadow {
+  fill: var(--p-chocolate);
+  opacity: 0.18;
+}
+.tower-body {
+  fill: var(--p-pink);
+  stroke: var(--p-chocolate);
+  stroke-width: 8;
+  stroke-linejoin: round;
+}
+.tower-roof {
+  fill: var(--p-yellow);
+  stroke: var(--p-chocolate);
+  stroke-width: 8;
+  stroke-linejoin: round;
+}
+.tower-detail {
+  fill: var(--p-sky);
+  stroke: var(--p-chocolate);
+  stroke-width: 7;
+}
+.tower-door {
+  fill: var(--p-coral);
+  stroke: var(--p-chocolate);
+  stroke-width: 7;
+}
+.tower-flag {
+  fill: var(--p-coral);
+  stroke: var(--p-chocolate);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tower-cheek {
+  fill: var(--p-coral);
+  opacity: 0.65;
+}
+.tower-face {
+  fill: none;
+  stroke: var(--p-chocolate);
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.adventure-copy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  transform: rotate(1deg);
+}
+.adventure-sticker,
+.auth-step {
+  display: inline-block;
+  color: var(--p-chocolate);
+  font-weight: 950;
+  letter-spacing: 0.02em;
+}
+.adventure-sticker {
+  padding: 8px 13px;
+  border: 2px solid var(--p-chocolate);
+  border-radius: 10px;
+  background: var(--p-yellow);
+  box-shadow: 0 5px 12px rgb(91 61 44 / 14%);
+  transform: rotate(-3deg);
+}
+.adventure-copy h1 {
+  margin: 18px 0 12px;
+  color: var(--p-chocolate);
+  font-family: var(--font-display, ui-rounded, 'Arial Rounded MT Bold', sans-serif);
+  font-size: clamp(64px, 8vw, 116px);
+  font-style: normal;
+  line-height: 0.78;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+.adventure-copy p {
+  max-width: 34ch;
+  margin: 24px 0 0;
+  color: var(--p-muted);
+  font-size: clamp(16px, 1.5vw, 20px);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.auth-card {
+  position: relative;
+  width: min(450px, 100%);
+  padding: clamp(28px, 4.5vw, 52px);
+  border-radius: 16px;
+  background: var(--p-paper);
+  box-shadow: var(--p-shadow-soft);
+  text-align: left;
+  transform: rotate(-0.5deg);
+}
+.auth-card-tape {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  width: 92px;
+  height: 35px;
+  border-radius: 3px;
+  background: var(--p-yellow);
+  opacity: 0.78;
+  transform: translateX(-50%) rotate(2deg);
+}
+.auth-step {
+  margin-bottom: 14px;
+  color: var(--p-coral-dark);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.auth-card h2 {
+  margin: 0 0 28px;
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+.auth-card .hero-name-field {
+  gap: 9px;
+  margin-bottom: 22px;
+}
+.hero-name-field > span {
+  font-size: 15px;
+}
+.hero-name-field small {
+  color: var(--p-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+.auth-card input {
+  border-color: color-mix(in srgb, var(--p-chocolate) 42%, transparent);
+  border-radius: 14px;
+  background: var(--p-white);
+}
+.auth-card input:hover {
+  border-color: var(--p-chocolate);
+}
+.auth-card input:focus {
+  border-color: var(--p-chocolate);
+  outline: 4px solid color-mix(in srgb, var(--p-focus) 28%, transparent);
+  outline-offset: 2px;
+}
+.google-action {
+  border-width: 2px;
+  border-radius: 14px;
+  background: var(--p-white);
+  box-shadow: 0 7px 16px rgb(91 61 44 / 14%);
+  transition:
+    transform 160ms var(--p-ease-out),
+    box-shadow 160ms var(--p-ease-out),
+    background-color 160ms var(--p-ease-out);
+  white-space: nowrap;
+}
+.google-mark {
+  width: 22px;
+  height: 22px;
+  color: var(--p-focus);
+}
+.guest-action {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--p-coral);
+  color: var(--p-ink);
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgb(91 61 44 / 18%);
+  transition:
+    transform 160ms var(--p-ease-out),
+    box-shadow 160ms var(--p-ease-out),
+    background-color 160ms var(--p-ease-out);
+  white-space: nowrap;
+}
+.guest-action svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.google-action:hover,
+.guest-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 22px rgb(91 61 44 / 20%);
+}
+.google-action:active,
+.guest-action:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgb(91 61 44 / 16%);
+}
+.google-action:disabled,
+.guest-action:disabled {
+  transform: none;
+  box-shadow: none;
+}
+.auth-divider {
+  margin: 17px 0;
+  color: var(--p-muted);
+}
+.auth-divider::before,
+.auth-divider::after {
+  background: color-mix(in srgb, var(--p-chocolate) 20%, transparent);
+}
+.guest-note {
+  margin: 18px auto 0;
+  max-width: 38ch;
+  color: var(--p-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-align: center;
+}
+.persistent-error {
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-danger) 10%, var(--p-white));
+}
+@keyframes tower-arrive {
+  from {
+    opacity: 0.4;
+    transform: translateY(26px) rotate(-5deg);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-3deg);
+    filter: blur(0) drop-shadow(0 16px 10px rgb(91 61 44 / 18%));
+  }
+}
+@media (max-width: 860px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 12px;
+    overflow-y: auto;
+  }
+  .auth-adventure {
+    min-height: 235px;
+    grid-template-columns: 160px minmax(0, 1fr);
+    align-self: auto;
+  }
+  .tower-mark {
+    margin-top: 15px;
+  }
+  .adventure-copy h1 {
+    margin: 12px 0 8px;
+    font-size: clamp(54px, 14vw, 78px);
+  }
+  .adventure-copy p {
+    margin-top: 14px;
+    font-size: 15px;
+  }
+  .auth-cloud-two {
+    display: none;
+  }
+  .auth-card {
+    margin-bottom: 20px;
+    transform: none;
+  }
+}
+@media (max-width: 480px) {
+  .auth-page {
+    padding-inline: 16px;
+  }
+  .auth-adventure {
+    grid-template-columns: 112px minmax(0, 1fr);
+    min-height: 190px;
+  }
+  .adventure-sticker {
+    padding: 6px 9px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .adventure-copy h1 {
+    font-size: clamp(48px, 15vw, 66px);
+  }
+  .adventure-copy p {
+    display: none;
+  }
+  .auth-card {
+    padding: 30px 22px 24px;
+  }
+  .auth-card h2 {
+    margin-bottom: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tower-mark {
+    animation: none;
+  }
+}
