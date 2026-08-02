@@ -3,7 +3,7 @@ import {
   HERO_DEFINITIONS,
   SUMMON_WEIGHTS,
   advancePity,
-  calculateAfkIntervals,
+  calculateAfkReward,
   duplicateShardReward,
   isPityPull,
   starUpgradeCost,
@@ -90,30 +90,24 @@ describe('trusted AFK interval rules', () => {
   const minute = 60_000;
 
   it.each([
-    [29, 0, 29],
-    [30, 1, 0],
-    [59, 1, 29],
-    [60, 2, 0],
-    [480, 16, 0],
-    [600, 16, 0],
-    [629, 16, 29],
-  ])(
-    '%i offline minutes yields %i complete intervals and %i remainder minutes',
-    (offlineMinutes, expectedIntervals, expectedRemainderMinutes) => {
-      const result = calculateAfkIntervals({
-        lastSettledAtMs: 1_000_000,
-        nowMs: 1_000_000 + offlineMinutes * minute,
-      });
-      expect(result.intervalCount).toBe(expectedIntervals);
-      expect(result.remainderMs).toBe(expectedRemainderMinutes * minute);
-      expect(result.settledThroughMs).toBe(
-        1_000_000 + offlineMinutes * minute - expectedRemainderMinutes * minute,
-      );
-    },
-  );
+    [9, { rewardedMinutes: 0, gold: 0, diamonds: 0, shards: 0 }],
+    [10, { rewardedMinutes: 10, gold: 80, diamonds: 10, shards: 3 }],
+    [19, { rewardedMinutes: 10, gold: 80, diamonds: 10, shards: 3 }],
+    [20, { rewardedMinutes: 20, gold: 160, diamonds: 20, shards: 6 }],
+    [29, { rewardedMinutes: 20, gold: 160, diamonds: 20, shards: 6 }],
+    [30, { rewardedMinutes: 30, gold: 250, diamonds: 35, shards: 10 }],
+    [600, { rewardedMinutes: 30, gold: 250, diamonds: 35, shards: 10 }],
+  ])('%i offline minutes yields the exact capped reward', (offlineMinutes, expected) => {
+    const nowMs = 1_000_000 + offlineMinutes * minute;
+    const result = calculateAfkReward({
+      lastSettledAtMs: 1_000_000,
+      nowMs,
+    });
+    expect(result).toEqual({ ...expected, settledThroughMs: nowMs });
+  });
 
   it('rejects a client-style clock that predates the trusted settlement cursor', () => {
-    expect(() => calculateAfkIntervals({ lastSettledAtMs: 2_000, nowMs: 1_999 })).toThrow(
+    expect(() => calculateAfkReward({ lastSettledAtMs: 2_000, nowMs: 1_999 })).toThrow(
       'INVALID_AFK_TIME_RANGE',
     );
   });

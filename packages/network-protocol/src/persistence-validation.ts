@@ -5,6 +5,7 @@ import type {
   MutationEnvelope,
   PersistenceValidationResult,
   PlayerBootstrap,
+  SummonResult,
 } from './persistence-types.js';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -81,17 +82,52 @@ function isValidAfkClaim(value: unknown) {
     isRecord(value) &&
     typeof value.id === 'string' &&
     UUID_PATTERN.test(value.id) &&
-    isNonNegativeSafeInteger(value.intervalCount) &&
-    (value.intervalCount as number) >= 1 &&
-    (value.intervalCount as number) <= 16 &&
+    (value.rewardedMinutes === 10 ||
+      value.rewardedMinutes === 20 ||
+      value.rewardedMinutes === 30) &&
     typeof value.periodStart === 'string' &&
     Number.isFinite(Date.parse(value.periodStart)) &&
     typeof value.periodEnd === 'string' &&
     Number.isFinite(Date.parse(value.periodEnd)) &&
     isNonNegativeSafeInteger(value.gold) &&
-    isNonNegativeSafeInteger(value.heroExperience) &&
-    isNonNegativeSafeInteger(value.upgradeJelly)
+    isNonNegativeSafeInteger(value.diamonds) &&
+    isNonNegativeSafeInteger(value.shardsPerActiveHero) &&
+    Array.isArray(value.recipientHeroIds) &&
+    value.recipientHeroIds.length > 0 &&
+    value.recipientHeroIds.every((id) => typeof id === 'string' && UUID_PATTERN.test(id))
   );
+}
+
+export function validateSummonResult(value: unknown): PersistenceValidationResult<SummonResult> {
+  if (
+    !isRecord(value) ||
+    !hasExactKeys(value, [
+      'outcomeType',
+      'heroDefinitionId',
+      'heroDisplayName',
+      'heroRarity',
+      'shardsAwarded',
+      'gemCost',
+      'gemBalance',
+      'pityBefore',
+      'pityAfter',
+      'alreadyApplied',
+    ]) ||
+    (value.outcomeType !== 'new_hero' && value.outcomeType !== 'duplicate') ||
+    typeof value.heroDefinitionId !== 'string' ||
+    value.heroDefinitionId.length === 0 ||
+    typeof value.heroDisplayName !== 'string' ||
+    value.heroDisplayName.length === 0 ||
+    !['common', 'rare', 'epic', 'legendary'].includes(String(value.heroRarity)) ||
+    !isNonNegativeSafeInteger(value.shardsAwarded) ||
+    !isNonNegativeSafeInteger(value.gemCost) ||
+    !isNonNegativeSafeInteger(value.gemBalance) ||
+    !isNonNegativeSafeInteger(value.pityBefore) ||
+    !isNonNegativeSafeInteger(value.pityAfter) ||
+    typeof value.alreadyApplied !== 'boolean'
+  )
+    return { ok: false, code: 'SCHEMA_VERSION_MISMATCH' };
+  return { ok: true, value: value as SummonResult };
 }
 
 function isValidProfile(value: unknown) {

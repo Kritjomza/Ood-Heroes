@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { Session } from '@supabase/supabase-js';
+import type { SummonResult } from '@odd-tower/network-protocol';
 import { GameApiClient } from '../../persistence/game-api-client';
 import { createIdempotencyKey } from '../../persistence/idempotency';
 import { PlayerStore } from '../../persistence/player-store';
@@ -34,7 +35,7 @@ export function PersistentShell({
   });
   const [screen, setScreen] = useState<PersistentScreen>('home');
   const [heroId, setHeroId] = useState<string | null>(null);
-  const [summonResult, setSummonResult] = useState<string | null>(null);
+  const [summonResult, setSummonResult] = useState<SummonResult | null>(null);
   const [, setCallbackVersion] = useState(0);
   const afkPreparedFor = useRef<string | null>(null);
   const api = useMemo(
@@ -198,11 +199,9 @@ export function PersistentShell({
               bannerId: player.banner.id,
             });
             if (!result || typeof result !== 'object' || !('outcomeType' in result)) return null;
-            const outcomeType = result.outcomeType === 'duplicate' ? 'duplicate' : 'new';
-            const message =
-              outcomeType === 'duplicate' ? 'Duplicate! Shards added.' : 'A new Hero joined!';
-            setSummonResult(message);
-            return { outcomeType, message };
+            const summonResult = result as SummonResult;
+            setSummonResult(summonResult);
+            return summonResult;
           }}
         />
       )}

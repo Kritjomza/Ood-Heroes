@@ -86,14 +86,28 @@ export type SummonBannerState = {
   totalPulls: number;
 };
 
+export type SummonResult = {
+  outcomeType: 'new_hero' | 'duplicate';
+  heroDefinitionId: string;
+  heroDisplayName: string;
+  heroRarity: HeroRarity;
+  shardsAwarded: number;
+  gemCost: number;
+  gemBalance: number;
+  pityBefore: number;
+  pityAfter: number;
+  alreadyApplied: boolean;
+};
+
 export type AfkClaimPreview = {
   id: string;
-  intervalCount: number;
+  rewardedMinutes: 10 | 20 | 30;
   periodStart: string;
   periodEnd: string;
   gold: number;
-  heroExperience: number;
-  upgradeJelly: number;
+  diamonds: number;
+  shardsPerActiveHero: number;
+  recipientHeroIds: string[];
 } | null;
 
 export type PersistenceHealthSnapshot = {

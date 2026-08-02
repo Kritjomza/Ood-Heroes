@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(41);
+select plan(42);
 
 insert into auth.users (id, aud, role, email, is_anonymous, created_at, updated_at)
 values
@@ -256,7 +256,7 @@ select is(
 );
 
 update public.afk_state
-set last_settled_at = clock_timestamp() - interval '61 minutes'
+set last_settled_at = clock_timestamp() - interval '31 minutes'
 where user_id = '10000000-0000-0000-0000-000000000001';
 
 select lives_ok(
@@ -269,7 +269,7 @@ select is(
   (select interval_count from public.afk_claims
    where user_id = '10000000-0000-0000-0000-000000000001'
      and status = 'pending'),
-  2, '61 minutes prepares two complete AFK intervals'
+  3, '31 minutes prepares the capped 30-minute AFK tier'
 );
 select lives_ok(
   format(
@@ -297,19 +297,27 @@ select is(
   (select balance from public.player_currencies
    where user_id = '10000000-0000-0000-0000-000000000001'
      and currency_code = 'gold'),
-  150, 'AFK Gold applies exactly once'
+  300, 'AFK Gold applies exactly once'
 );
 select is(
   (select balance from public.player_currencies
    where user_id = '10000000-0000-0000-0000-000000000001'
-     and currency_code = 'upgrade_jelly'),
-  2, 'AFK Jelly applies exactly once'
+     and currency_code = 'gem'),
+  235, 'AFK Diamonds apply exactly once'
 );
 select is(
   (select count(*)::integer from public.reward_ledger
    where user_id = '10000000-0000-0000-0000-000000000001'
      and source_type = 'afk'),
   1, 'AFK ledger identity is unique'
+);
+select is(
+  (select shards from public.player_heroes ph
+   join public.team_members tm on tm.player_hero_id = ph.id
+   join public.player_teams pt on pt.id = tm.team_id
+   where pt.user_id = '10000000-0000-0000-0000-000000000001'
+     and pt.is_active limit 1),
+  90, 'AFK Shards apply once to the active Hero'
 );
 
 select * from finish();

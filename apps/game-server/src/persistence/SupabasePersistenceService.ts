@@ -1,5 +1,9 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { validatePlayerBootstrap, type PlayerBootstrap } from '@odd-tower/network-protocol';
+import {
+  validatePlayerBootstrap,
+  validateSummonResult,
+  type PlayerBootstrap,
+} from '@odd-tower/network-protocol';
 import type { Database } from '@odd-tower/network-protocol';
 import type { PersistenceConfig } from '../config.js';
 import { DomainError, mapPersistenceError } from '../api/domainErrors.js';
@@ -38,12 +42,15 @@ export class SupabasePersistenceService implements PlayerPersistenceService {
     });
   }
 
-  summon(userId: string, bannerId: string, idempotencyKey: string) {
-    return this.#rpc('perform_summon', {
+  async summon(userId: string, bannerId: string, idempotencyKey: string) {
+    const data = await this.#rpc('perform_summon', {
       p_user_id: userId,
       p_banner_id: bannerId,
       p_idempotency_key: idempotencyKey,
     });
+    const validated = validateSummonResult(data);
+    if (!validated.ok) throw new DomainError(validated.code, 503);
+    return validated.value;
   }
 
   async summonHistory(userId: string, limit: number) {

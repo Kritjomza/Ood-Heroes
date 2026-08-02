@@ -22,7 +22,8 @@ export function AfkRewardModal({
           <AdventureIcon name="home" />
         </div>
         <h2 id="afk-title">While you were away</h2>
-        <p>Your team explored for {claim.intervalCount} complete half-hour intervals.</p>
+        <p>Your team explored for {claim.rewardedMinutes} rewarded minutes.</p>
+        {claim.rewardedMinutes === 30 && <p className="afk-cap-note">30-minute maximum reached.</p>}
         <ul className="reward-list">
           <li>
             <AdventureIcon name="gold" />
@@ -32,17 +33,17 @@ export function AfkRewardModal({
             </span>
           </li>
           <li>
-            <AdventureIcon name="jelly" />
+            <AdventureIcon name="gem" />
             <span>
-              <strong>{claim.upgradeJelly.toLocaleString()} Upgrade Jelly</strong>
-              <small>For future growth</small>
+              <strong>{claim.diamonds.toLocaleString()} Diamonds</strong>
+              <small>For new summons</small>
             </span>
           </li>
           <li>
             <AdventureIcon name="star" />
             <span>
-              <strong>{claim.heroExperience.toLocaleString()} EXP</strong>
-              <small>Per active hero</small>
+              <strong>{claim.shardsPerActiveHero.toLocaleString()} Shards per active hero</strong>
+              <small>Shared with your current party</small>
             </span>
           </li>
         </ul>

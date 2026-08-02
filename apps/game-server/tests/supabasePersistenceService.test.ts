@@ -33,4 +33,15 @@ describe('SupabasePersistenceService bootstrap failures', () => {
       status: 503,
     });
   });
+
+  it('returns only a validated summon result and fails closed on malformed RPC data', async () => {
+    rpc.mockResolvedValueOnce({ data: { outcomeType: 'new_hero' }, error: null });
+    await expect(
+      service.summon(
+        '10000000-0000-4000-8000-000000000001',
+        'standard_odd_heroes',
+        '20000000-0000-4000-8000-000000000001',
+      ),
+    ).rejects.toMatchObject({ code: 'SCHEMA_VERSION_MISMATCH', status: 503 });
+  });
 });

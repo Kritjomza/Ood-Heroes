@@ -4,6 +4,7 @@ import {
   validateAuthenticatedJoinOptions,
   validateMutationEnvelope,
   validatePlayerBootstrap,
+  validateSummonResult,
 } from '../src/index';
 
 const validBootstrap = {
@@ -106,6 +107,43 @@ describe('Phase 4 persistence validation', () => {
 
   it('rejects an unsupported bootstrap schema version', () => {
     expect(validatePlayerBootstrap({ ...validBootstrap, schemaVersion: 2 })).toEqual({
+      ok: false,
+      code: 'SCHEMA_VERSION_MISMATCH',
+    });
+  });
+
+  it('accepts the exact AFK reward preview contract', () => {
+    const pendingAfkClaim = {
+      id: '2f1d0b98-7310-4f9b-b1aa-7d5f43a9bc9d',
+      rewardedMinutes: 30,
+      periodStart: '2026-07-31T00:00:00.000Z',
+      periodEnd: '2026-07-31T00:30:00.000Z',
+      gold: 250,
+      diamonds: 35,
+      shardsPerActiveHero: 10,
+      recipientHeroIds: ['9b2a5b7e-6c30-4d44-9d4f-c286bf5f5d38'],
+    };
+    expect(validatePlayerBootstrap({ ...validBootstrap, pendingAfkClaim })).toEqual({
+      ok: true,
+      value: { ...validBootstrap, pendingAfkClaim },
+    });
+  });
+
+  it('validates summon results and rejects invalid rarity values', () => {
+    const result = {
+      outcomeType: 'new_hero',
+      heroDefinitionId: 'hero_006_samurai_bread',
+      heroDisplayName: 'Samurai Bread',
+      heroRarity: 'legendary',
+      shardsAwarded: 0,
+      gemCost: 100,
+      gemBalance: 200,
+      pityBefore: 19,
+      pityAfter: 0,
+      alreadyApplied: false,
+    };
+    expect(validateSummonResult(result)).toEqual({ ok: true, value: result });
+    expect(validateSummonResult({ ...result, heroRarity: 'mythic' })).toEqual({
       ok: false,
       code: 'SCHEMA_VERSION_MISMATCH',
     });

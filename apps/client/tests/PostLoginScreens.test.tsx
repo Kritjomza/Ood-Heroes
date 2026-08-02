@@ -104,9 +104,18 @@ describe('Pocket Adventure post-login screens', () => {
   });
 
   it('shows affordable pulls and starts reveal only after a server result', async () => {
-    const summon = vi
-      .fn()
-      .mockResolvedValue({ outcomeType: 'duplicate', message: 'Duplicate! Shards added.' });
+    const summon = vi.fn().mockResolvedValue({
+      outcomeType: 'duplicate',
+      heroDefinitionId: 'hero_006_samurai_bread',
+      heroDisplayName: 'Samurai Bread',
+      heroRarity: 'legendary',
+      shardsAwarded: 60,
+      gemCost: 100,
+      gemBalance: 200,
+      pityBefore: 5,
+      pityAfter: 0,
+      alreadyApplied: false,
+    });
     render(
       <SummonScreen
         player={postLoginPlayer}
@@ -123,6 +132,8 @@ describe('Pocket Adventure post-login screens', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Summon for 100 gems' }));
     expect(summon).toHaveBeenCalledOnce();
+    expect(await screen.findByRole('heading', { name: 'Samurai Bread' })).toBeInTheDocument();
+    expect(screen.getByText('Duplicate · +60 shards')).toBeInTheDocument();
   });
 
   it('shows formation-derived information and protects unchanged teams', () => {
@@ -146,13 +157,14 @@ describe('Pocket Adventure post-login screens', () => {
     rerender(
       <AfkRewardModal
         claim={{
-          id: 'claim',
-          intervalCount: 3,
-          periodStart: '',
-          periodEnd: '',
-          gold: 500,
-          heroExperience: 20,
-          upgradeJelly: 4,
+          id: '2f1d0b98-7310-4f9b-b1aa-7d5f43a9bc9d',
+          rewardedMinutes: 30,
+          periodStart: '2026-07-31T00:00:00.000Z',
+          periodEnd: '2026-07-31T00:30:00.000Z',
+          gold: 250,
+          diamonds: 35,
+          shardsPerActiveHero: 10,
+          recipientHeroIds: ['9b2a5b7e-6c30-4d44-9d4f-c286bf5f5d38'],
         }}
         busy={false}
         close={vi.fn()}
@@ -160,8 +172,11 @@ describe('Pocket Adventure post-login screens', () => {
       />,
     );
     expect(screen.getByRole('dialog', { name: 'While you were away' })).toHaveTextContent(
-      '500 Gold',
+      '250 Gold',
     );
+    expect(screen.getByText('35 Diamonds')).toBeInTheDocument();
+    expect(screen.getByText('10 Shards per active hero')).toBeInTheDocument();
+    expect(screen.getByText(/30-minute maximum reached/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Collect rewards' })).toBeInTheDocument();
   });
 });

@@ -8,8 +8,7 @@ const DUPLICATE_SHARDS: Record<HeroRarity, number> = {
 };
 
 const STAR_COSTS = [20, 50, 100, 200] as const;
-const AFK_INTERVAL_MS = 30 * 60 * 1000;
-const AFK_MAX_INTERVALS = 16;
+const MINUTE_MS = 60 * 1000;
 
 export const duplicateShardReward = (rarity: HeroRarity) => DUPLICATE_SHARDS[rarity];
 
@@ -36,19 +35,24 @@ export function teamSlotEligibility(input: {
   };
 }
 
-export function calculateAfkIntervals(input: { lastSettledAtMs: number; nowMs: number }) {
+export function calculateAfkReward(input: { lastSettledAtMs: number; nowMs: number }) {
   if (
     !Number.isSafeInteger(input.lastSettledAtMs) ||
     !Number.isSafeInteger(input.nowMs) ||
     input.nowMs < input.lastSettledAtMs
   )
     throw new Error('INVALID_AFK_TIME_RANGE');
-  const elapsedMs = input.nowMs - input.lastSettledAtMs;
-  const completeIntervals = Math.floor(elapsedMs / AFK_INTERVAL_MS);
-  const remainderMs = elapsedMs % AFK_INTERVAL_MS;
+  const elapsedMinutes = Math.floor((input.nowMs - input.lastSettledAtMs) / MINUTE_MS);
+  const reward =
+    elapsedMinutes >= 30
+      ? { rewardedMinutes: 30 as const, gold: 250, diamonds: 35, shards: 10 }
+      : elapsedMinutes >= 20
+        ? { rewardedMinutes: 20 as const, gold: 160, diamonds: 20, shards: 6 }
+        : elapsedMinutes >= 10
+          ? { rewardedMinutes: 10 as const, gold: 80, diamonds: 10, shards: 3 }
+          : { rewardedMinutes: 0 as const, gold: 0, diamonds: 0, shards: 0 };
   return {
-    intervalCount: Math.min(completeIntervals, AFK_MAX_INTERVALS),
-    remainderMs,
-    settledThroughMs: input.nowMs - remainderMs,
+    ...reward,
+    settledThroughMs: input.nowMs,
   };
 }
