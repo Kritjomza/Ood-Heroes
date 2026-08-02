@@ -8,7 +8,11 @@ import {
 describe('single-image world visual registry', () => {
   it('contains one canonical world image for every Floor 1 moving identity', () => {
     expect(WORLD_VISUALS).toHaveLength(17);
-    expect(WORLD_VISUALS.every((visual) => visual.sourcePath.endsWith('/world.webp'))).toBe(true);
+    expect(
+      WORLD_VISUALS.filter((visual) => visual.id.startsWith('hero_')).every((visual) =>
+        visual.sourcePath.endsWith('.png'),
+      ),
+    ).toBe(true);
     expect(WORLD_VISUALS.every((visual) => visual.frameCount === 1)).toBe(true);
     expect(validateWorldVisuals(WORLD_VISUALS)).toEqual([]);
   });
@@ -22,7 +26,7 @@ describe('single-image world visual registry', () => {
     expect(worldVisualFor('unknown')).toBeNull();
   });
 
-  it('rejects duplicate IDs, invalid anchors, and non-WebP multi-frame entries', () => {
+  it('rejects duplicate IDs, invalid anchors, and unsupported multi-frame entries', () => {
     const invalid = [
       ...WORLD_VISUALS,
       { ...WORLD_VISUALS[0]!, sourcePath: '/bad/sheet.png', anchorX: 2, frameCount: 4 },
@@ -31,7 +35,7 @@ describe('single-image world visual registry', () => {
       expect.arrayContaining([
         `Duplicate world visual id: ${WORLD_VISUALS[0]!.id}`,
         `Invalid world visual anchor: ${WORLD_VISUALS[0]!.id}`,
-        `World visual must be one WebP image: ${WORLD_VISUALS[0]!.id}`,
+        `World visual must be one supported image: ${WORLD_VISUALS[0]!.id}`,
       ]),
     );
   });

@@ -1,4 +1,5 @@
 import type { MotionProfileName } from '../game/animation/motionProfiles';
+import { heroImageForSlug } from './hero-assets';
 
 export type WorldVisualDefinition = {
   id: string;
@@ -33,12 +34,12 @@ const visual = (
 });
 
 export const WORLD_VISUALS: readonly WorldVisualDefinition[] = [
-  visual('hero_001_grilled_chicken', 'hero.grilled_chicken.world', '/assets/game/heroes/hero_001_grilled_chicken/world.webp', 'normal'),
-  visual('hero_002_pink_chocolate_lizard', 'hero.pink_chocolate_lizard.world', '/assets/game/heroes/hero_002_pink_chocolate_lizard/world.webp', 'light'),
-  visual('hero_003_robot_jelly', 'hero.robot_jelly.world', '/assets/game/heroes/hero_003_robot_jelly/world.webp', 'jelly'),
-  visual('hero_004_tofu_rabbit', 'hero.tofu_rabbit.world', '/assets/game/heroes/hero_004_tofu_rabbit/world.webp', 'floating'),
-  visual('hero_005_accountant_octopus', 'hero.accountant_octopus.world', '/assets/game/heroes/hero_005_accountant_octopus/world.webp', 'normal'),
-  visual('hero_006_samurai_bread', 'hero.samurai_bread.world', '/assets/game/heroes/hero_006_samurai_bread/world.webp', 'heavy'),
+  visual('hero_001_grilled_chicken', 'hero.grilled_chicken.world', heroImageForSlug('grilled_chicken')!, 'normal'),
+  visual('hero_002_pink_chocolate_lizard', 'hero.pink_chocolate_lizard.world', heroImageForSlug('pink_chocolate_lizard')!, 'light'),
+  visual('hero_003_robot_jelly', 'hero.robot_jelly.world', heroImageForSlug('robot_jelly')!, 'jelly'),
+  visual('hero_004_tofu_rabbit', 'hero.tofu_rabbit.world', heroImageForSlug('tofu_rabbit')!, 'floating'),
+  visual('hero_005_accountant_octopus', 'hero.accountant_octopus.world', heroImageForSlug('accountant_octopus')!, 'normal'),
+  visual('hero_006_samurai_bread', 'hero.samurai_bread.world', heroImageForSlug('samurai_bread')!, 'heavy'),
   visual('grumpy-radish', 'monster.grumpy_radish.world', '/assets/game/monsters/monster_001_grumpy_radish/world.webp', 'normal'),
   visual('jumping-sauce-bag', 'monster.jumping_sauce_bag.world', '/assets/game/monsters/monster_002_jumping_sauce_bag/world.webp', 'light'),
   visual('shoe-biting-dust-ball', 'monster.shoe_biting_dust_ball.world', '/assets/game/monsters/monster_003_shoe_biting_dust_ball/world.webp', 'floating'),
@@ -69,8 +70,8 @@ export function validateWorldVisuals(visuals: readonly WorldVisualDefinition[]):
       errors.push(`Invalid world visual anchor: ${entry.id}`);
     if (!(entry.baseScale > 0) || !(entry.shadowScale > 0))
       errors.push(`Invalid world visual scale: ${entry.id}`);
-    if (!entry.sourcePath.endsWith('/world.webp') || entry.frameCount !== 1)
-      errors.push(`World visual must be one WebP image: ${entry.id}`);
+    if (!/\.(?:png|webp)$/.test(entry.sourcePath) || entry.frameCount !== 1)
+      errors.push(`World visual must be one supported image: ${entry.id}`);
   }
   return errors;
 }

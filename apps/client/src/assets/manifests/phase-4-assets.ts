@@ -1,4 +1,5 @@
 import type { AssetEntry } from '../asset-types';
+import { heroImageForSlug } from '../hero-assets';
 
 const heroes = [
   ['grilled_chicken', 'Grilled Chicken Executioner', '🍗'],
@@ -73,7 +74,7 @@ export const PHASE_4_ASSETS: AssetEntry[] = [
 ];
 
 function entry(id: string, kind: AssetEntry['kind'], label: string, fallback: string): AssetEntry {
-  const worldSlug = id.startsWith('hero.') && id.endsWith('.world')
+  const heroSlug = id.startsWith('hero.')
     ? id.split('.')[1]
     : null;
   const monsterSlug = kind === 'monster' ? id.slice('monster.'.length) : null;
@@ -82,8 +83,8 @@ function entry(id: string, kind: AssetEntry['kind'], label: string, fallback: st
     kind,
     label,
     mock: kind === 'hero' ? 'css-hero' : 'glyph',
-    replacementPath: worldSlug
-      ? `/assets/game/heroes/${worldSlug}/world.webp`
+    replacementPath: heroSlug
+      ? heroImageForSlug(heroSlug) ?? ''
       : monsterSlug
         ? `/assets/game/monsters/${monsterSlug}/world.webp`
         : `/assets/final/${id.replaceAll('.', '/')}.webp`,
