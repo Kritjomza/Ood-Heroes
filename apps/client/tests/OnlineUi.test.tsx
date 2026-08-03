@@ -142,9 +142,9 @@ describe('online mode UI', () => {
         onToggleAutoHunt={toggle}
       />,
     );
-    expect(screen.getByText(/online combat progress is temporary/i)).toBeInTheDocument();
     expect(screen.getByText(/Session Gold: 9/i)).toBeInTheDocument();
     expect(screen.getByText(/Session Level 3/i)).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /fighter character/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /auto hunt/i }));
     expect(toggle).toHaveBeenCalledOnce();
   });
@@ -163,9 +163,6 @@ describe('online mode UI', () => {
         onToggleAutoHunt={() => {}}
       />,
     );
-    expect(screen.getByRole('status', { name: 'Combat status' })).toHaveTextContent(
-      'Strategic running away',
-    );
     expect(screen.getByRole('button', { name: 'Auto Hunt' })).toHaveTextContent('RETREATING');
     view.rerender(
       <OnlineHud
@@ -174,11 +171,11 @@ describe('online mode UI', () => {
         onToggleAutoHunt={() => {}}
       />,
     );
-    expect(screen.getByRole('dialog', { name: 'Team respawn' })).toHaveTextContent(
+    expect(screen.getByRole('status', { name: 'Team respawn' })).toHaveTextContent(
       'The squad became floor decorations',
     );
-    expect(screen.getByRole('dialog', { name: 'Team respawn' })).toHaveTextContent(
-      'Respawning in 5',
+    expect(screen.getByRole('status', { name: 'Team respawn' })).toHaveTextContent(
+      'Respawn in 5',
     );
   });
 

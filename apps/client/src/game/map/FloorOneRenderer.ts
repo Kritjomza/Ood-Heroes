@@ -3,15 +3,7 @@ import { FLOOR_ONE_MAP, WORLD, floorOneObject } from '@odd-tower/game-core';
 import { createFloorOneVisualModel } from './floorOneVisualModel';
 import { ensureFloorOneFallbackTextures } from './FloorOneAssetLoader';
 import { floorOneAsset } from './floorOneAssetRegistry';
-
-const ZONE_COLORS: Record<string, number> = {
-  portal: 0x49305f,
-  guardian_arena: 0x496375,
-  chocolate_swamp: 0x4b302d,
-  spicy_forest: 0x713a32,
-  beginner_fields: 0x496b3f,
-  central_camp: 0x315f60,
-};
+import { fitInside } from '../rendering/worldAssetLayout';
 
 export class FloorOneRenderer {
   private portal: Phaser.GameObjects.Arc | null = null;
@@ -26,9 +18,8 @@ export class FloorOneRenderer {
   create() {
     ensureFloorOneFallbackTextures(this.scene);
     const visual = createFloorOneVisualModel(FLOOR_ONE_MAP);
-    this.scene.add.rectangle(WORLD.size / 2, WORLD.size / 2, WORLD.size, WORLD.size, 0x203a35).setDepth(-20);
+    this.scene.add.tileSprite(WORLD.size / 2, WORLD.size / 2, WORLD.size, WORLD.size, 'floor1.ground.honey').setDepth(-20);
     for (const object of FLOOR_ONE_MAP.objects.filter((item) => item.type === 'zone')) {
-      const style = visual.zoneStyles.find((item) => item.id === object.zone);
       const groundId = object.zone === 'beginner_fields' ? 'floor1.ground.honey'
         : object.zone === 'chocolate_swamp' ? 'floor1.ground.mint'
           : object.zone === 'spicy_forest' ? 'floor1.ground.cocoa'
@@ -42,8 +33,7 @@ export class FloorOneRenderer {
           object.height * WORLD.tileSize,
           groundId,
         )
-        .setTint(style?.base ?? ZONE_COLORS[object.zone] ?? 0xffffff)
-        .setAlpha(object.zone === 'central_camp' ? 0.98 : 0.9)
+        .setAlpha(object.zone === 'central_camp' ? 1 : 0.98)
         .setDepth(-18);
     }
     const routes = this.scene.add.graphics().setDepth(visual.depths.path);
@@ -101,9 +91,12 @@ export class FloorOneRenderer {
   private renderPlacement(placement: { assetId: string; tileX: number; tileY: number; rotation: number; flipX: boolean; depth: 'ground' | 'below-actors' | 'above-actors' }) {
     const asset = floorOneAsset(placement.assetId);
     if (!asset || !this.scene.textures.exists(asset.id)) return;
-    this.scene.add.image(placement.tileX * WORLD.tileSize, placement.tileY * WORLD.tileSize, asset.id)
+    const image = this.scene.add.image(placement.tileX * WORLD.tileSize, placement.tileY * WORLD.tileSize, asset.id);
+    const contentScale = asset.category === 'prop' ? 1.45 : asset.category === 'landmark' ? 1.15 : asset.category === 'river' || asset.category === 'decal' ? 1.1 : 1;
+    const fitted = fitInside(image.width, image.height, asset.displayWidth * contentScale, asset.displayHeight * contentScale);
+    image
       .setOrigin(asset.origin[0], asset.origin[1])
-      .setDisplaySize(asset.displayWidth, asset.displayHeight)
+      .setDisplaySize(fitted.width, fitted.height)
       .setFlipX(asset.mirror && placement.flipX)
       .setRotation(asset.rotate ? placement.rotation : 0)
       .setDepth(placement.depth === 'ground' ? -16 : placement.depth === 'below-actors' ? 1 : 8);
@@ -142,13 +135,6 @@ export class FloorOneRenderer {
       this.scene.add.ellipse(cx, cy + 32, 380, 180, 0xaeeac9, 0.08).setDepth(-14);
       for (let i = 0; i < 8; i++) this.scene.add.circle(cx + Math.cos(i) * 120, cy + Math.sin(i) * 62, 4, 0xffdc72, 0.55).setDepth(-13);
     }
-  }
-
-  private lighten(color: number) {
-    const r = Math.min(255, ((color >> 16) & 255) + 35);
-    const g = Math.min(255, ((color >> 8) & 255) + 35);
-    const b = Math.min(255, (color & 255) + 35);
-    return (r << 16) | (g << 8) | b;
   }
 
   setPortalUnlocked(unlocked: boolean) {

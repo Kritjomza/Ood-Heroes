@@ -55,11 +55,11 @@ export function TowerHud({ model, minimap = fallbackMinimap, onToggleAuto, onPau
 
       <nav className="tower-rail tower-tool-rail" aria-label="Tower tools"><button aria-label="Inventory locked" disabled><HudIcon name="bag" /><small>Locked</small></button><button className={model.autoEnabled ? 'active' : ''} aria-label="Auto Hunt" aria-pressed={model.autoEnabled} onClick={onToggleAuto}><HudIcon name="auto" /><small>{model.autoEnabled ? model.autoState.toUpperCase() : 'AUTO'}</small></button><button aria-label="Show map tool" onClick={() => setMapExpanded(true)}><HudIcon name="map" /><small>Map</small></button></nav>
 
-      <section className="quest-feed tower-job-ticket sticker-panel"><b>Odd Job</b><span>{model.objective}</span><small>Target: {model.target} · {model.gold} coins</small></section>
+      <section className="quest-feed tower-job-ticket sticker-panel"><b>Odd Job</b><span>{model.objective}</span><small>Target: {model.target} · {model.mode === 'online' ? 'Session Gold' : 'Gold'}: {model.gold}</small></section>
       <TowerMinimap model={minimap} expanded={mapExpanded} onOpen={() => setMapExpanded(true)} onClose={closeMap} openerRef={mapOpenerRef} />
 
       <nav className="action-dock tower-action-dock sticker-panel" aria-label="Combat actions"><button aria-label="Bonk primary attack"><kbd>1</kbd><HudIcon name="bonk" /><small>Bonk</small></button><button aria-label="Odd skill"><kbd>2</kbd><HudIcon name="skill" /><small>Odd skill</small></button><button aria-label="Snack recovery"><kbd>3</kbd><HudIcon name="snack" /><small>Snack</small></button><button aria-label="Interact" disabled><kbd>E</kbd><HudIcon name="door" /><small>Interact</small></button></nav>
-      {model.respawnSeconds > 0 && <div className="tower-respawn" role="status"><strong>Team became pancakes.</strong><span>Respawn in {model.respawnSeconds}s</span></div>}
+      {model.respawnSeconds > 0 && <div className="tower-respawn" role="status" aria-label="Team respawn"><strong>The squad became floor decorations.</strong><span>Respawn in {model.respawnSeconds}s</span></div>}
     </div>
   );
 }

@@ -1,13 +1,13 @@
 .tower-hud {
-  --cocoa: #4d332d;
-  --ink: #34272a;
-  --cream: #fff8e8;
-  --paper: #fffdf7;
-  --gold: #ffc943;
-  --coral: #ef765f;
-  --mint: #83d8bc;
-  --sky: #91d8ee;
-  --purple: #9a75d8;
+  --cocoa: #56382f;
+  --ink: #40302f;
+  --cream: #fff8df;
+  --paper: #fffdf3;
+  --gold: #ffd45c;
+  --coral: #ff8279;
+  --mint: #91e0bd;
+  --sky: #9eddf2;
+  --purple: #b594e8;
   --focus: #315f9f;
   position: fixed;
   inset: 0;
@@ -26,7 +26,7 @@
   box-shadow:
     inset 0 2px 0 #fff,
     0 6px 0 rgb(77 51 45/0.28),
-    0 14px 28px rgb(42 27 28/0.16);
+    0 12px 24px rgb(91 58 43/0.13);
 }
 .tower-hud button {
   pointer-events: auto;
@@ -113,8 +113,8 @@
   overflow: hidden;
   border: 2px solid var(--cocoa);
   border-radius: 999px;
-  background: #3b3240;
-  color: #fff;
+  background: #f2e4d1;
+  color: var(--ink);
   font-size: 9px;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -129,13 +129,13 @@
   inset: 0;
   font-style: normal;
   font-weight: 900;
-  text-shadow: 0 1px 1px #000;
+  text-shadow: 0 1px 0 rgb(255 255 255/0.85);
 }
 .hp-meter span {
-  background: linear-gradient(#ff7e81, #d94059);
+  background: linear-gradient(#ff9b9b, #ff6978);
 }
 .xp-meter span {
-  background: linear-gradient(#8ccaff, #6578e8);
+  background: linear-gradient(#aee7ff, #7eb6f3);
 }
 .party-pips {
   position: absolute;
@@ -517,7 +517,96 @@
   clip-path: inset(50%);
 }
 .online-hud-shell .team-status-panel {
-  top: 170px;
+  top: max(112px, calc(env(safe-area-inset-top) + 102px));
+  left: max(10px, env(safe-area-inset-left));
+  width: min(330px, calc(100vw - 92px));
+  padding: 8px;
+  border: 3px solid var(--cocoa);
+  border-radius: 15px;
+  background: rgb(255 253 243/0.96);
+  box-shadow: inset 0 2px 0 #fff, 0 6px 0 rgb(86 56 47/0.2), 0 12px 24px rgb(91 58 43/0.12);
+  color: var(--ink);
+}
+.online-hud-shell .team-status-panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.online-hud-shell .team-status-panel h2 {
+  margin: 0;
+  color: var(--cocoa);
+  font-size: 13px;
+}
+.online-hud-shell .team-status-panel header > span {
+  padding: 2px 7px;
+  border: 2px solid var(--cocoa);
+  border-radius: 999px;
+  background: var(--mint);
+  font-size: 9px;
+}
+.snack-squad-roster {
+  display: grid;
+  gap: 4px;
+}
+.online-hud-shell .combat-hero {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 7px;
+  min-height: 52px;
+  padding: 3px 6px 3px 3px;
+  border: 2px solid rgb(86 56 47/0.18);
+  border-radius: 11px;
+  background: #fff7d9;
+}
+.online-hud-shell .combat-hero.role-tank { background: #e6f7ff; }
+.online-hud-shell .combat-hero.role-support { background: #e9fff3; }
+.online-hud-shell .hero-face {
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  border: 2px solid var(--cocoa);
+  border-radius: 12px;
+  background: #ffe58b;
+}
+.online-hud-shell .hero-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center 72%;
+  transform: scale(1.32);
+}
+.online-hud-shell .hero-details {
+  align-content: center;
+  gap: 2px;
+}
+.online-hud-shell .hero-details > div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.online-hud-shell .hero-details b { font-size: 10px; }
+.online-hud-shell .hero-level,
+.online-hud-shell .hero-state {
+  font-size: 8px;
+  font-weight: 900;
+}
+.online-hud-shell .hero-state {
+  margin-left: auto;
+  color: #317c5b;
+}
+.online-hud-shell .hero-details progress {
+  width: 100%;
+  height: 8px;
+}
+.online-hud-shell .hero-details small {
+  overflow: hidden;
+  color: #715c52;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .online-hud-shell .combat-status-bubble {
   top: 124px;
@@ -565,6 +654,10 @@
   .action-dock button {
     height: 70px;
   }
+  .online-hud-shell .team-status-panel {
+    top: max(104px, calc(env(safe-area-inset-top) + 94px));
+    width: min(310px, 28vw);
+  }
 }
 @media (max-height: 560px) and (orientation: landscape) {
   .tower-party {
@@ -587,6 +680,16 @@
   .quest-feed {
     display: none;
   }
+  .online-hud-shell .team-status-panel {
+    top: max(82px, calc(env(safe-area-inset-top) + 72px));
+    width: min(286px, 31vw);
+  }
+  .online-hud-shell .combat-hero {
+    grid-template-columns: 38px minmax(0, 1fr);
+    min-height: 40px;
+  }
+  .online-hud-shell .hero-face { width: 36px; height: 36px; }
+  .online-hud-shell .hero-details small { display: none; }
 }
 @media (max-width: 350px) {
   .floor-plaque {

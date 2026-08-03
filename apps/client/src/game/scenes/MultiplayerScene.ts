@@ -15,6 +15,7 @@ import type { MultiplayerClient } from '../multiplayer/MultiplayerClient';
 import { FloorOneRenderer } from '../map/FloorOneRenderer';
 import { preloadFloorOneAssets } from '../map/FloorOneAssetLoader';
 import { composeWorldScale, WORLD_SPRITE_HEIGHT, worldScaleForHeight } from '../rendering/spriteWorldScale';
+import { syncCameraTarget } from '../rendering/onlineCameraRig';
 import { WORLD_VISUALS } from '../../assets/world-visuals';
 import {
   createMotionState,
@@ -38,6 +39,7 @@ type TeamView = {
   direction: Direction;
   lastMotionPosition: Vector2;
   lastMotionAt: number;
+  cameraTarget: Phaser.GameObjects.Zone;
 };
 type HeroView = {
   id: string;
@@ -136,7 +138,7 @@ export class MultiplayerScene extends Phaser.Scene {
     if (predicted && localState) {
       if (!this.localTeam) {
         this.localTeam = this.createTeam(localState, true);
-        this.cameras.main.startFollow(this.localTeam.leader, true, 0.12, 0.12);
+        this.cameras.main.startFollow(this.localTeam.cameraTarget, true, 0.1, 0.1);
       }
       if (this.client.consumeHardCorrection()) this.localTeam.position = { ...predicted };
       else {
@@ -431,10 +433,12 @@ export class MultiplayerScene extends Phaser.Scene {
       direction: this.renderDirection(player.direction, 'down'),
       lastMotionPosition: { x: player.x, y: player.y },
       lastMotionAt: 0,
+      cameraTarget: this.add.zone(player.x, player.y, 1, 1),
     };
   }
 
   private positionTeam(team: TeamView) {
+    syncCameraTarget(team.cameraTarget, team.position);
     for (const hero of team.heroes) {
       const position = formationDestination(team.position, team.direction, hero.role);
       hero.container.setPosition(position.x, position.y);
@@ -679,6 +683,7 @@ export class MultiplayerScene extends Phaser.Scene {
   private destroyTeam(team: TeamView) {
     for (const hero of team.heroes) hero.container.destroy(true);
     team.label.destroy();
+    team.cameraTarget.destroy();
   }
 
   private onResize = (size: Phaser.Structs.Size) =>
