@@ -6,6 +6,8 @@ import { SessionRewardBadge } from './SessionRewardBadge';
 import { TeamStatusPanel } from './TeamStatusPanel';
 import { TowerHud } from '../tower/TowerHud';
 import { createOnlineTowerHudModel } from '../tower/towerHudModel';
+import { createFloorOneMinimapModel } from '../tower/towerHudModel';
+import { FLOOR_ONE_MAP, WORLD } from '@odd-tower/game-core';
 
 export function OnlineCombatHud({
   state,
@@ -20,6 +22,7 @@ export function OnlineCombatHud({
     <div className="online-hud-shell">
       <TowerHud
         model={createOnlineTowerHudModel(state)}
+        minimap={createFloorOneMinimapModel({ map: FLOOR_ONE_MAP, tileSize: WORLD.tileSize, ...state.world })}
         onToggleAuto={onToggleAutoHunt}
         onPause={() => {}}
         onLeave={onLeave}

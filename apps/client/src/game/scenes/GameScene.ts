@@ -562,6 +562,11 @@ export class GameScene extends Phaser.Scene {
       paused: this.paused,
       fps: Math.round(this.game.loop.actualFps || 60),
       position: `${Math.round(this.anchor.x)}, ${Math.round(this.anchor.y)}`,
+      world: {
+        player: { x: this.anchor.x, y: this.anchor.y, facing: this.facing },
+        portalUnlocked: false,
+        guardianActive: false,
+      },
     });
   }
   private onResize = (size: Phaser.Structs.Size) =>

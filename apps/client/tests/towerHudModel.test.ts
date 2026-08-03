@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { FLOOR_ONE_MAP } from '@odd-tower/game-core';
-import { createLocalTowerHudModel, createOnlineTowerHudModel, projectFloorOneMinimap } from '../src/ui/tower/towerHudModel';
+import {
+  createFloorOneMinimapModel,
+  createLocalTowerHudModel,
+  createOnlineTowerHudModel,
+  projectFloorOneMinimap,
+  projectWorldPoint,
+} from '../src/ui/tower/towerHudModel';
 import { initialMultiplayerState } from '../src/game/multiplayer/MultiplayerBridge';
 
 describe('tower HUD model', () => {
@@ -9,6 +15,7 @@ describe('tower HUD model', () => {
       level: 3, hp: 120, maxHp: 100, experience: -2, nextExperience: 50,
       autoEnabled: true, autoState: 'engaging', target: 'Wild Sausage', living: 2,
       respawnSeconds: 0, paused: false, fps: 60, position: '1024, 1024',
+      world: { player: { x: 1024, y: 1024, facing: 'down' }, portalUnlocked: false, guardianActive: false },
     });
     expect(model.modeLabel).toBe('LOCAL ADVENTURE');
     expect(model.healthRatio).toBe(1);
@@ -22,6 +29,25 @@ describe('tower HUD model', () => {
     expect(map.height).toBe(64);
     expect(map.markers.some((marker) => marker.kind === 'portal')).toBe(true);
     expect(map.markers.every((marker) => marker.x >= 0 && marker.x <= 1)).toBe(true);
+  });
+
+  it('projects and clamps live pixel positions onto Floor 1', () => {
+    expect(projectWorldPoint({ x: 1024, y: 512 }, FLOOR_ONE_MAP, 32)).toEqual({ x: 0.5, y: 0.25 });
+    expect(projectWorldPoint({ x: -20, y: 99999 }, FLOOR_ONE_MAP, 32)).toEqual({ x: 0, y: 1 });
+  });
+
+  it('derives live player, portal, and guardian minimap state', () => {
+    const map = createFloorOneMinimapModel({
+      map: FLOOR_ONE_MAP,
+      tileSize: 32,
+      player: { x: 1024, y: 1536, facing: 'left' },
+      portalUnlocked: true,
+      guardianActive: true,
+    });
+
+    expect(map.player).toEqual({ x: 0.5, y: 0.75, facing: 'left' });
+    expect(map.markers.find((marker) => marker.kind === 'portal')).toMatchObject({ state: 'ready', label: 'Floor 2 portal' });
+    expect(map.markers.find((marker) => marker.kind === 'boss')).toMatchObject({ state: 'active', label: 'Floor guardian' });
   });
 
   it('keeps online room capacity and latency in shared session model', () => {

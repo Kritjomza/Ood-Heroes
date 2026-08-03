@@ -220,4 +220,18 @@ describe('online mode UI', () => {
     expect(screen.getByText('Slowed')).toBeInTheDocument();
     expect(screen.getByText('Defeated')).toBeInTheDocument();
   });
+
+  it('projects online local-player coordinates into the shared minimap', () => {
+    render(
+      <OnlineHud
+        state={{
+          ...initialMultiplayerState,
+          world: { player: { x: 1536, y: 512, facing: 'right' }, portalUnlocked: true, guardianActive: false },
+        }}
+        onLeave={() => {}}
+        onToggleAutoHunt={() => {}}
+      />,
+    );
+    expect(screen.getByLabelText(/player at 75 percent, 25 percent/i)).toBeInTheDocument();
+  });
 });

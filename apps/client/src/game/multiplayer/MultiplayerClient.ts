@@ -14,7 +14,7 @@ import {
   type NetworkFloorGuardianState,
 } from '@odd-tower/network-protocol';
 import type { Vector2 } from '@odd-tower/game-core';
-import { MultiplayerBridge } from './MultiplayerBridge';
+import { MultiplayerBridge, type MultiplayerUiState } from './MultiplayerBridge';
 import { RemoteInterpolator } from './interpolation';
 import { PredictionController } from './prediction';
 import { CombatEventDeduplicator } from './combatEvents';
@@ -316,6 +316,7 @@ export class MultiplayerClient {
     if (!state.players) return;
     const receivedAt = performance.now();
     const seen = new Set<string>();
+    let localWorld: MultiplayerUiState['world']['player'];
     state.players.forEach((player, id) => {
       seen.add(id);
       const plain: NetworkPlayerState = {
@@ -329,6 +330,11 @@ export class MultiplayerClient {
         lastProcessedInputSequence: player.lastProcessedInputSequence,
       };
       if (id === this.localPlayerId) {
+        localWorld = {
+          x: plain.x,
+          y: plain.y,
+          facing: plain.direction === 'none' ? 'down' : plain.direction,
+        };
         if (!this.prediction || reconnect)
           this.prediction = new PredictionController({ x: plain.x, y: plain.y });
         if (reconnect)
@@ -371,6 +377,11 @@ export class MultiplayerClient {
         focusedMonsterName: focusedName,
         livingHeroes: [...combat.heroes].filter((hero) => hero.status === 'alive').length,
         respawnSeconds,
+        world: {
+          player: localWorld,
+          portalUnlocked: Boolean(combat.bossDefeated),
+          guardianActive: !combat.bossDefeated,
+        },
       });
     }
     if (

@@ -22,19 +22,28 @@ export class FloorOneRenderer {
   constructor(private readonly scene: Phaser.Scene) {}
 
   create() {
+    const visual = createFloorOneVisualModel(FLOOR_ONE_MAP);
     this.scene.add.rectangle(WORLD.size / 2, WORLD.size / 2, WORLD.size, WORLD.size, 0x203a35).setDepth(-20);
     for (const object of FLOOR_ONE_MAP.objects.filter((item) => item.type === 'zone')) {
+      const style = visual.zoneStyles.find((item) => item.id === object.zone);
       this.scene.add
         .rectangle(
           (object.x + object.width / 2) * WORLD.tileSize,
           (object.y + object.height / 2) * WORLD.tileSize,
           object.width * WORLD.tileSize,
           object.height * WORLD.tileSize,
-          ZONE_COLORS[object.zone] ?? 0x35454a,
+          style?.base ?? ZONE_COLORS[object.zone] ?? 0x35454a,
           object.zone === 'central_camp' ? 0.94 : 0.72,
         )
-        .setStrokeStyle(4, this.lighten(ZONE_COLORS[object.zone] ?? 0x35454a), 0.4)
+        .setStrokeStyle(5, style?.edge ?? this.lighten(ZONE_COLORS[object.zone] ?? 0x35454a), 0.5)
         .setDepth(-18);
+    }
+    const routes = this.scene.add.graphics().setDepth(visual.depths.path);
+    for (const path of visual.paths) {
+      routes.lineStyle(path.widthTiles * WORLD.tileSize, 0x47332c, 0.22);
+      routes.lineBetween(path.from.x * WORLD.tileSize, path.from.y * WORLD.tileSize, path.to.x * WORLD.tileSize, path.to.y * WORLD.tileSize);
+      routes.lineStyle(Math.max(8, path.widthTiles * WORLD.tileSize - 10), 0xf1d38c, 0.32);
+      routes.lineBetween(path.from.x * WORLD.tileSize, path.from.y * WORLD.tileSize, path.to.x * WORLD.tileSize, path.to.y * WORLD.tileSize);
     }
     this.createPixelGroundDetails();
     const slow = FLOOR_ONE_MAP.layers.find((layer) => layer.name === 'Terrain_Slow')?.rects ?? [];
@@ -66,6 +75,9 @@ export class FloorOneRenderer {
       .circle((portal.x + portal.width / 2) * 32, (portal.y + portal.height / 2) * 32, 58, 0x372147, 0.9)
       .setStrokeStyle(8, 0x8863a7, 0.85)
       .setDepth(1);
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.scene.tweens.add({ targets: this.portal, alpha: { from: 0.78, to: 1 }, scale: { from: 0.96, to: 1.04 }, duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    }
     this.scene.add
       .text(this.portal.x, this.portal.y + 78, 'SEALED PORTAL', { fontSize: '16px', color: '#dac8e8' })
       .setOrigin(0.5)

@@ -26,4 +26,13 @@ describe('HUD', () => {
     view.unmount();
     expect(bridge.listenerCount).toBe(0);
   });
+  it('passes live structured world coordinates to the shared tower map', () => {
+    const bridge = new GameBridge();
+    render(<Hud bridge={bridge} onToggleAuto={() => {}} onPause={() => {}} />);
+    act(() => bridge.publish({
+      ...initialHudState,
+      world: { player: { x: 640, y: 320, facing: 'left' }, portalUnlocked: false, guardianActive: false },
+    }));
+    expect(screen.getByLabelText(/player at 31 percent, 16 percent/i)).toBeInTheDocument();
+  });
 });

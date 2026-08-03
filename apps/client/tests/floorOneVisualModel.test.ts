@@ -9,6 +9,14 @@ describe('Floor 1 visual model', () => {
     expect(first).toEqual(second);
     expect(first.details.length).toBeGreaterThan(80);
     expect(first.details.every((detail) => !first.blocked.has(`${detail.tileX},${detail.tileY}`))).toBe(true);
-    expect(first.depths).toEqual({ ground: -20, detail: -15, objects: 3, foreground: 12 });
+    expect(first.depths).toEqual({ ground: -20, path: -17, detail: -15, objects: 3, foreground: 12 });
+  });
+
+  it('defines authored zones, routes, and scale limits without covering interactive footprints', () => {
+    const visual = createFloorOneVisualModel(FLOOR_ONE_MAP, 1931);
+    expect(visual.paths.length).toBeGreaterThan(0);
+    expect(visual.zoneStyles.map((zone) => zone.id)).toEqual(expect.arrayContaining(['central_camp', 'guardian_arena']));
+    expect(visual.scale.heroMaxTiles).toBeLessThanOrEqual(3);
+    expect(visual.details.every((detail) => !visual.reserved.has(`${detail.tileX},${detail.tileY}`))).toBe(true);
   });
 });

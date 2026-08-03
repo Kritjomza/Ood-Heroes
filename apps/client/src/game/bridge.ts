@@ -1,4 +1,9 @@
 import type { AutoHuntState } from '@odd-tower/game-core';
+export type HudWorldState = {
+  player?: { x: number; y: number; facing: 'left' | 'right' | 'up' | 'down' };
+  portalUnlocked: boolean;
+  guardianActive: boolean;
+};
 export type HudState = {
   level: number;
   hp: number;
@@ -13,6 +18,7 @@ export type HudState = {
   paused: boolean;
   fps: number;
   position: string;
+  world: HudWorldState;
 };
 export const initialHudState: HudState = {
   level: 1,
@@ -28,6 +34,7 @@ export const initialHudState: HudState = {
   paused: false,
   fps: 60,
   position: '1024, 1024',
+  world: { player: { x: 1024, y: 1024, facing: 'down' }, portalUnlocked: false, guardianActive: false },
 };
 export class GameBridge {
   private listeners = new Set<(s: HudState) => void>();

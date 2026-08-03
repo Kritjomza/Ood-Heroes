@@ -33,6 +33,11 @@ export type MultiplayerUiState = {
   focusedMonsterName: string;
   livingHeroes: number;
   respawnSeconds: number;
+  world: {
+    player?: { x: number; y: number; facing: 'left' | 'right' | 'up' | 'down' };
+    portalUnlocked: boolean;
+    guardianActive: boolean;
+  };
 };
 
 export const initialMultiplayerState: MultiplayerUiState = {
@@ -50,6 +55,7 @@ export const initialMultiplayerState: MultiplayerUiState = {
   focusedMonsterName: 'None',
   livingHeroes: 3,
   respawnSeconds: 0,
+  world: { portalUnlocked: false, guardianActive: false },
 };
 
 export class MultiplayerBridge {
@@ -96,6 +102,11 @@ function sameUiState(a: MultiplayerUiState, b: MultiplayerUiState) {
     a.focusedMonsterName !== b.focusedMonsterName ||
     a.livingHeroes !== b.livingHeroes ||
     a.respawnSeconds !== b.respawnSeconds ||
+    a.world.player?.x !== b.world.player?.x ||
+    a.world.player?.y !== b.world.player?.y ||
+    a.world.player?.facing !== b.world.player?.facing ||
+    a.world.portalUnlocked !== b.world.portalUnlocked ||
+    a.world.guardianActive !== b.world.guardianActive ||
     a.heroes.length !== b.heroes.length
   )
     return false;

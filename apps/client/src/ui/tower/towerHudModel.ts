@@ -28,8 +28,26 @@ export type TowerHudModel = {
   respawnSeconds: number;
 };
 
-export type MinimapMarker = { id: string; kind: 'camp' | 'boss' | 'portal' | 'landmark'; x: number; y: number };
-export type FloorOneMinimapModel = { width: number; height: number; markers: MinimapMarker[] };
+export type MinimapFacing = 'left' | 'right' | 'up' | 'down';
+export type MinimapMarker = {
+  id: string;
+  kind: 'camp' | 'boss' | 'portal' | 'landmark' | 'target';
+  x: number;
+  y: number;
+  label: string;
+  state?: 'locked' | 'ready' | 'idle' | 'active';
+};
+export type MinimapPlayer = { x: number; y: number; facing: MinimapFacing };
+export type FloorOneMinimapModel = { width: number; height: number; markers: MinimapMarker[]; player?: MinimapPlayer };
+export type WorldPoint = { x: number; y: number };
+export type FloorOneMinimapInput = {
+  map: typeof FLOOR_ONE_MAP;
+  tileSize: number;
+  player?: WorldPoint & { facing?: MinimapFacing };
+  portalUnlocked?: boolean;
+  guardianActive?: boolean;
+  target?: WorldPoint & { id: string; label: string };
+};
 
 const ratio = (value: number, max: number) => Math.max(0, Math.min(1, value / Math.max(1, max)));
 
@@ -66,10 +84,56 @@ export function createOnlineTowerHudModel(state: MultiplayerUiState): TowerHudMo
   };
 }
 
+export function projectWorldPoint(point: WorldPoint, map: typeof FLOOR_ONE_MAP, tileSize: number) {
+  const clamp = (value: number) => Math.max(0, Math.min(1, value));
+  return {
+    x: clamp(point.x / Math.max(1, map.width * tileSize)),
+    y: clamp(point.y / Math.max(1, map.height * tileSize)),
+  };
+}
+
+function markerLabel(kind: MinimapMarker['kind'], id: string) {
+  if (kind === 'portal') return 'Floor 2 portal';
+  if (kind === 'boss') return 'Floor guardian';
+  if (kind === 'camp') return 'Central camp';
+  if (id.includes('summon')) return 'Summon shrine';
+  if (id.includes('team')) return 'Team station';
+  if (id.includes('afk')) return 'AFK rewards';
+  return 'Floor landmark';
+}
+
 export function projectFloorOneMinimap(map: typeof FLOOR_ONE_MAP): FloorOneMinimapModel {
   const markers: MinimapMarker[] = map.objects.flatMap((object) => {
     const kind = object.type === 'portal' ? 'portal' : object.type === 'boss_spawn' ? 'boss' : object.type === 'landmark' ? 'landmark' : object.zone === 'central_camp' && object.type === 'player_spawn' ? 'camp' : null;
-    return kind ? [{ id: object.id, kind, x: (object.x + object.width / 2) / map.width, y: (object.y + object.height / 2) / map.height }] : [];
+    return kind ? [{
+      id: object.id,
+      kind,
+      x: Math.max(0, Math.min(1, (object.x + object.width / 2) / Math.max(1, map.width))),
+      y: Math.max(0, Math.min(1, (object.y + object.height / 2) / Math.max(1, map.height))),
+      label: markerLabel(kind, object.id),
+    }] : [];
   });
   return { width: map.width, height: map.height, markers };
+}
+
+export function createFloorOneMinimapModel(input: FloorOneMinimapInput): FloorOneMinimapModel {
+  const base = projectFloorOneMinimap(input.map);
+  const markers = base.markers.map((marker) => {
+    if (marker.kind === 'portal') return { ...marker, state: input.portalUnlocked ? 'ready' as const : 'locked' as const };
+    if (marker.kind === 'boss') return { ...marker, state: input.guardianActive ? 'active' as const : 'idle' as const };
+    return marker;
+  });
+  if (input.target) {
+    markers.push({
+      id: input.target.id,
+      kind: 'target',
+      label: input.target.label,
+      ...projectWorldPoint(input.target, input.map, input.tileSize),
+    });
+  }
+  return {
+    ...base,
+    markers,
+    player: input.player ? { ...projectWorldPoint(input.player, input.map, input.tileSize), facing: input.player.facing ?? 'down' } : undefined,
+  };
 }
