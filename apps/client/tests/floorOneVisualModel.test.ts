@@ -18,5 +18,9 @@ describe('Floor 1 visual model', () => {
     expect(visual.zoneStyles.map((zone) => zone.id)).toEqual(expect.arrayContaining(['central_camp', 'guardian_arena']));
     expect(visual.scale.heroMaxTiles).toBeLessThanOrEqual(3);
     expect(visual.details.every((detail) => !visual.reserved.has(`${detail.tileX},${detail.tileY}`))).toBe(true);
+    expect(visual.river.some((piece) => piece.assetId === 'floor1.river.bridge')).toBe(true);
+    expect(visual.transitions.map((item) => item.assetId)).toEqual(expect.arrayContaining(['floor1.transition.honey-mint', 'floor1.prop.friendly-sign']));
+    expect(visual.landmarks).toHaveLength(5);
+    expect(visual.placements.every((item) => item.assetId.startsWith('floor1.'))).toBe(true);
   });
 });

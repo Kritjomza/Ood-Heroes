@@ -2,6 +2,7 @@ import type { FLOOR_ONE_MAP } from '@odd-tower/game-core';
 
 export type FloorDetail = { tileX: number; tileY: number; kind: 'grass' | 'flower' | 'stone' | 'spark'; tint: number; scale: number };
 export type FloorPath = { from: { x: number; y: number }; to: { x: number; y: number }; widthTiles: number };
+export type FloorAssetPlacement = { assetId: string; tileX: number; tileY: number; rotation: number; flipX: boolean; depth: 'ground' | 'below-actors' | 'above-actors' };
 
 const ZONE_STYLES = {
   portal: { base: 0x3f2957, edge: 0xb48ad5 },
@@ -49,12 +50,46 @@ export function createFloorOneVisualModel(map: typeof FLOOR_ONE_MAP, seed = 1931
     rect: { x: item.x, y: item.y, width: item.width, height: item.height },
     ...ZONE_STYLES[item.zone],
   }));
+  const placements: FloorAssetPlacement[] = details.slice(0, 90).map((detail, index) => {
+    const zone = zoneStyles.find((item) => detail.tileX >= item.rect.x && detail.tileX < item.rect.x + item.rect.width && detail.tileY >= item.rect.y && detail.tileY < item.rect.y + item.rect.height)?.id;
+    const assetId = zone === 'chocolate_swamp'
+      ? ['floor1.prop.mint-puddle', 'floor1.prop.jelly-reeds', 'floor1.prop.stepping-stones', 'floor1.prop.soda-bubbles'][index % 4]!
+      : zone === 'spicy_forest'
+        ? ['floor1.prop.candy-roots', 'floor1.prop.ember-peppers', 'floor1.prop.dark-shrub', 'floor1.prop.purple-crystal'][index % 4]!
+        : ['floor1.prop.biscuit-rock', 'floor1.prop.warm-flowers'][index % 2]!;
+    return { assetId, tileX: detail.tileX, tileY: detail.tileY, rotation: (index % 4) * Math.PI / 2, flipX: index % 3 === 0, depth: assetId.includes('shrub') || assetId.includes('reeds') || assetId.includes('crystal') ? 'above-actors' : 'below-actors' };
+  });
+  const river: FloorAssetPlacement[] = Array.from({ length: 12 }, (_, index) => ({
+    assetId: index === 6 ? 'floor1.river.bridge' : index % 5 === 4 ? 'floor1.river.foam' : 'floor1.river.straight',
+    tileX: 16 + index * 2,
+    tileY: 34 + Math.round(Math.sin(index * 0.75) * 2),
+    rotation: index === 6 ? 0 : Math.PI / 2,
+    flipX: index % 2 === 0,
+    depth: index === 6 ? 'above-actors' : 'ground',
+  } as FloorAssetPlacement));
+  const transitions: FloorAssetPlacement[] = [
+    { assetId: 'floor1.transition.honey-mint', tileX: 23, tileY: 38, rotation: 0, flipX: false, depth: 'ground' },
+    { assetId: 'floor1.transition.mint-cocoa', tileX: 39, tileY: 31, rotation: Math.PI / 2, flipX: false, depth: 'ground' },
+    { assetId: 'floor1.transition.cocoa-honey', tileX: 40, tileY: 40, rotation: Math.PI / 2, flipX: true, depth: 'ground' },
+    { assetId: 'floor1.prop.friendly-sign', tileX: 24.5, tileY: 46, rotation: 0, flipX: false, depth: 'above-actors' },
+  ] as FloorAssetPlacement[];
+  const landmarks: FloorAssetPlacement[] = [
+    ['floor1.landmark.summon', 'landmark.summon_shrine'], ['floor1.landmark.team', 'landmark.team_station'], ['floor1.landmark.afk', 'landmark.afk_chest'],
+    ['floor1.landmark.portal', 'portal.floor_2'], ['floor1.landmark.arena', 'arena.player_entry'],
+  ].flatMap(([assetId, objectId]) => {
+    const object = map.objects.find((item) => item.id === objectId);
+    return object ? [{ assetId, tileX: object.x + object.width / 2, tileY: object.y + object.height / 2, rotation: 0, flipX: false, depth: 'above-actors' as const }] : [];
+  });
   return {
     blocked,
     reserved,
     details,
     paths,
     zoneStyles,
+    placements,
+    river,
+    transitions,
+    landmarks,
     scale: { heroMaxTiles: 2.6, bossMaxTiles: 4.2, landmarkLabelPx: 13 },
     depths: { ground: -20, path: -17, detail: -15, objects: 3, foreground: 12 } as const,
   };

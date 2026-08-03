@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { FLOOR_ONE_MAP, WORLD, floorOneObject } from '@odd-tower/game-core';
 import { createFloorOneVisualModel } from './floorOneVisualModel';
+import { ensureFloorOneFallbackTextures } from './FloorOneAssetLoader';
+import { floorOneAsset } from './floorOneAssetRegistry';
 
 const ZONE_COLORS: Record<string, number> = {
   portal: 0x49305f,
@@ -22,20 +24,26 @@ export class FloorOneRenderer {
   constructor(private readonly scene: Phaser.Scene) {}
 
   create() {
+    ensureFloorOneFallbackTextures(this.scene);
     const visual = createFloorOneVisualModel(FLOOR_ONE_MAP);
     this.scene.add.rectangle(WORLD.size / 2, WORLD.size / 2, WORLD.size, WORLD.size, 0x203a35).setDepth(-20);
     for (const object of FLOOR_ONE_MAP.objects.filter((item) => item.type === 'zone')) {
       const style = visual.zoneStyles.find((item) => item.id === object.zone);
+      const groundId = object.zone === 'beginner_fields' ? 'floor1.ground.honey'
+        : object.zone === 'chocolate_swamp' ? 'floor1.ground.mint'
+          : object.zone === 'spicy_forest' ? 'floor1.ground.cocoa'
+            : object.zone === 'central_camp' ? 'floor1.ground.camp'
+              : 'floor1.ground.arena';
       this.scene.add
-        .rectangle(
+        .tileSprite(
           (object.x + object.width / 2) * WORLD.tileSize,
           (object.y + object.height / 2) * WORLD.tileSize,
           object.width * WORLD.tileSize,
           object.height * WORLD.tileSize,
-          style?.base ?? ZONE_COLORS[object.zone] ?? 0x35454a,
-          object.zone === 'central_camp' ? 0.94 : 0.72,
+          groundId,
         )
-        .setStrokeStyle(5, style?.edge ?? this.lighten(ZONE_COLORS[object.zone] ?? 0x35454a), 0.5)
+        .setTint(style?.base ?? ZONE_COLORS[object.zone] ?? 0xffffff)
+        .setAlpha(object.zone === 'central_camp' ? 0.98 : 0.9)
         .setDepth(-18);
     }
     const routes = this.scene.add.graphics().setDepth(visual.depths.path);
@@ -45,20 +53,10 @@ export class FloorOneRenderer {
       routes.lineStyle(Math.max(8, path.widthTiles * WORLD.tileSize - 10), 0xf1d38c, 0.32);
       routes.lineBetween(path.from.x * WORLD.tileSize, path.from.y * WORLD.tileSize, path.to.x * WORLD.tileSize, path.to.y * WORLD.tileSize);
     }
-    this.createPixelGroundDetails();
-    const slow = FLOOR_ONE_MAP.layers.find((layer) => layer.name === 'Terrain_Slow')?.rects ?? [];
-    for (const rect of slow)
-      this.scene.add
-        .rectangle(
-          (rect.x + rect.width / 2) * 32,
-          (rect.y + rect.height / 2) * 32,
-          rect.width * 32,
-          rect.height * 32,
-          0x5d352f,
-          0.82,
-        )
-        .setStrokeStyle(3, 0xc18a62, 0.55)
-        .setDepth(-16);
+    visual.transitions.forEach((placement) => this.renderPlacement(placement));
+    visual.river.forEach((placement) => this.renderPlacement(placement));
+    visual.placements.forEach((placement) => this.renderPlacement(placement));
+    visual.landmarks.forEach((placement) => this.renderPlacement(placement));
     for (const landmark of FLOOR_ONE_MAP.objects.filter((item) => item.type === 'landmark'))
       this.scene.add
         .text((landmark.x + 0.5) * 32, (landmark.y + 0.5) * 32, this.landmarkLabel(landmark.id), {
@@ -98,6 +96,17 @@ export class FloorOneRenderer {
       })
       .setOrigin(0.5)
       .setDepth(2);
+  }
+
+  private renderPlacement(placement: { assetId: string; tileX: number; tileY: number; rotation: number; flipX: boolean; depth: 'ground' | 'below-actors' | 'above-actors' }) {
+    const asset = floorOneAsset(placement.assetId);
+    if (!asset || !this.scene.textures.exists(asset.id)) return;
+    this.scene.add.image(placement.tileX * WORLD.tileSize, placement.tileY * WORLD.tileSize, asset.id)
+      .setOrigin(asset.origin[0], asset.origin[1])
+      .setDisplaySize(asset.displayWidth, asset.displayHeight)
+      .setFlipX(asset.mirror && placement.flipX)
+      .setRotation(asset.rotate ? placement.rotation : 0)
+      .setDepth(placement.depth === 'ground' ? -16 : placement.depth === 'below-actors' ? 1 : 8);
   }
 
   private createPixelGroundDetails() {

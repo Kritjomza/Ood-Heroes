@@ -21,6 +21,7 @@ import {
 import type { GameBridge } from '../bridge';
 import type { Controls } from '../createGame';
 import { FloorOneRenderer } from '../map/FloorOneRenderer';
+import { preloadFloorOneAssets } from '../map/FloorOneAssetLoader';
 import {
   createMotionState,
   updateSingleSpriteMotion,
@@ -83,6 +84,9 @@ export class GameScene extends Phaser.Scene {
     this.bridge = bridge;
     this.controls = controls;
   }
+  preload() {
+    preloadFloorOneAssets(this);
+  }
   create() {
     this.physics.world.setBounds(0, 0, WORLD.size, WORLD.size);
     this.drawMap();
@@ -129,8 +133,8 @@ export class GameScene extends Phaser.Scene {
       const [x, y] = cell.split(',').map(Number);
       if (x === 0 || y === 0 || x === 63 || y === 63) continue;
       const block = this.add
-        .rectangle(x! * 32 + 16, y! * 32 + 16, 32, 32, 0x26343d)
-        .setStrokeStyle(1, 0x52616b);
+        .rectangle(x! * 32 + 16, y! * 32 + 16, 32, 32, 0x000000, 0)
+        .setVisible(false);
       this.physics.add.existing(block, true);
       this.obstacles.add(block);
     }

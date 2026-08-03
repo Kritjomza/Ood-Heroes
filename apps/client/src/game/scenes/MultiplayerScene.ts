@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import {
   WORLD,
   formationDestination,
-  prototypeMap,
   type Direction,
   type Vector2,
 } from '@odd-tower/game-core';
@@ -14,6 +13,8 @@ import type {
 } from '@odd-tower/network-protocol';
 import type { MultiplayerClient } from '../multiplayer/MultiplayerClient';
 import { FloorOneRenderer } from '../map/FloorOneRenderer';
+import { preloadFloorOneAssets } from '../map/FloorOneAssetLoader';
+import { composeWorldScale, WORLD_SPRITE_HEIGHT, worldScaleForHeight } from '../rendering/spriteWorldScale';
 import { WORLD_VISUALS } from '../../assets/world-visuals';
 import {
   createMotionState,
@@ -50,6 +51,7 @@ type HeroView = {
   slow: Phaser.GameObjects.Arc;
   lastStatus: string;
   visual: SingleSpriteMotionState;
+  baseScale: number;
 };
 type MonsterView = {
   container: Phaser.GameObjects.Container;
@@ -66,6 +68,7 @@ type MonsterView = {
   visual: SingleSpriteMotionState;
   lastMotionPosition: Vector2;
   lastMotionAt: number;
+  baseScale: number;
 };
 
 export class MultiplayerScene extends Phaser.Scene {
@@ -87,6 +90,7 @@ export class MultiplayerScene extends Phaser.Scene {
   }
 
   preload() {
+    preloadFloorOneAssets(this);
     const usedKeys = new Set<string>([
       ...Object.values(HERO_WORLD_ASSET_IDS),
       ...Object.values(MONSTER_ASSET_IDS),
@@ -273,7 +277,8 @@ export class MultiplayerScene extends Phaser.Scene {
       view.lastMotionAt = time;
       if (!this.tweens.isTweening(view.body)) {
         view.body.y = (view.body instanceof Phaser.GameObjects.Image ? 20 : 0) + view.visual.visualY;
-        view.body.setScale(view.visual.scaleX, view.visual.scaleY).setAngle(view.visual.angle);
+        const scale = composeWorldScale(view.baseScale, view.visual.scaleX, view.visual.scaleY);
+        view.body.setScale(scale.x, scale.y).setAngle(view.visual.angle);
         if (view.body instanceof Phaser.GameObjects.Image) view.body.setFlipX(view.visual.flipX);
         view.shadow.setScale(view.visual.shadowScale).setAlpha(view.visual.shadowAlpha);
       }
@@ -343,8 +348,8 @@ export class MultiplayerScene extends Phaser.Scene {
     const container = this.add
       .container(monster.x, monster.y)
       .setDepth(2)
-      .setSize(48, 56)
-      .setInteractive();
+      .setSize(34, 24)
+      .setInteractive(new Phaser.Geom.Rectangle(-17, 2, 34, 24), Phaser.Geom.Rectangle.Contains);
     const target = this.add.circle(0, 7, 27).setStrokeStyle(3, 0xffe46b).setVisible(false);
     const shadow = this.add.ellipse(0, 18, 38, 14, 0x101820, 0.28);
     const warning = this.add
@@ -362,6 +367,10 @@ export class MultiplayerScene extends Phaser.Scene {
             colors[monster.definitionId] ?? 0xffffff,
           )
           .setStrokeStyle(3, 0x20252b);
+    const baseScale = body instanceof Phaser.GameObjects.Image
+      ? worldScaleForHeight(body.height, WORLD_SPRITE_HEIGHT.monster)
+      : 1;
+    body.setScale(baseScale);
     const hpBack = this.add.rectangle(0, -30, 40, 6, 0x321d24);
     const hp = this.add.rectangle(0, -30, 38, 4, 0x67e76e);
     const label = this.add
@@ -393,19 +402,13 @@ export class MultiplayerScene extends Phaser.Scene {
       ),
       lastMotionPosition: { x: monster.x, y: monster.y },
       lastMotionAt: 0,
+      baseScale,
     };
   }
 
   private drawMap() {
     this.floorRenderer = new FloorOneRenderer(this);
     this.floorRenderer.create();
-    for (const cell of prototypeMap.blocked) {
-      const [x, y] = cell.split(',').map(Number);
-      if (x === 0 || y === 0 || x === 63 || y === 63) continue;
-      this.add
-        .rectangle(x! * WORLD.tileSize + 16, y! * WORLD.tileSize + 16, 32, 32, 0x26343d)
-        .setStrokeStyle(1, 0x52616b);
-    }
   }
 
   private createTeam(player: NetworkPlayerState, local: boolean): TeamView {
@@ -485,7 +488,10 @@ export class MultiplayerScene extends Phaser.Scene {
       if (this.tweens.isTweening(hero.body)) continue;
       hero.body.y = (hero.body instanceof Phaser.GameObjects.Image ? 20 : 0) + (reduced ? 0 : hero.visual.visualY);
       hero.body.setAngle(reduced ? 0 : hero.visual.angle);
-      hero.body.setScale(reduced ? 1 : hero.visual.scaleX, reduced ? 1 : hero.visual.scaleY);
+      const scale = reduced
+        ? { x: hero.baseScale, y: hero.baseScale }
+        : composeWorldScale(hero.baseScale, hero.visual.scaleX, hero.visual.scaleY);
+      hero.body.setScale(scale.x, scale.y);
       if (hero.body instanceof Phaser.GameObjects.Image) hero.body.setFlipX(hero.visual.flipX);
       hero.shadow.setScale(hero.visual.shadowScale).setAlpha(hero.visual.shadowAlpha);
     }
@@ -505,6 +511,9 @@ export class MultiplayerScene extends Phaser.Scene {
     const body = textureKey && this.textures.exists(textureKey)
       ? this.add.image(0, 20, textureKey).setOrigin(0.5, 0.82)
       : this.add.circle(0, 0, 20, fallbackColor).setStrokeStyle(4, 0x2b1a14);
+    const targetHeight = WORLD_SPRITE_HEIGHT.hero[role];
+    const baseScale = body instanceof Phaser.GameObjects.Image ? worldScaleForHeight(body.height, targetHeight) : 1;
+    body.setScale(baseScale);
     const hpBack = this.add.rectangle(0, -30, 31, 6, 0x62463b);
     const hp = this.add.rectangle(0, -30, 29, 4, 0x6bcf8e);
     const slow = this.add.circle(0, 0, 25).setStrokeStyle(3, 0x9fb4c8).setVisible(false);
@@ -525,6 +534,7 @@ export class MultiplayerScene extends Phaser.Scene {
         'right',
         (id.length % 13) / 13,
       ),
+      baseScale,
     };
   }
 
