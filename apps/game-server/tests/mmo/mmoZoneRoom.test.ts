@@ -28,7 +28,7 @@ beforeAll(async () => {
   };
   server = await boot(
     createGameServer(undefined, undefined, {}, undefined, {
-      flags: { worldEnabled: true, eligibleAccountIds: new Set(accountIds) },
+      flags: { worldEnabled: true, allowAll: true, eligibleAccountIds: new Set(accountIds) },
       authVerifier: {
         verifyAccessToken: async (token) => ({
           userId: token,

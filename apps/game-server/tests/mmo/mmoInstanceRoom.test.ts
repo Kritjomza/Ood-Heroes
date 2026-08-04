@@ -15,7 +15,7 @@ beforeAll(async () => {
   const directory = new WorldDirectory({ channels, createLeaseId: () => 'lease-1', leaseDurationMs: 15_000 });
   instances = new PrivateInstanceRegistry(() => 'instance-1');
   server = await boot(createGameServer(undefined, undefined, {}, undefined, {
-    flags: { worldEnabled: true, eligibleAccountIds: new Set(['leader', 'member']) },
+    flags: { worldEnabled: true, allowAll: true, eligibleAccountIds: new Set(['leader', 'member']) },
     authVerifier: { verifyAccessToken: async (token) => ({ userId: token, accountKind: 'permanent', email: null }) },
     directory,
     checkpoints: { load: async () => null, saveIfNewer: async () => 'saved' } satisfies WorldCheckpointRepository,

@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Do not edit or remove the legacy `floor_one` room behavior or current online lobby contracts.
-- All new entry is disabled unless `MMO_WORLD_ENABLED=1` and the account is eligible.
+- All new entry is disabled unless `MMO_WORLD_ENABLED=1`; enabled deployments admit all authenticated accounts by default.
 - A channel admits at most 30 connected accounts.
 - An account may own only one authoritative MMO channel lease.
 - Protocol version is `4`; incompatible clients fail before room admission.
@@ -392,4 +392,3 @@ git commit -m "test: verify MMO foundation rollout gate"
 ## Foundation Completion Gate
 
 The foundation is complete only when Tasks 1–8 are committed, the full gate command passes, the database migration remains additive, automatic entry is disabled by default, protocol-v3 legacy play remains functional, duplicate memberships remain zero, and the handoff report contains reproducible evidence. Failure of any requirement blocks Phase 2 rollout but does not require removing safely isolated foundation code.
-

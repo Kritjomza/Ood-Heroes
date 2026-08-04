@@ -1,6 +1,6 @@
 # MMO staged rollout and rollback
 
-The legacy `floor_1` room and room-code flow remain available throughout rollout. The MMO world is additive and only enters service when `MMO_WORLD_ENABLED=1` and the account is present in `MMO_WORLD_ACCOUNT_IDS`.
+The legacy `floor_1` room and room-code flow remain available throughout rollout. The MMO world is additive and enters service when `MMO_WORLD_ENABLED=1`. Normal rollout is open to every authenticated account; `MMO_WORLD_ALLOW_ALL=0` is an optional emergency cohort fallback.
 
 ## Go gates
 
@@ -14,13 +14,13 @@ The legacy `floor_1` room and room-code flow remain available throughout rollout
 
 ## Stages
 
-1. **Internal:** set `MMO_WORLD_ROLLOUT_STAGE=internal`, enable only operator accounts, and observe tick debt, channel crashes, transfer failures, persistence backlog, pending reward age, and progression anomalies for one full scheduled boss cycle.
-2. **Invited alpha:** append invited account IDs; hold expansion if any gate regresses.
-3. **Opt-in beta:** enable the cohort after rollback rehearsal and a clean recovery drill.
+1. **Internal:** set `MMO_WORLD_ROLLOUT_STAGE=internal`, use `MMO_WORLD_ALLOW_ALL=0` only if a temporary cohort is required, and observe tick debt, channel crashes, transfer failures, persistence backlog, pending reward age, and progression anomalies for one full scheduled boss cycle.
+2. **Open alpha:** set `MMO_WORLD_ALLOW_ALL=1` so every authenticated account can enter.
+3. **Open beta:** keep the world open after rollback rehearsal and a clean recovery drill.
 
 ## Rollback rehearsal
 
-1. Set `MMO_WORLD_ENABLED=0` or remove the affected IDs from `MMO_WORLD_ACCOUNT_IDS`.
+1. Set `MMO_WORLD_ENABLED=0` (or set `MMO_WORLD_ALLOW_ALL=0` and provide a temporary cohort if only partial rollback is needed).
 2. Restart only the new MMO server workers; leave the legacy server and Supabase tables running.
 3. Confirm legacy `floor_1` entry succeeds and no new MMO leases are assigned.
 4. Keep pending rewards visible in the cloud ledger; do not spend or replay them until the MMO service is restored and commitment is confirmed.

@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- MMO world entry remains disabled unless `MMO_WORLD_ENABLED=1` and the account is allowlisted.
+- MMO world entry remains disabled unless `MMO_WORLD_ENABLED=1`; when enabled, all authenticated accounts may enter by default.
 - Public channels admit 10–30 connected players with a hard cap of 30.
 - Parties contain at most four players; each player deploys three heroes.
 - Movement, target preference, Auto Hunt, and contextual interaction are the only primary controls.

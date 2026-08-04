@@ -7,26 +7,33 @@ describe('MMO feature flags', () => {
     (environment) => {
       expect(readMmoFeatureFlags(environment)).toEqual({
         worldEnabled: false,
+        allowAll: false,
         eligibleAccountIds: new Set(),
       });
     },
   );
 
-  it('normalizes a bounded account cohort when explicitly enabled', () => {
+  it('opens the MMO world to every account when enabled', () => {
     const flags = readMmoFeatureFlags({
       MMO_WORLD_ENABLED: '1',
       MMO_WORLD_ACCOUNT_IDS: ' account-b,account-a,account-b ',
     });
 
     expect([...flags.eligibleAccountIds]).toEqual(['account-a', 'account-b']);
+    expect(flags.allowAll).toBe(true);
     expect(isMmoEligible('account-a', flags)).toBe(true);
-    expect(isMmoEligible('account-c', flags)).toBe(false);
+    expect(isMmoEligible('account-c', flags)).toBe(true);
   });
 
-  it('does not treat an empty cohort as permission for every account', () => {
+  it('supports an explicit cohort fallback without requiring it for normal rollout', () => {
     const flags = readMmoFeatureFlags({ MMO_WORLD_ENABLED: '1', MMO_WORLD_ACCOUNT_IDS: '' });
 
     expect(flags.worldEnabled).toBe(true);
-    expect(isMmoEligible('account-a', flags)).toBe(false);
+    expect(flags.allowAll).toBe(true);
+    expect(isMmoEligible('account-a', flags)).toBe(true);
+    const cohort = readMmoFeatureFlags({ MMO_WORLD_ENABLED: '1', MMO_WORLD_ALLOW_ALL: '0', MMO_WORLD_ACCOUNT_IDS: 'account-a' });
+    expect(cohort.allowAll).toBe(false);
+    expect(isMmoEligible('account-a', cohort)).toBe(true);
+    expect(isMmoEligible('account-b', cohort)).toBe(false);
   });
 });

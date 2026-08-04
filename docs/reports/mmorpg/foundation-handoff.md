@@ -48,8 +48,8 @@ This is an in-process deterministic admission/lease diagnostic, not an internet 
 
 ## Rollout and rollback
 
-1. Keep `MMO_WORLD_ENABLED=0` and `VITE_MMO_WORLD_ENABLED=0` by default.
-2. Add only internal Supabase user IDs to `MMO_WORLD_ACCOUNT_IDS`.
+1. Enable the public world with `MMO_WORLD_ENABLED=1`, `MMO_WORLD_ALLOW_ALL=1`, and `VITE_MMO_WORLD_ENABLED=1` when the deployment is ready.
+2. `MMO_WORLD_ACCOUNT_IDS` is no longer required for normal open-world operation; set `MMO_WORLD_ALLOW_ALL=0` only for an emergency cohort fallback.
 3. Enable the server flag first and verify readiness, then deploy the client flag.
 4. Roll back entry immediately by disabling the client flag, followed by the server flag. The additive database objects may remain; legacy play is independent of them.
 
