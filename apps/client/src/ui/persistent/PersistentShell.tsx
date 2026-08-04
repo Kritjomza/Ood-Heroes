@@ -23,9 +23,11 @@ export type PersistentScreen = PrimaryScreen | 'hero';
 export function PersistentShell({
   onPlayLocal,
   onPlayOnline,
+  onContinueMmo,
 }: {
   onPlayLocal: () => void;
   onPlayOnline: () => void;
+  onContinueMmo?: () => void;
 }) {
   const store = useRef(new PlayerStore()).current;
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot);
@@ -167,6 +169,7 @@ export function PersistentShell({
           navigate={(next) => setScreen(next as PersistentScreen)}
           onPlayLocal={onPlayLocal}
           onPlayOnline={onPlayOnline}
+          onContinueMmo={onContinueMmo}
         />
       )}
       {screen === 'collection' && (

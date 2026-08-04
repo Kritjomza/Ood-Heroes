@@ -12,16 +12,31 @@ import { ModeSelection } from './ui/ModeSelection';
 import { OnlineHud } from './ui/OnlineHud';
 import { OnlineLobby } from './ui/OnlineLobby';
 import { PersistentShell } from './ui/persistent/PersistentShell';
-import { authConfigured } from './persistence/auth-client';
+import { authConfigured, getAuthClient } from './persistence/auth-client';
+import { MmoWorldBridge, initialMmoWorldState } from './mmo/MmoWorldBridge';
+import { MmoWorldClient } from './mmo/MmoWorldClient';
+import { MmoEntryScreen } from './ui/mmo/MmoEntryScreen';
+import { MmoWorldShell } from './ui/mmo/MmoWorldShell';
 
-type Mode = 'persistent' | 'selection' | 'local' | 'online-lobby' | 'online-room';
+type Mode =
+  | 'persistent'
+  | 'selection'
+  | 'local'
+  | 'online-lobby'
+  | 'online-room'
+  | 'mmo-entry'
+  | 'mmo-world';
 
 export function App() {
   const [mode, setMode] = useState<Mode>(() => (authConfigured() ? 'persistent' : 'selection'));
   const bridge = useRef(new MultiplayerBridge()).current;
   const client = useRef(new MultiplayerClient(bridge)).current;
   const [networkState, setNetworkState] = useState(initialMultiplayerState);
+  const mmoBridge = useRef(new MmoWorldBridge()).current;
+  const mmoClient = useRef(new MmoWorldClient(mmoBridge)).current;
+  const [mmoState, setMmoState] = useState(initialMmoWorldState);
   useEffect(() => bridge.subscribe(setNetworkState), [bridge]);
+  useEffect(() => mmoBridge.subscribe(setMmoState), [mmoBridge]);
   useEffect(() => {
     if (mode === 'online-room' && networkState.connection === 'failed') setMode('online-lobby');
   }, [mode, networkState.connection]);
@@ -38,12 +53,48 @@ export function App() {
     await client.leave();
     setMode('online-lobby');
   };
+  const enterMmo = async () => {
+    setMode('mmo-entry');
+    const { data } = await getAuthClient().auth.getSession();
+    try {
+      await mmoClient.connect(data.session?.access_token ?? '');
+      setMode('mmo-world');
+    } catch {
+      setMode('mmo-entry');
+    }
+  };
+  const leaveMmo = async () => {
+    await mmoClient.disconnect();
+    setMode('persistent');
+  };
 
   if (mode === 'persistent')
     return (
       <PersistentShell
         onPlayLocal={() => setMode('local')}
         onPlayOnline={() => setMode('online-lobby')}
+        onContinueMmo={
+          import.meta.env.VITE_MMO_WORLD_ENABLED === '1' ? () => void enterMmo() : undefined
+        }
+      />
+    );
+  if (mode === 'mmo-entry')
+    return (
+      <MmoEntryScreen
+        state={mmoState}
+        onRetry={() => void enterMmo()}
+        onReturnToLegacy={() => void leaveMmo()}
+      />
+    );
+  if (mode === 'mmo-world')
+    return (
+      <MmoWorldShell
+        state={mmoState}
+        onLeave={() => void leaveMmo()}
+        onMovement={(direction) => mmoClient.sendMovement(direction)}
+        onToggleAutoHunt={() => mmoClient.setAutoHunt(!mmoState.autoHuntEnabled)}
+        autoHuntEnabled={mmoState.autoHuntEnabled}
+        onTargetPreference={() => mmoClient.setTargetPreference(null)}
       />
     );
   if (mode === 'selection')

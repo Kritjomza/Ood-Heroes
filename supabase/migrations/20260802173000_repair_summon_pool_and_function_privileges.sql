@@ -10,7 +10,6 @@ values
   ('standard_odd_heroes', 'hero_006_samurai_bread', 300)
 on conflict (banner_id, hero_definition_id)
 do update set weight = excluded.weight;
-
 revoke execute on function private.player_bootstrap(uuid) from public, anon, authenticated;
 revoke execute on function private.player_bootstrap_legacy(uuid) from public, anon, authenticated;
 grant execute on function private.player_bootstrap(uuid) to service_role;

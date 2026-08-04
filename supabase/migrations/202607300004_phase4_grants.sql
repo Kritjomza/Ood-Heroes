@@ -1,6 +1,5 @@
 revoke all on all functions in schema public from public, anon, authenticated;
 revoke all on all functions in schema private from public, anon, authenticated;
-
 grant usage on schema public to service_role;
 grant usage on schema private to service_role;
 grant select, insert, update, delete on all tables in schema public to service_role;
@@ -19,5 +18,4 @@ grant execute on function public.prepare_afk_claim(uuid) to service_role;
 grant execute on function public.claim_afk_reward(uuid, uuid, uuid) to service_role;
 grant execute on function public.update_player_activity(uuid) to service_role;
 grant execute on function private.player_bootstrap(uuid) to service_role;
-
 revoke all on table private.mutation_results from public, anon, authenticated;

@@ -9,11 +9,13 @@ export function HomeScreen({
   navigate,
   onPlayLocal,
   onPlayOnline,
+  onContinueMmo,
 }: {
   player: PlayerBootstrap;
   navigate: (screen: string) => void;
   onPlayLocal: () => void;
   onPlayOnline: () => void;
+  onContinueMmo?: () => void;
 }) {
   const view = derivePlayerView(player);
   const [briefingOpen, setBriefingOpen] = useState(false);
@@ -105,13 +107,13 @@ export function HomeScreen({
           <div className="play-actions">
             <button
               className="plastic-button online-play primary-play-button"
-              aria-label="Enter Floor 1 online"
-              onClick={onPlayOnline}
+              aria-label={onContinueMmo ? 'Continue Adventure online' : 'Enter Floor 1 online'}
+              onClick={onContinueMmo ?? onPlayOnline}
             >
               <AdventureIcon name="play" />
               <span>
-                <strong>Enter Floor 1</strong>
-                <small>Online adventure</small>
+                <strong>{onContinueMmo ? 'Continue Adventure' : 'Enter Floor 1'}</strong>
+                <small>{onContinueMmo ? 'Persistent shared world' : 'Online adventure'}</small>
               </span>
             </button>
             <button className="plastic-button local-play" onClick={onPlayLocal}>

@@ -1,0 +1,36 @@
+warning: in the working copy of 'supabase\migrations\20260803200341_mmo_world_foundation.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'supabase\migrations\20260803200513_mmo_world_foundation.sql', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git "a/supabase\\migrations\\20260803200341_mmo_world_foundation.sql" "b/supabase\\migrations\\20260803200513_mmo_world_foundation.sql"[m
+[1mindex 533bd67..860323e 100644[m
+[1m--- "a/supabase\\migrations\\20260803200341_mmo_world_foundation.sql"[m
+[1m+++ "b/supabase\\migrations\\20260803200513_mmo_world_foundation.sql"[m
+[36m@@ -58,21 +58,9 @@[m [mdeclare[m
+   affected_rows integer;[m
+ begin[m
+   insert into public.mmo_world_checkpoints ([m
+[31m-    account_id,[m
+[31m-    zone_id,[m
+[31m-    sanctuary_id,[m
+[31m-    channel_hint,[m
+[31m-    revision,[m
+[31m-    checkpointed_at,[m
+[31m-    payload[m
+[32m+[m[32m    account_id, zone_id, sanctuary_id, channel_hint, revision, checkpointed_at, payload[m
+   ) values ([m
+[31m-    p_account_id,[m
+[31m-    p_zone_id,[m
+[31m-    p_sanctuary_id,[m
+[31m-    p_channel_hint,[m
+[31m-    p_revision,[m
+[31m-    p_checkpointed_at,[m
+[31m-    p_payload[m
+[32m+[m[32m    p_account_id, p_zone_id, p_sanctuary_id, p_channel_hint, p_revision, p_checkpointed_at, p_payload[m
+   )[m
+   on conflict (account_id) do update[m
+   set zone_id = excluded.zone_id,[m
+[36m@@ -91,4 +79,4 @@[m [m$$;[m
+ revoke all on function public.save_mmo_world_checkpoint(uuid, text, text, text, bigint, timestamptz, jsonb)[m
+   from public, anon, authenticated;[m
+ grant execute on function public.save_mmo_world_checkpoint(uuid, text, text, text, bigint, timestamptz, jsonb)[m
+[31m-  to service_role;[m
+[32m+[m[32m  to service_role;;[m

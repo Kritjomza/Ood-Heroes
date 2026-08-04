@@ -13,6 +13,8 @@ import { createPlayerRouter } from './api/playerRoutes.js';
 import { requestContext } from './api/requestContext.js';
 import { PersistenceQueue } from './persistence/PersistenceQueue.js';
 import { authMiddleware } from './auth/authMiddleware.js';
+import { MmoZoneRoom, type MmoZoneRoomOptions } from './mmo/channels/MmoZoneRoom.js';
+import { MmoInstanceRoom } from './mmo/instances/MmoInstanceRoom.js';
 
 export type PersistenceDependencies = {
   authVerifier: AuthVerifier;
@@ -27,6 +29,7 @@ export function createGameServer(
   registry = new RoomCodeRegistry(),
   roomOptions: { reconnectGraceSeconds?: number } = {},
   persistenceDependencies?: PersistenceDependencies,
+  mmoDependencies?: MmoZoneRoomOptions,
 ) {
   const server = new Server({
     transport: new WebSocketTransport(),
@@ -151,6 +154,14 @@ export function createGameServer(
         }
       : {}),
   });
+  if (mmoDependencies?.flags.worldEnabled)
+    server.define('mmo_zone_v1', MmoZoneRoom, mmoDependencies);
+  if (mmoDependencies?.flags.worldEnabled && mmoDependencies.instances)
+    server.define('mmo_instance_v1', MmoInstanceRoom, {
+      authVerifier: mmoDependencies.authVerifier,
+      instances: mmoDependencies.instances,
+      ...(mmoDependencies.instanceRepository ? { repository: mmoDependencies.instanceRepository } : {}),
+    });
   return server;
 }
 

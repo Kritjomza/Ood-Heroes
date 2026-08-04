@@ -1,15 +1,11 @@
 create extension if not exists pgcrypto with schema extensions;
-
 create schema if not exists private;
 revoke all on schema private from public, anon, authenticated;
-
 create table public.schema_versions (
   version integer primary key check (version > 0),
   applied_at timestamptz not null default now()
 );
-
 insert into public.schema_versions (version) values (1);
-
 create table public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   display_name varchar(20) not null
@@ -23,7 +19,6 @@ create table public.profiles (
   updated_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now()
 );
-
 create table public.hero_definitions (
   id text primary key,
   slug text unique not null,
@@ -46,7 +41,6 @@ create table public.hero_definitions (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-
 create table public.player_heroes (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(user_id) on delete cascade,
@@ -58,7 +52,6 @@ create table public.player_heroes (
   updated_at timestamptz not null default now(),
   unique (user_id, hero_definition_id)
 );
-
 create table public.player_currencies (
   user_id uuid not null references public.profiles(user_id) on delete cascade,
   currency_code text not null check (currency_code in ('gold', 'gem', 'upgrade_jelly')),
@@ -66,7 +59,6 @@ create table public.player_currencies (
   updated_at timestamptz not null default now(),
   primary key (user_id, currency_code)
 );
-
 create table public.player_teams (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(user_id) on delete cascade,
@@ -78,7 +70,6 @@ create table public.player_teams (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-
 create table public.team_members (
   team_id uuid not null references public.player_teams(id) on delete cascade,
   slot_index smallint not null check (slot_index between 1 and 3),
@@ -86,7 +77,6 @@ create table public.team_members (
   primary key (team_id, slot_index),
   unique (team_id, player_hero_id)
 );
-
 create table public.summon_banners (
   id text primary key,
   display_name text not null,
@@ -99,14 +89,12 @@ create table public.summon_banners (
   updated_at timestamptz not null default now(),
   check (ends_at is null or starts_at is null or ends_at > starts_at)
 );
-
 create table public.summon_pool_entries (
   banner_id text not null references public.summon_banners(id) on delete cascade,
   hero_definition_id text not null references public.hero_definitions(id),
   weight integer not null check (weight > 0),
   primary key (banner_id, hero_definition_id)
 );
-
 create table public.player_summon_state (
   user_id uuid not null references public.profiles(user_id) on delete cascade,
   banner_id text not null references public.summon_banners(id) on delete cascade,
@@ -115,7 +103,6 @@ create table public.player_summon_state (
   updated_at timestamptz not null default now(),
   primary key (user_id, banner_id)
 );
-
 create table public.summon_history (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(user_id) on delete cascade,
@@ -130,7 +117,6 @@ create table public.summon_history (
   created_at timestamptz not null default now(),
   unique (user_id, idempotency_key)
 );
-
 create table public.reward_ledger (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(user_id) on delete cascade,
@@ -141,7 +127,6 @@ create table public.reward_ledger (
   created_at timestamptz not null default now(),
   unique (user_id, reward_identity)
 );
-
 create table public.afk_state (
   user_id uuid primary key references public.profiles(user_id) on delete cascade,
   last_activity_at timestamptz not null default now(),
@@ -149,7 +134,6 @@ create table public.afk_state (
   rate_version integer not null default 1 check (rate_version > 0),
   updated_at timestamptz not null default now()
 );
-
 create table public.afk_claims (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(user_id) on delete cascade,
@@ -168,7 +152,6 @@ create table public.afk_claims (
     or (status = 'claimed' and claimed_at is not null)
   )
 );
-
 create index profiles_last_seen_at_idx on public.profiles (last_seen_at);
 create index player_heroes_user_id_idx on public.player_heroes (user_id);
 create index player_heroes_user_definition_idx
@@ -187,7 +170,6 @@ create index afk_claims_user_status_idx on public.afk_claims (user_id, status);
 create unique index afk_claims_claim_idempotency_idx
   on public.afk_claims (user_id, claim_idempotency_key)
   where claim_idempotency_key is not null;
-
 create function private.set_updated_at()
 returns trigger
 language plpgsql
@@ -199,7 +181,6 @@ begin
   return new;
 end;
 $$;
-
 create trigger profiles_set_updated_at
 before update on public.profiles
 for each row execute function private.set_updated_at();
@@ -224,5 +205,4 @@ for each row execute function private.set_updated_at();
 create trigger afk_state_set_updated_at
 before update on public.afk_state
 for each row execute function private.set_updated_at();
-
 revoke all on function private.set_updated_at() from public, anon, authenticated;

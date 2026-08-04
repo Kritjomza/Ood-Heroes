@@ -173,6 +173,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      mmo_world_checkpoints: {
+        Row: {
+          account_id: string;
+          channel_hint: string | null;
+          checkpointed_at: string;
+          payload: Json;
+          revision: number;
+          sanctuary_id: string;
+          zone_id: string;
+        };
+        Insert: {
+          account_id: string;
+          channel_hint?: string | null;
+          checkpointed_at?: string;
+          payload?: Json;
+          revision: number;
+          sanctuary_id: string;
+          zone_id: string;
+        };
+        Update: {
+          account_id?: string;
+          channel_hint?: string | null;
+          checkpointed_at?: string;
+          payload?: Json;
+          revision?: number;
+          sanctuary_id?: string;
+          zone_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'mmo_world_checkpoints_account_id_fkey';
+            columns: ['account_id'];
+            isOneToOne: true;
+            referencedRelation: 'profiles';
+            referencedColumns: ['user_id'];
+          },
+        ];
+      };
       player_currencies: {
         Row: {
           balance: number;
@@ -576,6 +614,120 @@ export type Database = {
           },
         ];
       };
+      mmo_account_progression: {
+        Row: {
+          account_id: string;
+          adventure_experience: number;
+          adventure_rank: number;
+          revision: number;
+          updated_at: string;
+        };
+        Insert: {
+          account_id: string;
+          adventure_experience?: number;
+          adventure_rank?: number;
+          revision?: number;
+          updated_at?: string;
+        };
+        Update: {
+          account_id?: string;
+          adventure_experience?: number;
+          adventure_rank?: number;
+          revision?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      mmo_hero_progression: {
+        Row: {
+          account_id: string;
+          experience: number;
+          hero_id: string;
+          level: number;
+          revision: number;
+          updated_at: string;
+        };
+        Insert: {
+          account_id: string;
+          experience?: number;
+          hero_id: string;
+          level?: number;
+          revision?: number;
+          updated_at?: string;
+        };
+        Update: {
+          account_id?: string;
+          experience?: number;
+          hero_id?: string;
+          level?: number;
+          revision?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      mmo_reward_ledger: {
+        Row: {
+          account_id: string;
+          committed_at: string | null;
+          payload: Json;
+          prepared_at: string;
+          reward_identity: string;
+          status: string;
+        };
+        Insert: {
+          account_id: string;
+          committed_at?: string | null;
+          payload: Json;
+          prepared_at?: string;
+          reward_identity: string;
+          status: string;
+        };
+        Update: {
+          account_id?: string;
+          committed_at?: string | null;
+          payload?: Json;
+          prepared_at?: string;
+          reward_identity?: string;
+          status?: string;
+        };
+        Relationships: [];
+      };
+      mmo_parties: {
+        Row: { party_id: string; leader_account_id: string; revision: number; updated_at: string };
+        Insert: { party_id: string; leader_account_id: string; revision?: number; updated_at?: string };
+        Update: { party_id?: string; leader_account_id?: string; revision?: number; updated_at?: string };
+        Relationships: [];
+      };
+      mmo_party_members: {
+        Row: { party_id: string; account_id: string; joined_at: string };
+        Insert: { party_id: string; account_id: string; joined_at?: string };
+        Update: { party_id?: string; account_id?: string; joined_at?: string };
+        Relationships: [];
+      };
+      mmo_party_invites: {
+        Row: { party_id: string; target_account_id: string; invited_by: string; status: string; created_at: string };
+        Insert: { party_id: string; target_account_id: string; invited_by: string; status?: string; created_at?: string };
+        Update: { party_id?: string; target_account_id?: string; invited_by?: string; status?: string; created_at?: string };
+        Relationships: [];
+      };
+      mmo_friend_consents: {
+        Row: { from_account_id: string; to_account_id: string; granted_at: string };
+        Insert: { from_account_id: string; to_account_id: string; granted_at?: string };
+        Update: { from_account_id?: string; to_account_id?: string; granted_at?: string };
+        Relationships: [];
+      };
+      mmo_private_instances: {
+        Row: { instance_id: string; kind: string; leader_account_id: string; status: string; checkpoint_revision: number; checkpoint_payload: Json; revive_tokens: number; world_revision: number; updated_at: string };
+        Insert: { instance_id: string; kind: string; leader_account_id: string; status: string; checkpoint_revision?: number; checkpoint_payload?: Json; revive_tokens?: number; world_revision?: number; updated_at?: string };
+        Update: { instance_id?: string; kind?: string; leader_account_id?: string; status?: string; checkpoint_revision?: number; checkpoint_payload?: Json; revive_tokens?: number; world_revision?: number; updated_at?: string };
+        Relationships: [];
+      };
+      mmo_instance_members: {
+        Row: { instance_id: string; account_id: string; joined_at: string };
+        Insert: { instance_id: string; account_id: string; joined_at?: string };
+        Update: { instance_id?: string; account_id?: string; joined_at?: string };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -591,6 +743,56 @@ export type Database = {
           p_user_id: string;
         };
         Returns: Json;
+      };
+      save_mmo_world_checkpoint: {
+        Args: {
+          p_account_id: string;
+          p_channel_hint: string | null;
+          p_checkpointed_at: string;
+          p_payload: Json;
+          p_revision: number;
+          p_sanctuary_id: string;
+          p_zone_id: string;
+        };
+        Returns: boolean;
+      };
+      save_mmo_progression: {
+        Args: {
+          p_account_id: string;
+          p_adventure_experience: number;
+          p_adventure_rank: number;
+          p_heroes: Json;
+          p_revision: number;
+          p_updated_at?: string;
+        };
+        Returns: boolean;
+      };
+      prepare_mmo_reward: {
+        Args: {
+          p_account_id: string;
+          p_payload: Json;
+          p_prepared_at?: string;
+          p_reward_identity: string;
+        };
+        Returns: {
+          account_id: string;
+          committed_at: string | null;
+          payload: Json;
+          prepared_at: string;
+          reward_identity: string;
+          status: string;
+        };
+      };
+      commit_mmo_reward: {
+        Args: { p_committed_at?: string; p_reward_identity: string };
+        Returns: {
+          account_id: string;
+          committed_at: string | null;
+          payload: Json;
+          prepared_at: string;
+          reward_identity: string;
+          status: string;
+        };
       };
       claim_afk_reward: {
         Args: {

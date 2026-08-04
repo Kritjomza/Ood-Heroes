@@ -1,5 +1,6 @@
 @import './ui/online/tokens.css';
 @import './ui/persistent/tokens.css';
+@import './ui/mmo/mmo-shell.css';
 
 :root {
   font-family: Inter, system-ui, sans-serif;

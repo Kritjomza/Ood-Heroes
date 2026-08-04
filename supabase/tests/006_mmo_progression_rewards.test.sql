@@ -1,0 +1,18 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(13);
+select has_table('public','mmo_account_progression','account progression exists');
+select has_table('public','mmo_hero_progression','hero progression exists');
+select has_table('public','mmo_reward_ledger','reward ledger exists');
+select has_function('public','save_mmo_progression',array['uuid','smallint','bigint','bigint','jsonb','timestamp with time zone'],'monotonic progression function exists');
+select has_function('public','prepare_mmo_reward',array['text','uuid','jsonb','timestamp with time zone'],'idempotent reward prepare exists');
+select has_function('public','commit_mmo_reward',array['text','timestamp with time zone'],'reward commit exists');
+select ok((select relrowsecurity from pg_class where oid='public.mmo_account_progression'::regclass),'account progression RLS enabled');
+select ok((select relrowsecurity from pg_class where oid='public.mmo_reward_ledger'::regclass),'reward RLS enabled');
+select is((select count(*)::integer from pg_policies where schemaname='public' and tablename='mmo_reward_ledger'),1,'reward has one ownership policy');
+select ok(has_table_privilege('authenticated','public.mmo_reward_ledger','SELECT'),'players can view pending rewards');
+select ok(not has_table_privilege('authenticated','public.mmo_reward_ledger','UPDATE'),'players cannot commit rewards');
+select ok(not has_function_privilege('authenticated','public.prepare_mmo_reward(text,uuid,jsonb,timestamptz)','EXECUTE'),'players cannot prepare rewards');
+select ok(has_function_privilege('service_role','public.commit_mmo_reward(text,timestamptz)','EXECUTE'),'server can commit rewards');
+select * from finish();
+rollback;

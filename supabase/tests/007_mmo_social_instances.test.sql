@@ -1,0 +1,17 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(12);
+select has_table('public','mmo_parties','parties exist');
+select has_table('public','mmo_party_members','party members exist');
+select has_table('public','mmo_party_invites','party invites exist');
+select has_table('public','mmo_friend_consents','friend consent exists');
+select has_table('public','mmo_private_instances','private instances exist');
+select has_table('public','mmo_instance_members','instance members exist');
+select ok((select relrowsecurity from pg_class where oid='public.mmo_parties'::regclass),'party RLS enabled');
+select ok((select relrowsecurity from pg_class where oid='public.mmo_private_instances'::regclass),'instance RLS enabled');
+select ok(has_table_privilege('authenticated','public.mmo_parties','SELECT'),'members can read parties');
+select ok(not has_table_privilege('authenticated','public.mmo_parties','INSERT'),'clients cannot mutate parties');
+select ok(not has_table_privilege('authenticated','public.mmo_private_instances','UPDATE'),'clients cannot mutate instances');
+select ok(has_table_privilege('service_role','public.mmo_instance_members','INSERT'),'server can persist instance membership');
+select * from finish();
+rollback;

@@ -2,19 +2,8 @@
 update public.afk_claims
 set status = 'claimed', claimed_at = clock_timestamp()
 where status = 'pending';
-
 update public.afk_state set last_settled_at = clock_timestamp();
-
-do $$
-begin
-  if to_regprocedure('private.player_bootstrap_legacy(uuid)') is null then
-    alter function private.player_bootstrap(uuid) rename to player_bootstrap_legacy;
-  else
-    drop function if exists private.player_bootstrap(uuid);
-  end if;
-end;
-$$;
-
+alter function private.player_bootstrap(uuid) rename to player_bootstrap_legacy;
 create function private.player_bootstrap(p_user_id uuid)
 returns jsonb
 language sql
@@ -33,11 +22,6 @@ as $$
     )
   );
 $$;
-
-revoke execute on function private.player_bootstrap(uuid) from public, anon, authenticated;
-revoke execute on function private.player_bootstrap_legacy(uuid) from public, anon, authenticated;
-grant execute on function private.player_bootstrap(uuid) to service_role;
-
 create or replace function private.summon_result(p_user_id uuid, p_history_id uuid)
 returns jsonb
 language sql
@@ -62,7 +46,6 @@ as $$
   join public.hero_definitions hd on hd.id = sh.hero_definition_id
   where sh.id = p_history_id and sh.user_id = p_user_id;
 $$;
-
 create or replace function public.prepare_afk_claim(p_user_id uuid)
 returns jsonb
 language plpgsql
@@ -130,7 +113,6 @@ begin
   return v_payload || jsonb_build_object('id', v_claim_id, 'periodStart', v_last_settled, 'periodEnd', v_now);
 end;
 $$;
-
 create or replace function public.claim_afk_reward(p_user_id uuid, p_claim_id uuid, p_idempotency_key uuid)
 returns jsonb
 language plpgsql
@@ -181,7 +163,6 @@ begin
   return v_result;
 end;
 $$;
-
 revoke execute on function public.perform_summon(uuid, text, uuid) from public, anon, authenticated;
 revoke execute on function public.prepare_afk_claim(uuid) from public, anon, authenticated;
 revoke execute on function public.claim_afk_reward(uuid, uuid, uuid) from public, anon, authenticated;

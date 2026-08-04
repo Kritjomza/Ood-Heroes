@@ -1,0 +1,10 @@
+
+> odd-tower@0.1.0 dev:client
+> vite --config apps/client/vite.config.ts --host 127.0.0.1
+
+NODE_ENV=production is not supported in the .env file. Only NODE_ENV=development is supported to create a development build of your project. If you need to set process.env.NODE_ENV, you can set it in the Vite config instead.
+
+  [32m[1mVITE[22m v8.1.5[39m  [2mready in [0m[1m951[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m4173[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m

@@ -6,7 +6,6 @@ create table private.mutation_results (
   created_at timestamptz not null default now(),
   primary key (user_id, operation, idempotency_key)
 );
-
 create function private.level_from_total_experience(p_total integer)
 returns integer
 language plpgsql
@@ -28,7 +27,6 @@ begin
   return v_level;
 end;
 $$;
-
 create function private.player_bootstrap(p_user_id uuid)
 returns jsonb
 language sql
@@ -125,7 +123,6 @@ as $$
   from public.profiles p
   where p.user_id = p_user_id;
 $$;
-
 create function public.initialize_player_account(
   p_user_id uuid,
   p_display_name text,
@@ -214,7 +211,6 @@ exception
     raise exception using errcode = 'P0001', message = 'AUTH_INVALID';
 end;
 $$;
-
 create function public.get_player_bootstrap(p_user_id uuid)
 returns jsonb
 language sql
@@ -224,7 +220,6 @@ set search_path = pg_catalog, public
 as $$
   select private.player_bootstrap(p_user_id);
 $$;
-
 create function public.update_player_profile(
   p_user_id uuid,
   p_display_name text,
@@ -253,7 +248,6 @@ begin
   return private.player_bootstrap(p_user_id);
 end;
 $$;
-
 create function public.get_summon_history(
   p_user_id uuid,
   p_limit integer default 20
@@ -282,7 +276,6 @@ as $$
     limit least(greatest(p_limit, 1), 50)
   ) history_row;
 $$;
-
 create function private.summon_result(
   p_user_id uuid,
   p_history_id uuid
@@ -321,7 +314,6 @@ as $$
   from public.summon_history sh
   where sh.id = p_history_id and sh.user_id = p_user_id;
 $$;
-
 create function public.perform_summon(
   p_user_id uuid,
   p_banner_id text,
@@ -460,7 +452,6 @@ begin
   return private.summon_result(p_user_id, v_history_id);
 end;
 $$;
-
 create function public.upgrade_hero_star(
   p_user_id uuid,
   p_player_hero_id uuid,
@@ -516,7 +507,6 @@ begin
   return v_result;
 end;
 $$;
-
 create function public.update_active_team(
   p_user_id uuid,
   p_player_hero_ids uuid[],
@@ -584,7 +574,6 @@ begin
   return v_result;
 end;
 $$;
-
 create function public.unlock_team_slot(
   p_user_id uuid,
   p_idempotency_key uuid
@@ -634,7 +623,6 @@ begin
   return v_result;
 end;
 $$;
-
 create function public.apply_combat_reward(
   p_user_id uuid,
   p_reward_identity text,
@@ -744,7 +732,6 @@ begin
   );
 end;
 $$;
-
 create function public.prepare_afk_claim(p_user_id uuid)
 returns jsonb
 language plpgsql
@@ -824,7 +811,6 @@ begin
   );
 end;
 $$;
-
 create function public.claim_afk_reward(
   p_user_id uuid,
   p_claim_id uuid,
@@ -908,7 +894,6 @@ begin
   return v_result;
 end;
 $$;
-
 create function public.update_player_activity(p_user_id uuid)
 returns void
 language sql
